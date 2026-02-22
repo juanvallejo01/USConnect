@@ -7,7 +7,6 @@ import { OverviewTab } from "@/components/admin/overview-tab"
 import { UsersTab } from "@/components/admin/users-tab"
 import { ModerationTab } from "@/components/admin/moderation-tab"
 import { AnalyticsTab } from "@/components/admin/analytics-tab"
-import { useSpark } from "@/context/spark-context"
 
 type AdminTab = "overview" | "users" | "moderation" | "analytics"
 
@@ -18,16 +17,19 @@ const adminTabs: { id: AdminTab; label: string; icon: typeof Users }[] = [
   { id: "analytics", label: "Analytics", icon: Activity },
 ]
 
-export function AdminDashboardPage() {
-  const { closeAdmin } = useSpark()
+interface AdminDashboardPageProps {
+  onClose: () => void
+}
+
+export function AdminDashboardPage({ onClose }: AdminDashboardPageProps) {
   const [activeTab, setActiveTab] = useState<AdminTab>("overview")
 
   return (
     <MobileFrame showStatusBar={false}>
-      <div className="bg-gradient-to-r from-[#C62828] to-[#1565C0] px-5 pt-12 pb-4">
+      <div className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] px-5 pt-12 pb-4">
         <div className="flex items-center gap-3">
           <button
-            onClick={closeAdmin}
+            onClick={onClose}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-all active:scale-90"
             aria-label="Go back"
           >
@@ -48,7 +50,7 @@ export function AdminDashboardPage() {
                 onClick={() => setActiveTab(id)}
                 className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                   isActive
-                    ? "bg-white text-[#C62828] shadow-sm"
+                    ? "bg-white text-[#8B5CF6] shadow-sm"
                     : "bg-white/10 text-white/80 hover:bg-white/20"
                 }`}
               >
@@ -60,7 +62,7 @@ export function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-gray-50">
         {activeTab === "overview" && <OverviewTab />}
         {activeTab === "users" && <UsersTab />}
         {activeTab === "moderation" && <ModerationTab />}

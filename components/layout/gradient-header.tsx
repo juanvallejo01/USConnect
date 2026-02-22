@@ -8,7 +8,7 @@ interface GradientHeaderProps {
 
 export function GradientHeader({ title, subtitle, rightAction }: GradientHeaderProps) {
   return (
-    <div className="relative px-6 pt-4 pb-4 bg-gradient-to-r from-[#C62828] to-[#1565C0]">
+    <div className="relative px-6 pt-4 pb-4 bg-gradient-to-r from-[#8B5CF6] to-[#EC4899]">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">{title}</h1>

@@ -6,7 +6,7 @@ import { FEED_POSTS } from "@/utils/constants"
 
 export function FeedPage() {
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-gray-50">
       <GradientHeader
         title="Campus Feed"
         subtitle="What's happening at USC"

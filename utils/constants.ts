@@ -1,9 +1,11 @@
 export const BRAND = {
   name: "Campus Circle",
-  gradientFrom: "#C62828",
-  gradientTo: "#1565C0",
-  gradientClass: "bg-gradient-to-r from-[#C62828] to-[#1565C0]",
-  gradientClassBr: "bg-gradient-to-br from-[#C62828] to-[#1565C0]",
+  gradientFrom: "#8B5CF6",
+  gradientTo: "#EC4899",
+  gradientClass: "bg-gradient-to-r from-[#8B5CF6] to-[#EC4899]",
+  gradientClassBr: "bg-gradient-to-br from-[#8B5CF6] to-[#EC4899]",
+  purple: "#8B5CF6",
+  pink: "#EC4899",
 } as const
 
 export interface UserProfile {
@@ -11,20 +13,7 @@ export interface UserProfile {
   name: string
   avatar: string
   major: string
-}
-
-export interface SparkUser extends UserProfile {
-  status: string
-  lastMessage: string
-  time: string
-  unread: boolean
-}
-
-export interface ChatMessage {
-  id: number
-  text: string
-  sent: boolean
-  time: string
+  campusRank: number
 }
 
 export interface FeedPost {
@@ -43,8 +32,10 @@ export interface FeedComment {
   id: number
   name: string
   avatar: string
-  text: string
-  time: string
+  timestamp: string
+  content: string
+  image?: string
+  likes: number
 }
 
 export const PROFILES = [
@@ -74,94 +65,30 @@ export const PROFILES = [
   },
 ] as const
 
-export const SPARKS_DATA: SparkUser[] = [
-  {
-    id: 1,
-    name: "Sarah Miller",
-    avatar: "/images/profile-1.jpg",
-    major: "Film Production",
-    status: "Looking for study partners",
-    lastMessage: "Hey! Are you going to the event tonight?",
-    time: "2m ago",
-    unread: true,
-  },
-  {
-    id: 2,
-    name: "James Chen",
-    avatar: "/images/profile-2.jpg",
-    major: "Computer Science",
-    status: "Building cool things",
-    lastMessage: "That sounds great, let's do it!",
-    time: "15m ago",
-    unread: true,
-  },
-  {
-    id: 3,
-    name: "Emily Davis",
-    avatar: "/images/profile-3.jpg",
-    major: "Art History",
-    status: "Thesis writing mode",
-    lastMessage: "Haha yeah, the lecture was so long",
-    time: "1h ago",
-    unread: false,
-  },
-  {
-    id: 4,
-    name: "Alex Rivera",
-    avatar: "/images/profile-4.jpg",
-    major: "Business Administration",
-    status: "Always down for coffee",
-    lastMessage: "See you at the library tomorrow?",
-    time: "3h ago",
-    unread: false,
-  },
-]
-
-export const CHAT_DATA: Record<number, { name: string; avatar: string; messages: ChatMessage[] }> = {
-  1: {
-    name: "Sarah Miller",
-    avatar: "/images/profile-1.jpg",
-    messages: [
-      { id: 1, text: "Hey! I saw you're in the film program too?", sent: false, time: "4:30 PM" },
-      { id: 2, text: "Yeah! I'm focusing on cinematography. What about you?", sent: true, time: "4:31 PM" },
-      { id: 3, text: "That's awesome! I'm more into editing and post-production.", sent: false, time: "4:32 PM" },
-      { id: 4, text: "We should collaborate on a project sometime!", sent: true, time: "4:33 PM" },
-      { id: 5, text: "Hey! Are you going to the event tonight?", sent: false, time: "4:45 PM" },
-    ],
-  },
-  2: {
-    name: "James Chen",
-    avatar: "/images/profile-2.jpg",
-    messages: [
-      { id: 1, text: "Dude, that hackathon was insane", sent: false, time: "2:10 PM" },
-      { id: 2, text: "Right?! I can't believe we pulled it off", sent: true, time: "2:12 PM" },
-      { id: 3, text: "That sounds great, let's do it!", sent: false, time: "2:15 PM" },
-    ],
-  },
-  3: {
-    name: "Emily Davis",
-    avatar: "/images/profile-3.jpg",
-    messages: [
-      { id: 1, text: "Did you finish the art history essay?", sent: false, time: "11:20 AM" },
-      { id: 2, text: "Almost! Just need the conclusion", sent: true, time: "11:25 AM" },
-      { id: 3, text: "Haha yeah, the lecture was so long", sent: false, time: "11:30 AM" },
-    ],
-  },
-  4: {
-    name: "Alex Rivera",
-    avatar: "/images/profile-4.jpg",
-    messages: [
-      { id: 1, text: "Want to study for midterms together?", sent: false, time: "9:00 AM" },
-      { id: 2, text: "Sure! Library at 3?", sent: true, time: "9:05 AM" },
-      { id: 3, text: "See you at the library tomorrow?", sent: false, time: "9:10 AM" },
-    ],
-  },
+export interface SparkUser {
+  id: number
+  name: string
+  avatar: string
+  major: string
+  status: string
+  lastMessage: string
+  time: string
+  unread: boolean
 }
+
+export const USERS_DATA: UserProfile[] = [
+  { id: 1, name: "Sarah Miller", avatar: "/images/profile-1.jpg", major: "Film Production", campusRank: 2847 },
+  { id: 2, name: "James Chen", avatar: "/images/profile-2.jpg", major: "Computer Science", campusRank: 2691 },
+  { id: 3, name: "Emily Davis", avatar: "/images/profile-3.jpg", major: "Art History", campusRank: 2503 },
+  { id: 4, name: "Alex Rivera", avatar: "/images/profile-4.jpg", major: "Business Administration", campusRank: 2389 },
+  { id: 5, name: "Jordan Lee", avatar: "/images/profile-5.jpg", major: "Psychology", campusRank: 2201 },
+  { id: 6, name: "Taylor Kim", avatar: "/images/profile-6.jpg", major: "Engineering", campusRank: 2098 },
+]
 
 export const FEED_POSTS: FeedPost[] = [
   {
     id: 1,
-    user: { id: 1, name: "Sarah Miller", major: "Film Production", avatar: "/images/profile-1.jpg" },
+    user: { id: 1, name: "Sarah Miller", major: "Film Production", avatar: "/images/profile-1.jpg", campusRank: 2847 },
     timestamp: "2h ago",
     content: "Caught the most incredible sunset over campus today. This is why I love USC.",
     image: "/images/feed-post-1.jpg",
@@ -169,13 +96,13 @@ export const FEED_POSTS: FeedPost[] = [
     connects: 8,
     discussions: 5,
     comments: [
-      { id: 1, name: "James Chen", avatar: "/images/profile-2.jpg", text: "This is stunning! What camera did you use?", time: "1h ago" },
-      { id: 2, name: "Emily Davis", avatar: "/images/profile-3.jpg", text: "Golden hour on campus hits different", time: "45m ago" },
+      { id: 1, name: "James Chen", avatar: "/images/profile-2.jpg", timestamp: "1h ago", content: "This is stunning! What camera did you use?", likes: 3 },
+      { id: 2, name: "Emily Davis", avatar: "/images/profile-3.jpg", timestamp: "45m ago", content: "Golden hour on campus hits different", likes: 2 },
     ],
   },
   {
     id: 2,
-    user: { id: 2, name: "James Chen", major: "Computer Science", avatar: "/images/profile-2.jpg" },
+    user: { id: 2, name: "James Chen", major: "Computer Science", avatar: "/images/profile-2.jpg", campusRank: 2691 },
     timestamp: "4h ago",
     content: "Study group for midterms anyone? We got snacks, good vibes, and a whiteboard full of algorithms.",
     image: "/images/feed-post-2.jpg",
@@ -183,12 +110,12 @@ export const FEED_POSTS: FeedPost[] = [
     connects: 12,
     discussions: 8,
     comments: [
-      { id: 1, name: "Alex Rivera", avatar: "/images/profile-4.jpg", text: "Count me in! Which floor?", time: "3h ago" },
+      { id: 1, name: "Alex Rivera", avatar: "/images/profile-4.jpg", timestamp: "3h ago", content: "Count me in! Which floor?", likes: 1 },
     ],
   },
   {
     id: 3,
-    user: { id: 3, name: "Emily Davis", major: "Art History", avatar: "/images/profile-3.jpg" },
+    user: { id: 3, name: "Emily Davis", major: "Art History", avatar: "/images/profile-3.jpg", campusRank: 2503 },
     timestamp: "6h ago",
     content: "Just finished my thesis draft on Baroque influence in modern street art. 47 pages later and I can finally breathe. Anyone else pulling all-nighters this week?",
     sparks: 28,

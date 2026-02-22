@@ -36,7 +36,7 @@ export function GradientButton({
 
   return (
     <button
-      className={`${base} bg-gradient-to-r from-[#C62828] to-[#1565C0] text-white ${className}`}
+      className={`${base} bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] text-white ${className}`}
       {...props}
     >
       {children}
