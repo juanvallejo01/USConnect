@@ -1,8 +1,6 @@
-import { Users, Activity, Heart, Newspaper, TrendingUp, Bell } from "lucide-react"
+import { Users, Activity, Heart, MessageSquare, TrendingUp, Percent } from "lucide-react"
 import { StatCard } from "./stat-card"
-import { useRank } from "@/context/rank-context"
-import { useMatch } from "@/context/match-context"
-import { useNotification } from "@/context/notification-context"
+import { useAdminStats } from "@/hooks/use-admin-stats"
 
 const recentActivity = [
   { text: "New user registered: Taylor Kim", time: "5m ago", type: "user" },
@@ -12,23 +10,37 @@ const recentActivity = [
 ]
 
 export function OverviewTab() {
-  const { averageLikes } = useRank()
-  const { likes, matches } = useMatch()
-  const { notifications } = useNotification()
+  const { stats, isLoading, error } = useAdminStats()
   
-  const stats = [
-    { label: "Total Users", value: "2,847", icon: Users, color: "from-[#8B5CF6] to-[#EC4899]" },
-    { label: "Active Today", value: "412", icon: Activity, color: "from-[#EC4899] to-[#F97316]" },
-    { label: "Total Likes", value: likes.length.toString(), icon: Heart, color: "from-[#EC4899] to-[#EF4444]" },
-    { label: "Total Matches", value: matches.length.toString(), icon: TrendingUp, color: "from-[#8B5CF6] to-[#6366F1]" },
-    { label: "Notifications", value: notifications.length.toString(), icon: Bell, color: "from-[#F59E0B] to-[#EC4899]" },
-    { label: "Avg Likes", value: Math.round(averageLikes).toString(), icon: Heart, color: "from-[#8B5CF6] to-[#A855F7]" },
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-sm text-gray-500">Loading statistics...</div>
+      </div>
+    )
+  }
+
+  if (error || !stats) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-sm text-red-500">{error || "Failed to load statistics"}</div>
+      </div>
+    )
+  }
+
+  const adminStats = [
+    { label: "Total Users", value: stats.totalUsers.toString(), icon: Users, color: "from-[#8B5CF6] to-[#EC4899]" },
+    { label: "Active Users", value: stats.activeUsers.toString(), icon: Activity, color: "from-[#EC4899] to-[#F97316]" },
+    { label: "Total Likes", value: stats.totalLikes.toString(), icon: Heart, color: "from-[#EC4899] to-[#EF4444]" },
+    { label: "Total Matches", value: stats.totalMatches.toString(), icon: TrendingUp, color: "from-[#8B5CF6] to-[#6366F1]" },
+    { label: "Messages", value: stats.totalMessages.toString(), icon: MessageSquare, color: "from-[#F59E0B] to-[#EC4899]" },
+    { label: "Match Rate", value: `${Math.round(stats.matchRate * 100)}%`, icon: Percent, color: "from-[#8B5CF6] to-[#A855F7]" },
   ]
 
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="grid grid-cols-2 gap-3">
-        {stats.map((stat) => (
+        {adminStats.map((stat) => (
           <StatCard key={stat.label} {...stat} />
         ))}
       </div>

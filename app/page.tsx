@@ -34,13 +34,13 @@ export default function Home() {
 }
 
 function AppShell() {
-  const { isLoggedIn } = useAuth()
+  const { isLoggedIn, user } = useAuth()
   const { activeUserId, closeChat } = useChat()
   const [activeTab, setActiveTab] = useState<Tab>("explore")
   const [showAdmin, setShowAdmin] = useState(false)
   
-  // Check if user is admin (you can add real logic here)
-  const isAdmin = true
+  // Check if user is admin based on role from backend
+  const isAdmin = user?.role === 'ADMIN'
 
   if (!isLoggedIn) {
     return <AuthPage />
