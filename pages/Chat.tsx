@@ -94,14 +94,14 @@ export function ChatPage() {
             disabled={!canSend}
             className={`flex-1 rounded-full border px-5 py-3 text-sm outline-none transition-all duration-300 ${
               canSend
-                ? "border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-500 focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20 focus:bg-white"
+                ? "border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-500 focus:border-[#3C5E82] focus:ring-2 focus:ring-[#3C5E82]/20 focus:bg-white"
                 : "border-gray-200 bg-gray-100 text-gray-400 placeholder:text-gray-400 cursor-not-allowed"
             }`}
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || !canSend}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] shadow-md transition-all duration-300 hover:shadow-lg active:scale-90 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed disabled:active:scale-100"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] shadow-md transition-all duration-300 hover:shadow-lg active:scale-90 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed disabled:active:scale-100"
             aria-label="Send message"
           >
             <Send size={18} className="text-white ml-0.5" />

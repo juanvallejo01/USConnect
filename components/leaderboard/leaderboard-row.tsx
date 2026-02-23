@@ -24,7 +24,7 @@ export function LeaderboardRow({
     <div
       className={`flex items-center gap-3 rounded-2xl p-4 ${
         isTopThree
-          ? "bg-gradient-to-r from-[#8B5CF6]/10 to-[#EC4899]/10 border border-purple-200 shadow-md"
+          ? "bg-gradient-to-r from-[#3C5E82]/10 to-[#5E82AC]/10 border border-[#5E82AC]/30 shadow-md"
           : "bg-white border border-gray-100 shadow-sm"
       }`}
     >
@@ -43,7 +43,7 @@ export function LeaderboardRow({
       <div
         className={`rounded-full px-3 py-1.5 ${
           isTopThree
-            ? "bg-gradient-to-r from-[#8B5CF6] to-[#EC4899]"
+            ? "bg-gradient-to-r from-[#3C5E82] to-[#5E82AC]"
             : "bg-gray-100"
         }`}
       >

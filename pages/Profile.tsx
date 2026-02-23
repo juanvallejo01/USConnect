@@ -40,11 +40,11 @@ export function ProfilePage() {
 
       <div className="flex flex-col items-center px-6 py-6">
         <div className="relative mb-5">
-          <div className="relative h-28 w-28 rounded-full overflow-hidden ring-4 ring-[#8B5CF6]/10 ring-offset-4 ring-offset-gray-50">
+          <div className="relative h-28 w-28 rounded-full overflow-hidden ring-4 ring-[#3C5E82]/10 ring-offset-4 ring-offset-gray-50">
             <Image src="/images/swipe-profile.jpg" alt="Your profile photo" fill className="object-cover" />
           </div>
           <button
-            className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] shadow-md transition-all active:scale-90"
+            className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] shadow-md transition-all active:scale-90"
             aria-label="Change profile photo"
           >
             <Camera size={16} className="text-white" />
@@ -54,7 +54,7 @@ export function ProfilePage() {
         <p className="text-sm text-gray-500 mt-0.5">USC Film School</p>
         
         {/* Likes Received Badge */}
-        <div className="mt-4 flex items-center gap-2 rounded-full bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] px-4 py-2 shadow-lg">
+        <div className="mt-4 flex items-center gap-2 rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] px-4 py-2 shadow-lg">
           <Heart size={16} className="text-white" fill="white" />
           <span className="text-sm font-bold text-white">{likesReceived} {likesReceived === 1 ? 'Like' : 'Likes'}</span>
         </div>
@@ -69,7 +69,7 @@ export function ProfilePage() {
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           rows={3}
-          className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-900 placeholder:text-gray-500 outline-none transition-all focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20 resize-none leading-relaxed"
+          className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-900 placeholder:text-gray-500 outline-none transition-all focus:border-[#3C5E82] focus:ring-2 focus:ring-[#3C5E82]/20 resize-none leading-relaxed"
         />
       </div>
 
@@ -84,8 +84,8 @@ export function ProfilePage() {
                 onClick={() => toggleInterest(interest)}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-all active:scale-95 ${
                   isSelected
-                    ? "bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] text-white shadow-md"
-                    : "bg-white text-gray-500 border border-gray-200 hover:border-[#8B5CF6]/30"
+                    ? "bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white shadow-md"
+                    : "bg-white text-gray-500 border border-gray-200 hover:border-[#3C5E82]/30"
                 }`}
               >
                 {interest}

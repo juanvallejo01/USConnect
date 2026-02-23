@@ -38,6 +38,7 @@ export function PostCard({
   onUnlike,
   onComment,
   onDelete,
+  onUserClick,
 }: { 
   post: Post
   currentUserId: string
@@ -45,6 +46,7 @@ export function PostCard({
   onUnlike: (postId: string) => void
   onComment: (postId: string, content: string) => void
   onDelete?: (postId: string) => void
+  onUserClick?: (userId: string) => void
 }) {
   const [showComments, setShowComments] = useState(false)
   const [commentInput, setCommentInput] = useState("")
@@ -99,11 +101,23 @@ export function PostCard({
   const isOwnPost = post.user.id === currentUserId
 
   return (
-    <div className="rounded-3xl bg-white border border-gray-200 shadow-sm overflow-hidden">
-      <div className="flex items-center gap-3 px-5 pt-5 pb-3">
-        <UserAvatar src="/images/swipe-profile.jpg" alt={`${post.user.name}'s avatar`} />
+    <div className="bg-white border-b border-gray-100">
+      <div className="flex items-center gap-3 px-4 py-3">
+        <div
+          onClick={() => onUserClick?.(post.user.id)}
+          className="cursor-pointer"
+        >
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+            {post.user.name.charAt(0)}
+          </div>
+        </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900">{post.user.name}</h3>
+          <h3
+            onClick={() => onUserClick?.(post.user.id)}
+            className="text-sm font-semibold text-gray-900 cursor-pointer hover:underline"
+          >
+            {post.user.name}
+          </h3>
           <p className="text-xs text-gray-500">
             {post.user.major} &middot; {getRelativeTime(post.createdAt)}
           </p>
@@ -119,28 +133,24 @@ export function PostCard({
         )}
       </div>
 
-      <div className="px-5 pb-3">
-        <p className="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">{post.content}</p>
-      </div>
-
       {post.imageUrl && (
-        <div className="relative w-full aspect-[4/3]">
+        <div className="relative w-full aspect-square">
           <Image src={post.imageUrl} alt="Post image" fill className="object-cover" />
         </div>
       )}
 
-      <div className="flex items-center gap-1 px-5 py-3 border-t border-gray-200">
+      <div className="flex items-center gap-1 px-4 py-2">
         <button
           onClick={handleLike}
           className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all active:scale-95 ${
             post.isLiked
-              ? "bg-gradient-to-r from-pink-50 to-purple-50 text-pink-600"
+              ? "bg-gradient-to-r from-[#3C5E82]/10 to-[#5E82AC]/10 text-[#3C5E82]"
               : "hover:bg-gray-50 text-gray-600"
           }`}
         >
           <Heart
             size={18}
-            className={post.isLiked ? "fill-pink-600" : ""}
+            className={post.isLiked ? "fill-[#3C5E82]" : ""}
             strokeWidth={post.isLiked ? 0 : 2}
           />
           <span className="text-sm font-medium">{post.likesCount}</span>
@@ -164,8 +174,17 @@ export function PostCard({
         </button>
       </div>
 
+      {post.content && (
+        <div className="px-4 pb-2">
+          <p className="text-sm text-gray-900 leading-relaxed">
+            <span className="font-semibold">{post.user.name}</span>{" "}
+            <span className="whitespace-pre-wrap">{post.content}</span>
+          </p>
+        </div>
+      )}
+
       {showComments && (
-        <div className="border-t border-gray-200 px-5 py-4 bg-gray-50">
+        <div className="px-4 py-3 bg-gray-50/50">
           {comments.length > 0 ? (
             <div className="space-y-3 mb-4">
               {comments.map((comment) => (
@@ -197,12 +216,12 @@ export function PostCard({
                 }
               }}
               placeholder="Add a comment..."
-              className="flex-1 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm outline-none transition-all focus:border-purple-300 focus:ring-2 focus:ring-purple-100"
+              className="flex-1 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm outline-none transition-all focus:border-[#5E82AC] focus:ring-2 focus:ring-[#5E82AC]/20"
             />
             <button
               onClick={handleAddComment}
               disabled={!commentInput.trim()}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white transition-all active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send size={16} />
             </button>

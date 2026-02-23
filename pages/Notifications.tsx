@@ -31,7 +31,7 @@ export function NotificationsPage() {
           <div className="p-4 flex justify-end">
             <button
               onClick={markAllAsRead}
-              className="text-sm text-purple-600 hover:text-purple-700 font-medium transition-colors"
+              className="text-sm text-[#3C5E82] hover:text-[#3C5E82]/80 font-medium transition-colors"
             >
               Mark all as read
             </button>
@@ -56,7 +56,7 @@ export function NotificationsPage() {
                 key={notification.id}
                 className={`bg-white rounded-3xl p-5 shadow-sm border border-gray-100 transition-all duration-300 ${
                   !notification.read 
-                    ? "ring-2 ring-purple-200 bg-gradient-to-br from-purple-50/50 to-pink-50/50" 
+                    ? "ring-2 ring-[#5E82AC]/30 bg-gradient-to-br from-[#3C5E82]/5 to-[#5E82AC]/5" 
                     : ""
                 }`}
               >
@@ -69,7 +69,7 @@ export function NotificationsPage() {
                       className="w-14 h-14 rounded-full object-cover"
                     />
                     {!notification.read && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full border-2 border-white" />
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] rounded-full border-2 border-white" />
                     )}
                   </div>
 
@@ -91,7 +91,7 @@ export function NotificationsPage() {
                     {/* Action button */}
                     <button
                       onClick={() => handleStartChat(notification.matchedWithId, notification.id)}
-                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2.5 px-4 rounded-full font-medium text-sm flex items-center justify-center gap-2 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 active:scale-95"
+                      className="w-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white py-2.5 px-4 rounded-full font-medium text-sm flex items-center justify-center gap-2 hover:from-[#3C5E82]/90 hover:to-[#5E82AC]/90 transition-all duration-300 active:scale-95"
                     >
                       <MessageCircle className="w-4 h-4" />
                       Start Chat

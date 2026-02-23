@@ -5,7 +5,9 @@ import { Plus, X, Image as ImageIcon, Trash2 } from "lucide-react"
 import Image from "next/image"
 import { GradientHeader } from "@/components/layout/gradient-header"
 import { PostCard } from "@/components/feed/post-card"
+import { UserProfile } from "./UserProfile"
 import { useAuth } from "@/context/auth-context"
+import { FEED_POSTS } from "@/utils/constants"
 
 interface Post {
   id: string
@@ -27,6 +29,7 @@ export function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreatePost, setShowCreatePost] = useState(false)
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [newPostContent, setNewPostContent] = useState("")
   const [selectedImages, setSelectedImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -41,7 +44,24 @@ export function FeedPage() {
   const loadFeed = async () => {
     try {
       setLoading(true)
-      setPosts([])
+      const token = localStorage.getItem('accessToken')
+      if (!token) {
+        setLoading(false)
+        return
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/feed`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setPosts(data)
+      } else {
+        console.error("Failed to load feed")
+      }
     } catch (error) {
       console.error("Failed to load feed:", error)
     } finally {
@@ -100,42 +120,178 @@ export function FeedPage() {
   }
 
   const handleCreatePost = async () => {
-    if ((!newPostContent.trim() && selectedImages.length === 0) || creating) return
+    if (creating) return
+    
+    // Validación: Si hay descripción, debe haber imagen
+    if (newPostContent.trim() && selectedImages.length === 0) {
+      alert('Please add an image to your post')
+      return
+    }
+
+    // Validación: Debe haber al menos imagen o texto
+    if (!newPostContent.trim() && selectedImages.length === 0) {
+      alert('Please add content or an image to your post')
+      return
+    }
+    
     try {
       setCreating(true)
-      setNewPostContent("")
-      setSelectedImages([])
-      setImagePreviews([])
-      setCurrentPreviewIndex(0)
-      setShowCreatePost(false)
+      const token = localStorage.getItem('accessToken')
+      if (!token) {
+        alert('Please log in to create a post')
+        return
+      }
+
+      // Por ahora solo enviamos el contenido de texto
+      // TODO: Implementar subida de imágenes
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          content: newPostContent.trim(),
+          imageUrl: imagePreviews.length > 0 ? imagePreviews[0] : undefined,
+        }),
+      })
+
+      if (response.ok) {
+        const newPost = await response.json()
+        // Agregar el nuevo post al principio de la lista
+        setPosts([newPost, ...posts])
+        setNewPostContent("")
+        setSelectedImages([])
+        setImagePreviews([])
+        setCurrentPreviewIndex(0)
+        setShowCreatePost(false)
+      } else {
+        const error = await response.json()
+        alert(error.message || 'Failed to create post')
+      }
     } catch (error) {
       console.error("Failed to create post:", error)
+      alert('Failed to create post')
     } finally {
       setCreating(false)
     }
   }
 
   const handleLike = async (postId: string) => {
-    setPosts(posts.map((p) =>
-      p.id === postId ? { ...p, isLiked: true, likesCount: p.likesCount + 1 } : p
-    ))
+    try {
+      const token = localStorage.getItem('accessToken')
+      if (!token) return
+
+      // Optimistic update
+      setPosts(posts.map((p) =>
+        p.id === postId ? { ...p, isLiked: true, likesCount: p.likesCount + 1 } : p
+      ))
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/like`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) {
+        // Revert on error
+        setPosts(posts.map((p) =>
+          p.id === postId ? { ...p, isLiked: false, likesCount: p.likesCount - 1 } : p
+        ))
+      }
+    } catch (error) {
+      console.error("Failed to like post:", error)
+      // Revert on error
+      setPosts(posts.map((p) =>
+        p.id === postId ? { ...p, isLiked: false, likesCount: p.likesCount - 1 } : p
+      ))
+    }
   }
 
   const handleUnlike = async (postId: string) => {
-    setPosts(posts.map((p) =>
-      p.id === postId ? { ...p, isLiked: false, likesCount: p.likesCount - 1 } : p
-    ))
+    try {
+      const token = localStorage.getItem('accessToken')
+      if (!token) return
+
+      // Optimistic update
+      setPosts(posts.map((p) =>
+        p.id === postId ? { ...p, isLiked: false, likesCount: p.likesCount - 1 } : p
+      ))
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/like`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) {
+        // Revert on error
+        setPosts(posts.map((p) =>
+          p.id === postId ? { ...p, isLiked: true, likesCount: p.likesCount + 1 } : p
+        ))
+      }
+    } catch (error) {
+      console.error("Failed to unlike post:", error)
+      // Revert on error
+      setPosts(posts.map((p) =>
+        p.id === postId ? { ...p, isLiked: true, likesCount: p.likesCount + 1 } : p
+      ))
+    }
   }
 
   const handleComment = async (postId: string, content: string) => {
-    setPosts(posts.map((p) =>
-      p.id === postId ? { ...p, commentsCount: p.commentsCount + 1 } : p
-    ))
+    try {
+      const token = localStorage.getItem('accessToken')
+      if (!token) return
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/comment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content }),
+      })
+
+      if (response.ok) {
+        setPosts(posts.map((p) =>
+          p.id === postId ? { ...p, commentsCount: p.commentsCount + 1 } : p
+        ))
+      }
+    } catch (error) {
+      console.error("Failed to add comment:", error)
+    }
   }
 
   const handleDelete = async (postId: string) => {
     if (!confirm("Are you sure you want to delete this post?")) return
-    setPosts(posts.filter((p) => p.id !== postId))
+    
+    try {
+      const token = localStorage.getItem('accessToken')
+      if (!token) return
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        setPosts(posts.filter((p) => p.id !== postId))
+      } else {
+        alert('Failed to delete post')
+      }
+    } catch (error) {
+      console.error("Failed to delete post:", error)
+      alert('Failed to delete post')
+    }
+  }
+
+  if (selectedUserId) {
+    return <UserProfile userId={selectedUserId} onClose={() => setSelectedUserId(null)} />
   }
 
   return (
@@ -154,15 +310,31 @@ export function FeedPage() {
         }
       />
 
+      {/* Create Post Button - Sticky */}
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
+        <button
+          onClick={() => setShowCreatePost(true)}
+          className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors"
+        >
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] flex items-center justify-center flex-shrink-0">
+            <span className="text-white font-bold text-sm">
+              {user?.name?.charAt(0).toUpperCase() || "U"}
+            </span>
+          </div>
+          <span className="text-gray-500 text-sm flex-1 text-left">Share something with your campus...</span>
+          <Plus size={20} className="text-[#3C5E82]" />
+        </button>
+      </div>
+
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3C5E82]"></div>
           </div>
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="rounded-full bg-gradient-to-br from-purple-100 to-pink-100 p-6 mb-4">
-              <Plus size={32} className="text-purple-600" />
+            <div className="rounded-full bg-gradient-to-br from-[#3C5E82]/20 to-[#5E82AC]/20 p-6 mb-4">
+              <Plus size={32} className="text-[#3C5E82]" />
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">No posts yet</h3>
             <p className="text-sm text-gray-500 text-center max-w-[280px] mb-4">
@@ -170,13 +342,13 @@ export function FeedPage() {
             </p>
             <button
               onClick={() => setShowCreatePost(true)}
-              className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-medium text-sm transition-all active:scale-95"
+              className="px-6 py-2.5 bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white rounded-full font-medium text-sm transition-all active:scale-95"
             >
               Create Post
             </button>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 pb-4">
             {posts.map((post) => (
               <PostCard
                 key={post.id}
@@ -186,6 +358,7 @@ export function FeedPage() {
                 onUnlike={handleUnlike}
                 onComment={handleComment}
                 onDelete={handleDelete}
+                onUserClick={setSelectedUserId}
               />
             ))}
           </div>
@@ -209,8 +382,8 @@ export function FeedPage() {
               <h2 className="text-base font-bold text-gray-900">New Post</h2>
               <button
                 onClick={handleCreatePost}
-                disabled={(!newPostContent.trim() && selectedImages.length === 0) || creating}
-                className="px-4 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={creating || (newPostContent.trim() && selectedImages.length === 0)}
+                className="px-4 py-1.5 bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white rounded-full font-semibold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {creating ? "Posting..." : "Share"}
               </button>
@@ -218,7 +391,7 @@ export function FeedPage() {
 
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] flex items-center justify-center flex-shrink-0">
                   <span className="text-white font-bold text-sm">
                     {user?.name?.charAt(0).toUpperCase() || "U"}
                   </span>
@@ -232,11 +405,20 @@ export function FeedPage() {
               <textarea
                 value={newPostContent}
                 onChange={(e) => setNewPostContent(e.target.value)}
-                placeholder="Write a caption..."
+                placeholder={selectedImages.length > 0 ? "Write a caption..." : "Add an image first to write a caption..."}
                 rows={imagePreviews.length > 0 ? 3 : 5}
                 className="w-full border-none bg-transparent px-0 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none resize-none"
                 autoFocus
+                disabled={selectedImages.length === 0}
               />
+
+              {selectedImages.length === 0 && newPostContent.trim() && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2">
+                  <p className="text-xs text-amber-800">
+                    📸 Please add an image to post with a caption
+                  </p>
+                </div>
+              )}
 
               {imagePreviews.length > 0 && (
                 <div className="relative w-full rounded-2xl overflow-hidden mt-4 bg-gray-100">
@@ -289,7 +471,7 @@ export function FeedPage() {
                           key={index}
                           onClick={() => setCurrentPreviewIndex(index)}
                           className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all ${
-                            index === currentPreviewIndex ? "ring-2 ring-purple-600 scale-105" : "opacity-60"
+                            index === currentPreviewIndex ? "ring-2 ring-[#3C5E82] scale-105" : "opacity-60"
                           }`}
                         >
                           <Image src={preview} alt={`Thumb ${index + 1}`} fill className="object-cover" />
@@ -301,7 +483,7 @@ export function FeedPage() {
                   {imagePreviews.length < 10 && (
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full py-3 bg-white border-t border-gray-200 text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors"
+                      className="w-full py-3 bg-white border-t border-gray-200 text-sm font-medium text-[#3C5E82] hover:bg-[#5E82AC]/10 transition-colors"
                     >
                       + Add More Photos ({imagePreviews.length}/10)
                     </button>
@@ -312,11 +494,11 @@ export function FeedPage() {
               {imagePreviews.length === 0 && (
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full mt-4 rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 hover:border-purple-300 hover:bg-purple-50/50 transition-all"
+                  className="w-full mt-4 rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 hover:border-[#5E82AC] hover:bg-[#5E82AC]/5 transition-all"
                 >
                   <div className="flex flex-col items-center gap-2">
-                    <div className="p-3 rounded-full bg-gradient-to-br from-purple-100 to-pink-100">
-                      <ImageIcon size={24} className="text-purple-600" />
+                    <div className="p-3 rounded-full bg-gradient-to-br from-[#3C5E82]/20 to-[#5E82AC]/20">
+                      <ImageIcon size={24} className="text-[#3C5E82]" />
                     </div>
                     <p className="text-sm font-medium text-gray-900">Add Photos</p>
                     <p className="text-xs text-gray-500">JPG, PNG • Up to 10 photos • Max 5MB each</p>

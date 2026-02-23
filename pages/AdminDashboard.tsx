@@ -32,7 +32,7 @@ export function AdminDashboardPage({ onClose }: AdminDashboardPageProps) {
 
   return (
     <MobileFrame showStatusBar={false}>
-      <div className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] px-5 pt-12 pb-4">
+      <div className="bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] px-5 pt-12 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
@@ -65,7 +65,7 @@ export function AdminDashboardPage({ onClose }: AdminDashboardPageProps) {
                 onClick={() => setActiveTab(id)}
                 className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                   isActive
-                    ? "bg-white text-[#8B5CF6] shadow-sm"
+                    ? "bg-white text-[#3C5E82] shadow-sm"
                     : "bg-white/10 text-white/80 hover:bg-white/20"
                 }`}
               >

@@ -16,7 +16,7 @@ export function RankBadge({ rank, size = "md" }: RankBadgeProps) {
 
   return (
     <div
-      className={`${sizeClasses[size]} flex items-center justify-center rounded-full bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] shadow-sm`}
+      className={`${sizeClasses[size]} flex items-center justify-center rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] shadow-sm`}
     >
       <Trophy size={size === "sm" ? 10 : size === "md" ? 12 : 14} className="text-white" />
     </div>

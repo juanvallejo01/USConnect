@@ -78,8 +78,8 @@ export function MatchesPage() {
       <div className="flex-1 overflow-y-auto">
         {MOCK_MATCHES.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full px-6 py-12">
-            <div className="rounded-full bg-gradient-to-br from-purple-100 to-pink-100 p-6 mb-4">
-              <Heart size={48} className="text-purple-600" />
+            <div className="rounded-full bg-gradient-to-br from-[#3C5E82]/20 to-[#5E82AC]/20 p-6 mb-4">
+              <Heart size={48} className="text-[#3C5E82]" />
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">No matches yet</h3>
             <p className="text-sm text-gray-500 text-center max-w-[280px]">
@@ -92,7 +92,7 @@ export function MatchesPage() {
               <button
                 key={match.id}
                 onClick={() => handleOpenChat(match)}
-                className="w-full bg-white rounded-2xl p-4 border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-300 active:scale-98"
+                className="w-full bg-white rounded-2xl p-4 border border-gray-200 hover:border-[#5E82AC] hover:shadow-md transition-all duration-300 active:scale-98"
               >
                 <div className="flex items-center gap-3">
                   {/* Avatar */}
@@ -100,10 +100,10 @@ export function MatchesPage() {
                     <img
                       src={match.avatar}
                       alt={match.name}
-                      className="w-16 h-16 rounded-full object-cover ring-2 ring-purple-100"
+                      className="w-16 h-16 rounded-full object-cover ring-2 ring-[#5E82AC]/20"
                     />
                     {match.unread && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full border-2 border-white flex items-center justify-center">
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] rounded-full border-2 border-white flex items-center justify-center">
                         <span className="text-[10px] font-bold text-white">!</span>
                       </div>
                     )}
@@ -129,7 +129,7 @@ export function MatchesPage() {
                         {match.lastMessage}
                       </p>
                     ) : (
-                      <div className="flex items-center gap-1.5 text-purple-600">
+                      <div className="flex items-center gap-1.5 text-[#3C5E82]">
                         <MessageCircle size={14} />
                         <span className="text-sm font-medium">Start chatting</span>
                       </div>

@@ -16,7 +16,6 @@ const tabs = [
   { id: "feed" as const, label: "Feed", icon: Newspaper },
   { id: "matches" as const, label: "Matches", icon: MessageCircle },
   { id: "leaderboard" as const, label: "Rank", icon: Trophy },
-  { id: "notifications" as const, label: "Alerts", icon: Bell, showBadge: true },
   { id: "profile" as const, label: "Profile", icon: User },
 ]
 
@@ -44,14 +43,14 @@ export function BottomNav({ activeTab, onTabChange, showAdmin = false }: BottomN
               className="relative flex flex-col items-center gap-1 px-3 py-1.5 transition-colors"
             >
               {isActive && (
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 h-[3px] w-8 rounded-full bg-gradient-to-r from-[#8B5CF6] to-[#EC4899]" />
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 h-[3px] w-8 rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC]" />
               )}
               
               <div className="relative">
                 <Icon
                   size={20}
                   strokeWidth={isActive ? 2.5 : 1.8}
-                  className={isActive ? "text-[#8B5CF6]" : "text-gray-500"}
+                  className={isActive ? "text-[#3C5E82]" : "text-gray-500"}
                 />
                 {hasBadge && (
                   <div className="absolute -top-1 -right-1 flex items-center justify-center">

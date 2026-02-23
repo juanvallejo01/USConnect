@@ -87,10 +87,10 @@ export function AuthPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-6">
       <div className="w-full max-w-[390px] flex flex-col items-center gap-8">
         <div className="flex flex-col items-center gap-4">
-          <div className="flex h-20 w-20 items-center justify-center rounded-[22px] bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] shadow-lg">
+          <div className="flex h-20 w-20 items-center justify-center rounded-[22px] bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] shadow-lg">
             <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M20 4L8 12V28L20 36L32 28V12L20 4Z" fill="white" fillOpacity="0.9" />
-              <path d="M20 10L14 14V26L20 30L26 26V14L20 10Z" fill="#8B5CF6" />
+              <path d="M20 10L14 14V26L20 30L26 26V14L20 10Z" fill="#3C5E82" />
             </svg>
           </div>
           <div className="flex flex-col items-center gap-1">
@@ -125,7 +125,7 @@ export function AuthPage() {
                   placeholder="John Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-full border border-gray-200 bg-gray-50 px-5 py-3.5 text-sm text-gray-900 placeholder:text-gray-500 outline-none transition-all focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20"
+                  className="w-full rounded-full border border-gray-200 bg-gray-50 px-5 py-3.5 text-sm text-gray-900 placeholder:text-gray-500 outline-none transition-all focus:border-[#3C5E82] focus:ring-2 focus:ring-[#3C5E82]/20"
                 />
               </div>
             )}
@@ -141,7 +141,7 @@ export function AuthPage() {
                 placeholder="yourname@usc.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-full border border-gray-200 bg-gray-50 px-5 py-3.5 text-sm text-gray-900 placeholder:text-gray-500 outline-none transition-all focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20"
+                className="w-full rounded-full border border-gray-200 bg-gray-50 px-5 py-3.5 text-sm text-gray-900 placeholder:text-gray-500 outline-none transition-all focus:border-[#3C5E82] focus:ring-2 focus:ring-[#3C5E82]/20"
               />
             </div>
 
@@ -157,7 +157,7 @@ export function AuthPage() {
                   placeholder={isRegistering ? "At least 6 characters" : "Enter your password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-full border border-gray-200 bg-gray-50 px-5 py-3.5 pr-12 text-sm text-gray-900 placeholder:text-gray-500 outline-none transition-all focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20"
+                  className="w-full rounded-full border border-gray-200 bg-gray-50 px-5 py-3.5 pr-12 text-sm text-gray-900 placeholder:text-gray-500 outline-none transition-all focus:border-[#3C5E82] focus:ring-2 focus:ring-[#3C5E82]/20"
                 />
                 <button
                   type="button"
@@ -182,7 +182,7 @@ export function AuthPage() {
                   placeholder="Computer Science"
                   value={major}
                   onChange={(e) => setMajor(e.target.value)}
-                  className="w-full rounded-full border border-gray-200 bg-gray-50 px-5 py-3.5 text-sm text-gray-900 placeholder:text-gray-500 outline-none transition-all focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20"
+                  className="w-full rounded-full border border-gray-200 bg-gray-50 px-5 py-3.5 text-sm text-gray-900 placeholder:text-gray-500 outline-none transition-all focus:border-[#3C5E82] focus:ring-2 focus:ring-[#3C5E82]/20"
                 />
               </div>
             )}

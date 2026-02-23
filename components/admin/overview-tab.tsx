@@ -29,12 +29,12 @@ export function OverviewTab() {
   }
 
   const adminStats = [
-    { label: "Total Users", value: stats.totalUsers.toString(), icon: Users, color: "from-[#8B5CF6] to-[#EC4899]" },
-    { label: "Active Users", value: stats.activeUsers.toString(), icon: Activity, color: "from-[#EC4899] to-[#F97316]" },
-    { label: "Total Likes", value: stats.totalLikes.toString(), icon: Heart, color: "from-[#EC4899] to-[#EF4444]" },
-    { label: "Total Matches", value: stats.totalMatches.toString(), icon: TrendingUp, color: "from-[#8B5CF6] to-[#6366F1]" },
-    { label: "Messages", value: stats.totalMessages.toString(), icon: MessageSquare, color: "from-[#F59E0B] to-[#EC4899]" },
-    { label: "Match Rate", value: `${Math.round(stats.matchRate * 100)}%`, icon: Percent, color: "from-[#8B5CF6] to-[#A855F7]" },
+    { label: "Total Users", value: stats.totalUsers.toString(), icon: Users, color: "from-[#3C5E82] to-[#5E82AC]" },
+    { label: "Active Users", value: stats.activeUsers.toString(), icon: Activity, color: "from-[#5E82AC] to-[#F97316]" },
+    { label: "Total Likes", value: stats.totalLikes.toString(), icon: Heart, color: "from-[#5E82AC] to-[#EF4444]" },
+    { label: "Total Matches", value: stats.totalMatches.toString(), icon: TrendingUp, color: "from-[#3C5E82] to-[#6366F1]" },
+    { label: "Messages", value: stats.totalMessages.toString(), icon: MessageSquare, color: "from-[#F59E0B] to-[#5E82AC]" },
+    { label: "Match Rate", value: `${Math.round(stats.matchRate * 100)}%`, icon: Percent, color: "from-[#3C5E82] to-[#A855F7]" },
   ]
 
   return (
@@ -51,9 +51,9 @@ export function OverviewTab() {
           {recentActivity.map((item, i) => (
             <div key={i} className="flex items-center gap-3">
               <div className={`h-2 w-2 rounded-full ${
-                item.type === "user" ? "bg-[#8B5CF6]" :
-                item.type === "match" ? "bg-[#EC4899]" :
-                item.type === "like" ? "bg-pink-400" :
+                item.type === "user" ? "bg-[#3C5E82]" :
+                item.type === "match" ? "bg-[#5E82AC]" :
+                item.type === "like" ? "bg-[#5E82AC]" :
                 "bg-gray-400"
               }`} />
               <p className="flex-1 text-xs text-gray-900">{item.text}</p>
