@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, BarChart3, Users, AlertTriangle, Activity } from "lucide-react"
+import { ArrowLeft, BarChart3, Users, AlertTriangle, Activity, LogOut } from "lucide-react"
 import { MobileFrame } from "@/components/layout/mobile-frame"
 import { OverviewTab } from "@/components/admin/overview-tab"
 import { UsersTab } from "@/components/admin/users-tab"
 import { ModerationTab } from "@/components/admin/moderation-tab"
 import { AnalyticsTab } from "@/components/admin/analytics-tab"
+import { useAuth } from "@/context/auth-context"
 
 type AdminTab = "overview" | "users" | "moderation" | "analytics"
 
@@ -23,22 +24,36 @@ interface AdminDashboardPageProps {
 
 export function AdminDashboardPage({ onClose }: AdminDashboardPageProps) {
   const [activeTab, setActiveTab] = useState<AdminTab>("overview")
+  const { logout } = useAuth()
+
+  const handleLogout = async () => {
+    await logout()
+  }
 
   return (
     <MobileFrame showStatusBar={false}>
       <div className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] px-5 pt-12 pb-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-all active:scale-90"
-            aria-label="Go back"
-          >
-            <ArrowLeft size={18} className="text-white" />
-          </button>
-          <div>
-            <h1 className="text-lg font-bold text-white">Admin Dashboard</h1>
-            <p className="text-xs text-white/70">Campus Circle Management</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onClose}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-all active:scale-90"
+              aria-label="Go back"
+            >
+              <ArrowLeft size={18} className="text-white" />
+            </button>
+            <div>
+              <h1 className="text-lg font-bold text-white">Admin Dashboard</h1>
+              <p className="text-xs text-white/70">Campus Circle Management</p>
+            </div>
           </div>
+          <button
+            onClick={handleLogout}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-all active:scale-90"
+            aria-label="Logout"
+          >
+            <LogOut size={18} className="text-white" />
+          </button>
         </div>
 
         <div className="flex items-center gap-1 mt-4">

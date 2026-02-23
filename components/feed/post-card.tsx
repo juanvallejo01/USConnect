@@ -1,185 +1,214 @@
 "use client"
 
 import { useState } from "react"
-import { Heart, MessageSquare, ChevronDown, ChevronUp, Send } from "lucide-react"
+import { Heart, MessageSquare, Send, Share2, Trash2 } from "lucide-react"
 import Image from "next/image"
 import { UserAvatar } from "@/components/layout/user-avatar"
-import type { FeedPost } from "@/utils/constants"
 
-export function PostCard({ post }: { post: FeedPost }) {
-  const [liked, setLiked] = useState(false)
-  const [likeCount, setLikeCount] = useState(post.likes)
+interface Post {
+  id: string
+  content: string
+  imageUrl?: string
+  likesCount: number
+  commentsCount: number
+  isLiked: boolean
+  createdAt: string
+  user: {
+    id: string
+    name: string
+    major: string
+  }
+}
+
+interface Comment {
+  id: string
+  content: string
+  createdAt: string
+  user: {
+    id: string
+    name: string
+    major: string
+  }
+}
+
+export function PostCard({ 
+  post, 
+  currentUserId,
+  onLike,
+  onUnlike,
+  onComment,
+  onDelete,
+}: { 
+  post: Post
+  currentUserId: string
+  onLike: (postId: string) => void
+  onUnlike: (postId: string) => void
+  onComment: (postId: string, content: string) => void
+  onDelete?: (postId: string) => void
+}) {
   const [showComments, setShowComments] = useState(false)
   const [commentInput, setCommentInput] = useState("")
-  const [comments, setComments] = useState(post.comments)
+  const [comments, setComments] = useState<Comment[]>([])
+  const [loadingComments, setLoadingComments] = useState(false)
 
-  function handleLike() {
-    setLiked(!liked)
-    setLikeCount((prev) => (liked ? prev - 1 : prev + 1))
+  const handleLike = () => {
+    if (post.isLiked) {
+      onUnlike(post.id)
+    } else {
+      onLike(post.id)
+    }
   }
 
-  function handleAddComment() {
+  const handleAddComment = () => {
     if (!commentInput.trim()) return
-    setComments((prev) => [
-      ...prev,
-      {
-        id: prev.length + 10,
-        name: "You",
-        avatar: "/images/swipe-profile.jpg",
-        text: commentInput.trim(),
-        time: "Just now",
-      },
-    ])
+    onComment(post.id, commentInput.trim())
     setCommentInput("")
   }
+
+  const loadComments = async () => {
+    if (comments.length > 0) return
+    setLoadingComments(true)
+    // Load comments from API
+    // For now, empty
+    setLoadingComments(false)
+  }
+
+  const toggleComments = () => {
+    if (!showComments) {
+      loadComments()
+    }
+    setShowComments(!showComments)
+  }
+
+  const getRelativeTime = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 1) return "Just now"
+    if (diffMins < 60) return `${diffMins}m ago`
+    if (diffHours < 24) return `${diffHours}h ago`
+    if (diffDays === 1) return "Yesterday"
+    if (diffDays < 7) return `${diffDays}d ago`
+    return date.toLocaleDateString()
+  }
+
+  const isOwnPost = post.user.id === currentUserId
 
   return (
     <div className="rounded-3xl bg-white border border-gray-200 shadow-sm overflow-hidden">
       <div className="flex items-center gap-3 px-5 pt-5 pb-3">
-        <UserAvatar src={post.user.avatar} alt={`${post.user.name}'s avatar`} />
+        <UserAvatar src="/images/swipe-profile.jpg" alt={`${post.user.name}'s avatar`} />
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold text-gray-900">{post.user.name}</h3>
           <p className="text-xs text-gray-500">
-            {post.user.major} &middot; {post.timestamp}
+            {post.user.major} &middot; {getRelativeTime(post.createdAt)}
           </p>
         </div>
+        {isOwnPost && onDelete && (
+          <button
+            onClick={() => onDelete(post.id)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Delete post"
+          >
+            <Trash2 size={16} className="text-gray-400" />
+          </button>
+        )}
       </div>
 
       <div className="px-5 pb-3">
-        <p className="text-sm text-gray-900 leading-relaxed">{post.content}</p>
+        <p className="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">{post.content}</p>
       </div>
 
-      {post.image && (
+      {post.imageUrl && (
         <div className="relative w-full aspect-[4/3]">
-          <Image src={post.image} alt="Post image" fill className="object-cover" />
+          <Image src={post.imageUrl} alt="Post image" fill className="object-cover" />
         </div>
       )}
 
-      <InteractionRow
-        liked={liked}
-        likeCount={likeCount}
-        connects={post.connects}
-        commentCount={comments.length}
-        showComments={showComments}
-        onLike={handleLike}
-        onToggleComments={() => setShowComments(!showComments)}
-      />
-
-      {showComments && (
-        <CommentSection
-          comments={comments}
-          commentInput={commentInput}
-          onInputChange={setCommentInput}
-          onSubmit={handleAddComment}
-        />
-      )}
-    </div>
-  )
-}
-
-function InteractionRow({
-  liked,
-  likeCount,
-  connects,
-  commentCount,
-  showComments,
-  onLike,
-  onToggleComments,
-}: {
-  liked: boolean
-  likeCount: number
-  connects: number
-  commentCount: number
-  showComments: boolean
-  onLike: () => void
-  onToggleComments: () => void
-}) {
-  return (
-    <div className="flex items-center gap-1 px-5 py-3 border-t border-gray-200">
-      <button
-        onClick={onLike}
-        className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all active:scale-95 ${
-          liked
-            ? "bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] text-white"
-            : "bg-gray-100 text-gray-500 hover:text-gray-900"
-        }`}
-      >
-        <Heart size={14} fill={liked ? "currentColor" : "none"} />
-        {likeCount}
-      </button>
-      <div className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-500">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <line x1="19" y1="8" x2="19" y2="14" />
-          <line x1="22" y1="11" x2="16" y2="11" />
-        </svg>
-        {connects}
-      </div>
-      <button
-        onClick={onToggleComments}
-        className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors active:scale-95"
-      >
-        <MessageSquare size={14} />
-        {commentCount}
-        {showComments ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-      </button>
-    </div>
-  )
-}
-
-function CommentSection({
-  comments,
-  commentInput,
-  onInputChange,
-  onSubmit,
-}: {
-  comments: { id: number; name: string; avatar: string; text: string; time: string }[]
-  commentInput: string
-  onInputChange: (val: string) => void
-  onSubmit: () => void
-}) {
-  return (
-    <div className="border-t border-gray-200 px-5 py-3">
-      <div className="flex flex-col gap-3">
-        {comments.map((comment) => (
-          <div key={comment.id} className="flex items-start gap-2.5">
-            <UserAvatar src={comment.avatar} alt={`${comment.name}'s avatar`} size="xs" />
-            <div className="flex-1 min-w-0">
-              <div className="rounded-2xl bg-gray-100 px-3.5 py-2.5">
-                <p className="text-xs font-semibold text-gray-900">{comment.name}</p>
-                <p className="text-xs text-gray-700 leading-relaxed mt-0.5">{comment.text}</p>
-              </div>
-              <span className="text-[10px] text-gray-500 ml-3 mt-1">{comment.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-2.5 mt-3 pt-3 border-t border-gray-200">
-        <UserAvatar src="/images/swipe-profile.jpg" alt="Your avatar" size="xs" />
-        <input
-          type="text"
-          placeholder="Start a discussion..."
-          value={commentInput}
-          onChange={(e) => onInputChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault()
-              onSubmit()
-            }
-          }}
-          className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-xs text-gray-900 placeholder:text-gray-500 outline-none transition-all focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6]/20"
-        />
+      <div className="flex items-center gap-1 px-5 py-3 border-t border-gray-200">
         <button
-          onClick={onSubmit}
-          disabled={!commentInput.trim()}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] shadow-sm transition-all active:scale-90 disabled:opacity-40"
-          aria-label="Send comment"
+          onClick={handleLike}
+          className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all active:scale-95 ${
+            post.isLiked
+              ? "bg-gradient-to-r from-pink-50 to-purple-50 text-pink-600"
+              : "hover:bg-gray-50 text-gray-600"
+          }`}
         >
-          <Send size={12} className="text-white ml-0.5" />
+          <Heart
+            size={18}
+            className={post.isLiked ? "fill-pink-600" : ""}
+            strokeWidth={post.isLiked ? 0 : 2}
+          />
+          <span className="text-sm font-medium">{post.likesCount}</span>
+        </button>
+
+        <button
+          onClick={toggleComments}
+          className="flex items-center gap-2 rounded-full px-4 py-2 hover:bg-gray-50 text-gray-600 transition-all active:scale-95"
+        >
+          <MessageSquare size={18} />
+          <span className="text-sm font-medium">{post.commentsCount}</span>
+        </button>
+
+        <div className="flex-1" />
+
+        <button
+          className="flex items-center gap-2 rounded-full px-4 py-2 hover:bg-gray-50 text-gray-600 transition-all active:scale-95"
+          aria-label="Share"
+        >
+          <Share2 size={18} />
         </button>
       </div>
+
+      {showComments && (
+        <div className="border-t border-gray-200 px-5 py-4 bg-gray-50">
+          {comments.length > 0 ? (
+            <div className="space-y-3 mb-4">
+              {comments.map((comment) => (
+                <div key={comment.id} className="flex gap-2">
+                  <UserAvatar src="/images/swipe-profile.jpg" alt={comment.user.name} size="xs" />
+                  <div className="flex-1 bg-white rounded-2xl px-4 py-2 border border-gray-200">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-semibold text-gray-900">{comment.user.name}</span>
+                      <span className="text-xs text-gray-400">{getRelativeTime(comment.createdAt)}</span>
+                    </div>
+                    <p className="text-sm text-gray-700">{comment.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 text-center mb-4">No comments yet. Be the first!</p>
+          )}
+
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={commentInput}
+              onChange={(e) => setCommentInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault()
+                  handleAddComment()
+                }
+              }}
+              placeholder="Add a comment..."
+              className="flex-1 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm outline-none transition-all focus:border-purple-300 focus:ring-2 focus:ring-purple-100"
+            />
+            <button
+              onClick={handleAddComment}
+              disabled={!commentInput.trim()}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send size={16} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

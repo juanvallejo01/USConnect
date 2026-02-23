@@ -1,9 +1,9 @@
 "use client"
 
-import { Compass, Newspaper, Trophy, User, Shield, Bell } from "lucide-react"
+import { Compass, Newspaper, Trophy, User, Shield, Bell, MessageCircle } from "lucide-react"
 import { useNotification } from "@/context/notification-context"
 
-export type Tab = "explore" | "feed" | "leaderboard" | "notifications" | "profile" | "admin"
+export type Tab = "explore" | "feed" | "matches" | "leaderboard" | "notifications" | "profile" | "admin"
 
 interface BottomNavProps {
   activeTab: Tab
@@ -14,6 +14,7 @@ interface BottomNavProps {
 const tabs = [
   { id: "explore" as const, label: "Explore", icon: Compass },
   { id: "feed" as const, label: "Feed", icon: Newspaper },
+  { id: "matches" as const, label: "Matches", icon: MessageCircle },
   { id: "leaderboard" as const, label: "Rank", icon: Trophy },
   { id: "notifications" as const, label: "Alerts", icon: Bell, showBadge: true },
   { id: "profile" as const, label: "Profile", icon: User },

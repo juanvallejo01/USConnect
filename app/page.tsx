@@ -11,6 +11,7 @@ import { BottomNav, type Tab } from "@/components/navigation/bottom-nav"
 import { AuthPage } from "@/pages/Auth"
 import { ExplorePage } from "@/pages/Explore"
 import { FeedPage } from "@/pages/Feed"
+import { MatchesPage } from "@/pages/Matches"
 import { LeaderboardPage } from "@/pages/Leaderboard"
 import { NotificationsPage } from "@/pages/Notifications"
 import { ChatPage } from "@/pages/Chat"
@@ -46,10 +47,12 @@ function AppShell() {
     return <AuthPage />
   }
 
-  if (showAdmin) {
-    return <AdminDashboardPage onClose={() => setShowAdmin(false)} />
+  // Si es admin, mostrar SOLO el panel de administración
+  if (isAdmin) {
+    return <AdminDashboardPage onClose={() => {}} />
   }
 
+  // Usuarios normales: mostrar chat y navegación normal (sin admin)
   if (activeUserId !== null) {
     return (
       <MobileFrame>
@@ -62,19 +65,11 @@ function AppShell() {
     switch (activeTab) {
       case "explore": return <ExplorePage />
       case "feed": return <FeedPage />
+      case "matches": return <MatchesPage />
       case "leaderboard": return <LeaderboardPage />
       case "notifications": return <NotificationsPage />
       case "profile": return <ProfilePage />
-      case "admin": return null
       default: return <ExplorePage />
-    }
-  }
-
-  function handleTabChange(tab: Tab) {
-    if (tab === "admin") {
-      setShowAdmin(true)
-    } else {
-      setActiveTab(tab)
     }
   }
 
@@ -85,8 +80,8 @@ function AppShell() {
       </main>
       <BottomNav 
         activeTab={activeTab} 
-        onTabChange={handleTabChange}
-        showAdmin={isAdmin}
+        onTabChange={setActiveTab}
+        showAdmin={false}
       />
     </MobileFrame>
   )
