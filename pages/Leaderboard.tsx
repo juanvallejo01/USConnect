@@ -34,12 +34,21 @@ interface PostRanking {
   }
 }
 
+interface MyRank {
+  rank: number
+  id: string
+  name: string
+  major: string
+  weeklyLikes: number
+}
+
 type RankingType = 'users' | 'posts'
 
 export function LeaderboardPage() {
   const [rankingType, setRankingType] = useState<RankingType>('users')
   const [usersRanking, setUsersRanking] = useState<UserRanking[]>([])
   const [postsRanking, setPostsRanking] = useState<PostRanking[]>([])
+  const [myRank, setMyRank] = useState<MyRank | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState<UserRanking | null>(null)
   const [viewingProfile, setViewingProfile] = useState<string | null>(null)
@@ -54,11 +63,14 @@ export function LeaderboardPage() {
       const token = localStorage.getItem('accessToken')
       if (!token) return
 
-      const [usersRes, postsRes] = await Promise.all([
+      const [usersRes, postsRes, myRankRes] = await Promise.all([
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard/users`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard/posts`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard/my-rank`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
       ])
@@ -71,6 +83,11 @@ export function LeaderboardPage() {
       if (postsRes.ok) {
         const posts = await postsRes.json()
         setPostsRanking(posts)
+      }
+
+      if (myRankRes.ok) {
+        const rank = await myRankRes.json()
+        setMyRank(rank)
       }
     } catch (error) {
       console.error("Failed to load rankings:", error)
@@ -95,6 +112,9 @@ export function LeaderboardPage() {
   const currentRanking = rankingType === 'users' ? usersRanking : []
   const topThree = currentRanking.slice(0, 3)
   const restRanking = currentRanking.slice(3)
+  
+  // Check if current user is in top 10
+  const isInTop10 = myRank && myRank.rank <= 10
 
   if (viewingProfile) {
     return <UserProfile userId={viewingProfile} onClose={() => setViewingProfile(null)} />
@@ -347,6 +367,18 @@ export function LeaderboardPage() {
                   <span className="font-semibold">{selectedUser.topPost.likesCount} likes</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* My Rank Footer - Show only if user is NOT in top 10 */}
+      {rankingType === 'users' && myRank && !isInTop10 && (
+        <div className="border-t border-gray-200 bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] px-5 py-3">
+          <div className="flex items-center justify-center gap-2">
+            <p className="text-sm text-white/80">Your current rank:</p>
+            <div className="rounded-full bg-white/20 backdrop-blur-sm px-4 py-1.5">
+              <p className="text-lg font-bold text-white">#{myRank.rank}</p>
             </div>
           </div>
         </div>

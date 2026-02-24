@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Plus, X, Image as ImageIcon, Trash2 } from "lucide-react"
+import { Plus, X, Image as ImageIcon, Trash2, Lock, Crown, Star } from "lucide-react"
 import Image from "next/image"
 import { GradientHeader } from "@/components/layout/gradient-header"
 import { PostCard } from "@/components/feed/post-card"
@@ -9,18 +9,23 @@ import { UserProfile } from "./UserProfile"
 import { useAuth } from "@/context/auth-context"
 import { FEED_POSTS } from "@/utils/constants"
 
+type AccessLevel = "PUBLIC" | "SUBSCRIBERS" | "TIER_GOLD" | "TIER_PREMIUM"
+
 interface Post {
   id: string
   content: string
   imageUrl?: string
+  accessLevel: AccessLevel
   likesCount: number
   commentsCount: number
   isLiked: boolean
+  isSubscribed?: boolean
   createdAt: string
   user: {
     id: string
     name: string
     major: string
+    isCreator?: boolean
   }
 }
 
@@ -31,11 +36,14 @@ export function FeedPage() {
   const [showCreatePost, setShowCreatePost] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [newPostContent, setNewPostContent] = useState("")
+  const [accessLevel, setAccessLevel] = useState<AccessLevel>("PUBLIC")
   const [selectedImages, setSelectedImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
   const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0)
   const [creating, setCreating] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const isCreator = (user as any)?.isCreator === true
 
   useEffect(() => {
     loadFeed()
@@ -153,6 +161,7 @@ export function FeedPage() {
         body: JSON.stringify({
           content: newPostContent.trim(),
           imageUrl: imagePreviews.length > 0 ? imagePreviews[0] : undefined,
+          accessLevel,
         }),
       })
 
@@ -164,6 +173,7 @@ export function FeedPage() {
         setSelectedImages([])
         setImagePreviews([])
         setCurrentPreviewIndex(0)
+        setAccessLevel("PUBLIC")
         setShowCreatePost(false)
       } else {
         const error = await response.json()
@@ -349,18 +359,63 @@ export function FeedPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-4 pb-4">
-            {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                currentUserId={user?.id || ""}
-                onLike={handleLike}
-                onUnlike={handleUnlike}
-                onComment={handleComment}
-                onDelete={handleDelete}
-                onUserClick={setSelectedUserId}
-              />
-            ))}
+            {posts.map((post) => {
+              // Determine if this VIP post is locked for the current viewer
+              const isVip = post.accessLevel !== "PUBLIC"
+              const isOwnPost = post.user.id === user?.id
+              const isLocked = isVip && !isOwnPost && !post.isSubscribed
+
+              if (isLocked) {
+                return (
+                  <div key={post.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    {/* Blurred preview */}
+                    <div className="relative h-36 bg-gradient-to-br from-[#3C5E82]/10 to-[#5E82AC]/10 flex flex-col items-center justify-center gap-2 select-none">
+                      <div className="flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-[#3C5E82] to-[#5E82AC]">
+                        <Lock size={22} className="text-white" />
+                      </div>
+                      <p className="text-sm font-bold text-gray-700">Exclusive Content</p>
+                      <p className="text-xs text-gray-500">Subscribe to {post.user.name} to unlock</p>
+                    </div>
+                    {/* Creator info + subscribe CTA */}
+                    <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] flex items-center justify-center flex-shrink-0">
+                          <span className="text-white text-xs font-bold">{post.user.name.charAt(0)}</span>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs font-bold text-gray-900">{post.user.name}</span>
+                            <Crown size={10} className="text-amber-500" />
+                          </div>
+                          <span className="text-[10px] text-gray-400">
+                            {post.accessLevel === "TIER_GOLD" ? "⭐ Gold" : post.accessLevel === "TIER_PREMIUM" ? "👑 Premium" : "Subscribers only"}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setSelectedUserId(post.user.id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white text-xs font-semibold transition-all active:scale-95"
+                      >
+                        <Star size={11} /> Subscribe
+                      </button>
+                    </div>
+                  </div>
+                )
+              }
+
+              return (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  currentUserId={user?.id || ""}
+                  onLike={handleLike}
+                  onUnlike={handleUnlike}
+                  onComment={handleComment}
+                  onDelete={handleDelete}
+                  onUserClick={setSelectedUserId}
+                />
+              )
+            })}
           </div>
         )}
       </div>
@@ -382,7 +437,7 @@ export function FeedPage() {
               <h2 className="text-base font-bold text-gray-900">New Post</h2>
               <button
                 onClick={handleCreatePost}
-                disabled={creating || (newPostContent.trim() && selectedImages.length === 0)}
+                disabled={creating || (!!newPostContent.trim() && selectedImages.length === 0)}
                 className="px-4 py-1.5 bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white rounded-full font-semibold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {creating ? "Posting..." : "Share"}
@@ -396,10 +451,23 @@ export function FeedPage() {
                     {user?.name?.charAt(0).toUpperCase() || "U"}
                   </span>
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm font-semibold text-gray-900">{user?.name || "User"}</p>
                   <p className="text-xs text-gray-500">{(user as any)?.major || "USC Student"}</p>
                 </div>
+                {/* Access level selector — only visible for creators */}
+                {isCreator && (
+                  <select
+                    value={accessLevel}
+                    onChange={(e) => setAccessLevel(e.target.value as AccessLevel)}
+                    className="text-xs font-semibold rounded-full px-3 py-1.5 border border-gray-200 bg-white text-gray-700 outline-none focus:border-[#3C5E82] transition-colors"
+                  >
+                    <option value="PUBLIC">🌍 Public</option>
+                    <option value="SUBSCRIBERS">🔒 Subscribers</option>
+                    <option value="TIER_GOLD">⭐ Gold</option>
+                    <option value="TIER_PREMIUM">👑 Premium</option>
+                  </select>
+                )}
               </div>
 
               <textarea

@@ -6,6 +6,7 @@ import { MatchProvider } from "@/context/match-context"
 import { NotificationProvider } from "@/context/notification-context"
 import { ChatProvider, useChat } from "@/context/chat-context"
 import { RankProvider } from "@/context/rank-context"
+import { ProfilePhotosProvider } from "@/context/profile-photos-context"
 import { MobileFrame } from "@/components/layout/mobile-frame"
 import { BottomNav, type Tab } from "@/components/navigation/bottom-nav"
 import { AuthPage } from "@/pages/Auth"
@@ -21,15 +22,17 @@ import { AdminDashboardPage } from "@/pages/AdminDashboard"
 export default function Home() {
   return (
     <AuthProvider>
-      <MatchProvider>
-        <NotificationProvider>
-          <ChatProvider>
-            <RankProvider>
-              <AppShell />
-            </RankProvider>
-          </ChatProvider>
-        </NotificationProvider>
-      </MatchProvider>
+      <ProfilePhotosProvider>
+        <MatchProvider>
+          <NotificationProvider>
+            <ChatProvider>
+              <RankProvider>
+                <AppShell />
+              </RankProvider>
+            </ChatProvider>
+          </NotificationProvider>
+        </MatchProvider>
+      </ProfilePhotosProvider>
     </AuthProvider>
   )
 }
