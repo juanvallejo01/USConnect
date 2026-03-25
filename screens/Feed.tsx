@@ -305,7 +305,7 @@ export function FeedPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F8F8FA]">
+    <div className="flex flex-col h-full bg-[#FAFAFA]">
       <GradientHeader
         title="Campus Feed"
         subtitle="What's happening at USC"
@@ -321,28 +321,29 @@ export function FeedPage() {
       />
 
       {/* Create Post Button - Sticky */}
-      <div className="sticky top-0 z-10 bg-white border-b border-[#EBEBF0] px-4 py-3.5">
+      <div className="sticky top-0 z-10 bg-white border-b border-[#EBEBF0] px-4 py-3">
         <button
           onClick={() => setShowCreatePost(true)}
-          className="w-full flex items-center gap-3 px-5 py-3.5 bg-[#F8F8FA] hover:bg-[#EBEBF0] rounded-3xl transition-colors duration-300"
+          className="w-full flex items-center gap-3"
         >
-          <div className="h-10 w-10 rounded-full bg-[#4A90D9] flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">
+          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#4A90D9] to-[#357ABD] flex items-center justify-center flex-shrink-0 ring-2 ring-[#4A90D9]/20">
+            <span className="text-white font-bold text-xs">
               {user?.name?.charAt(0).toUpperCase() || "U"}
             </span>
           </div>
-          <span className="text-[#8E8E93] text-sm flex-1 text-left">Share something with your campus...</span>
-          <Plus size={20} className="text-[#4A90D9]" />
+          <div className="flex-1 text-left border border-[#DBDBDB] rounded-full px-4 py-2">
+            <span className="text-[#8E8E93] text-[13px]">What&apos;s on your mind?</span>
+          </div>
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto">
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4A90D9]"></div>
           </div>
         ) : posts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12">
+          <div className="flex flex-col items-center justify-center py-12 px-4">
             <div className="rounded-full bg-[#4A90D9]/10 p-6 mb-4">
               <Plus size={32} className="text-[#4A90D9]" />
             </div>
@@ -358,7 +359,7 @@ export function FeedPage() {
             </button>
           </div>
         ) : (
-          <div className="flex flex-col gap-4 pb-4">
+          <div className="flex flex-col">
             {posts.map((post) => {
               // Determine if this VIP post is locked for the current viewer
               const isVip = post.accessLevel !== "PUBLIC"
@@ -367,37 +368,38 @@ export function FeedPage() {
 
               if (isLocked) {
                 return (
-                  <div key={post.id} className="bg-white rounded-3xl cloud-shadow border border-[#EBEBF0] overflow-hidden">
-                    {/* Blurred preview */}
-                    <div className="relative h-36 bg-[#4A90D9]/8 flex flex-col items-center justify-center gap-2 select-none">
-                      <div className="flex items-center justify-center h-12 w-12 rounded-full bg-[#4A90D9]">
-                        <Lock size={22} className="text-white" />
+                  <div key={post.id} className="bg-white border-b border-[#EBEBF0]">
+                    {/* Creator header */}
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#4A90D9] to-[#357ABD] flex items-center justify-center flex-shrink-0 ring-2 ring-[#4A90D9]/20">
+                        <span className="text-white text-sm font-bold">{post.user.name.charAt(0)}</span>
                       </div>
-                      <p className="text-sm font-bold text-[#1A1A2E]">Exclusive Content</p>
-                      <p className="text-xs text-[#8E8E93]">Subscribe to {post.user.name} to unlock</p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[13px] font-bold text-[#1A1A2E]">{post.user.name}</span>
+                          <Crown size={12} className="text-amber-500" />
+                        </div>
+                        <span className="text-[11px] text-[#8E8E93]">
+                          {post.accessLevel === "TIER_GOLD" ? "⭐ Gold Tier" : post.accessLevel === "TIER_PREMIUM" ? "👑 Premium Tier" : "Subscribers only"}
+                        </span>
+                      </div>
                     </div>
-                    {/* Creator info + subscribe CTA */}
-                    <div className="flex items-center justify-between px-4 py-3 border-t border-[#EBEBF0]">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-[#4A90D9] flex items-center justify-center flex-shrink-0">
-                          <span className="text-white text-xs font-bold">{post.user.name.charAt(0)}</span>
+                    {/* Locked overlay */}
+                    <div className="relative w-full aspect-[4/3] bg-gradient-to-b from-[#E8EFF8] to-[#D4E2F4] flex flex-col items-center justify-center gap-3 select-none">
+                      <div className="absolute inset-0 backdrop-blur-sm bg-white/30" />
+                      <div className="relative z-10 flex flex-col items-center gap-3">
+                        <div className="flex items-center justify-center h-14 w-14 rounded-full bg-white/80 backdrop-blur-sm shadow-lg">
+                          <Lock size={24} className="text-[#4A90D9]" />
                         </div>
-                        <div>
-                          <div className="flex items-center gap-1">
-                            <span className="text-xs font-bold text-[#1A1A2E]">{post.user.name}</span>
-                            <Crown size={10} className="text-amber-500" />
-                          </div>
-                          <span className="text-[10px] text-[#C7C7CC]">
-                            {post.accessLevel === "TIER_GOLD" ? "⭐ Gold" : post.accessLevel === "TIER_PREMIUM" ? "👑 Premium" : "Subscribers only"}
-                          </span>
-                        </div>
+                        <p className="text-sm font-bold text-[#1A1A2E]">Exclusive Content</p>
+                        <p className="text-xs text-[#8E8E93]">Subscribe to {post.user.name} to unlock</p>
+                        <button
+                          onClick={() => setSelectedUserId(post.user.id)}
+                          className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#4A90D9] text-white text-xs font-bold shadow-md transition-all duration-300 active:scale-95 mt-1"
+                        >
+                          <Star size={12} /> Subscribe
+                        </button>
                       </div>
-                      <button
-                        onClick={() => setSelectedUserId(post.user.id)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#4A90D9] text-white text-xs font-semibold cloud-shadow transition-all duration-300 active:scale-95"
-                      >
-                        <Star size={11} /> Subscribe
-                      </button>
                     </div>
                   </div>
                 )
