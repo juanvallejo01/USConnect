@@ -135,7 +135,7 @@ export function SwipeCard({
       <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 z-10">
         {/* Nearby badge */}
         <div className="mb-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#1DA462] px-3 py-1.5 shadow-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#1DA462] px-3 py-1.5 shadow-sm">
             <MapPin size={11} className="text-white" fill="white" />
             <span className="text-xs font-bold text-white">Nearby</span>
           </span>
@@ -161,7 +161,7 @@ export function SwipeCard({
               {profile.interests.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-white/20 backdrop-blur-md px-3 py-1 text-xs font-medium text-white"
+                  className="rounded-xl bg-white/25 backdrop-blur-lg px-3 py-1 text-xs font-medium text-white"
                 >
                   {tag}
                 </span>
@@ -171,7 +171,7 @@ export function SwipeCard({
 
           {/* Info / expand button */}
           <button
-            className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/70 bg-white/15 backdrop-blur-sm transition-all active:scale-90"
+            className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-2xl border-2 border-white/50 bg-white/20 backdrop-blur-lg transition-all active:scale-90"
             onClick={(e) => e.stopPropagation()}
           >
             <Info size={17} className="text-white" />

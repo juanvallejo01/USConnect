@@ -20,7 +20,7 @@ const sizeMap = {
 export function UserAvatar({ src, alt, size = "md", ring = false, gradientRing = false, indicator = false }: UserAvatarProps) {
   if (gradientRing) {
     return (
-      <div className={`relative ${sizeMap[size]} rounded-full overflow-hidden p-[2px] bg-gradient-to-br from-[#C62828] to-[#1565C0]`}>
+      <div className={`relative ${sizeMap[size]} rounded-full overflow-hidden p-[2px] bg-gradient-to-br from-[#4A90D9] to-[#B8A9C9]`}>
         <div className="relative h-full w-full rounded-full overflow-hidden">
           <Image src={src} alt={alt} fill className="object-cover" />
         </div>
@@ -32,7 +32,7 @@ export function UserAvatar({ src, alt, size = "md", ring = false, gradientRing =
     <div className={`relative ${sizeMap[size]} shrink-0 rounded-full overflow-hidden ${ring ? "ring-2 ring-border ring-offset-2 ring-offset-background" : ""}`}>
       <Image src={src} alt={alt} fill className="object-cover" />
       {indicator && (
-        <div className="absolute top-0 right-0 h-3.5 w-3.5 rounded-full bg-gradient-to-r from-[#C62828] to-[#1565C0] border-2 border-card" />
+        <div className="absolute top-0 right-0 h-3 w-3 rounded-full bg-[#34C759] border-2 border-white" />
       )}
     </div>
   )

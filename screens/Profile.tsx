@@ -154,51 +154,51 @@ export function ProfilePage() {
   ]
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 overflow-y-auto">
+    <div className="flex flex-col h-full bg-[#F8F8FA] overflow-y-auto">
       {/* Header */}
       <div className="px-6 pt-4 pb-2 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
-        <button onClick={logout} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-          <LogOut size={20} className="text-gray-500" />
+        <h1 className="text-2xl font-bold text-[#1A1A2E]">Profile</h1>
+        <button onClick={logout} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#EBEBF0] transition-colors">
+          <LogOut size={20} className="text-[#8E8E93]" />
         </button>
       </div>
 
       {/* Avatar */}
       <div className="flex flex-col items-center px-6 py-4">
         <div className="relative mb-4">
-          <div className="relative h-24 w-24 rounded-full overflow-hidden ring-4 ring-[#3C5E82]/10 ring-offset-4 ring-offset-gray-50">
+          <div className="relative h-24 w-24 rounded-full overflow-hidden ring-4 ring-[#4A90D9]/10 ring-offset-4 ring-offset-[#F8F8FA]">
             <Image src={photos[0] ?? "/images/swipe-profile.jpg"} alt="Your profile photo" fill className="object-cover" />
           </div>
           <button
             onClick={() => setShowPhotoManager(true)}
-            className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] shadow-md transition-all active:scale-90"
+            className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#4A90D9] shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition-all active:scale-90"
           >
             <Camera size={14} className="text-white" />
           </button>
         </div>
         <div className="flex items-center gap-2">
-          <h2 className="text-xl font-bold text-gray-900">{user?.name || "User"}</h2>
+          <h2 className="text-xl font-bold text-[#1A1A2E]">{user?.name || "User"}</h2>
           {user?.isCreator && (
             <span className="flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-400 px-2 py-0.5 text-[10px] font-bold text-white shadow">
               <Crown size={10} /> Creator
             </span>
           )}
         </div>
-        <p className="text-sm text-gray-500 mt-0.5">{user?.major || "USC Student"}</p>
-        <div className="mt-3 flex items-center gap-2 rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] px-4 py-1.5 shadow">
+        <p className="text-sm text-[#8E8E93] mt-0.5">{user?.major || "USC Student"}</p>
+        <div className="mt-3 flex items-center gap-2 rounded-full bg-[#4A90D9] px-4 py-1.5 shadow-[0_4px_16px_rgba(74,144,217,0.2)]">
           <Heart size={14} className="text-white" fill="white" />
           <span className="text-sm font-bold text-white">{likesReceived} {likesReceived === 1 ? "Like" : "Likes"}</span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-200 mx-4 mb-1">
+      <div className="flex border-b border-[#EBEBF0] mx-4 mb-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-semibold transition-colors border-b-2 ${
-              activeTab === tab.id ? "border-[#3C5E82] text-[#3C5E82]" : "border-transparent text-gray-400 hover:text-gray-600"
+              activeTab === tab.id ? "border-[#4A90D9] text-[#4A90D9]" : "border-transparent text-[#C7C7CC] hover:text-[#8E8E93]"
             }`}
           >
             {tab.icon}
@@ -211,17 +211,17 @@ export function ProfilePage() {
       {activeTab === "account" && (
         <div className="px-6 pt-4 pb-6 flex flex-col gap-4">
           <div>
-            <label htmlFor="bio" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">About You</label>
+            <label htmlFor="bio" className="block text-xs font-semibold text-[#8E8E93] uppercase tracking-wider mb-2">About You</label>
             <textarea
               id="bio"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={3}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-900 outline-none transition-all focus:border-[#3C5E82] focus:ring-2 focus:ring-[#3C5E82]/20 resize-none leading-relaxed"
+              className="w-full rounded-2xl border border-[#EBEBF0] bg-white px-5 py-4 text-sm text-[#1A1A2E] outline-none transition-all focus:border-[#4A90D9] focus:ring-2 focus:ring-[#4A90D9]/20 resize-none leading-relaxed"
             />
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Interests</p>
+            <p className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider mb-3">Interests</p>
             <div className="flex flex-wrap gap-2.5">
               {DEFAULT_INTERESTS.map((interest) => {
                 const isSelected = selectedInterests.includes(interest)
@@ -231,8 +231,8 @@ export function ProfilePage() {
                     onClick={() => toggleInterest(interest)}
                     className={`rounded-full px-4 py-2 text-sm font-medium transition-all active:scale-95 ${
                       isSelected
-                        ? "bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white shadow-md"
-                        : "bg-white text-gray-500 border border-gray-200 hover:border-[#3C5E82]/30"
+                        ? "bg-[#4A90D9] text-white shadow-[0_4px_16px_rgba(74,144,217,0.2)]"
+                        : "bg-white text-[#8E8E93] border border-[#EBEBF0] hover:border-[#4A90D9]/30"
                     }`}
                   >
                     {interest}
@@ -245,14 +245,14 @@ export function ProfilePage() {
           {/* Photos hint */}
           <button
             onClick={() => setShowPhotoManager(true)}
-            className="flex items-center gap-3 w-full rounded-2xl border border-dashed border-[#3C5E82]/30 bg-[#3C5E82]/5 px-5 py-4 transition-all active:scale-[0.98]"
+            className="flex items-center gap-3 w-full rounded-2xl border border-dashed border-[#4A90D9]/30 bg-[#4A90D9]/5 px-5 py-4 transition-all active:scale-[0.98]"
           >
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC]">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#4A90D9]">
               <Camera size={16} className="text-white" />
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-gray-800">Editar fotos</p>
-              <p className="text-xs text-gray-400">{photos.length} foto{photos.length !== 1 ? "s" : ""} · toca para gestionar</p>
+              <p className="text-sm font-semibold text-[#1A1A2E]">Editar fotos</p>
+              <p className="text-xs text-[#C7C7CC]">{photos.length} foto{photos.length !== 1 ? "s" : ""} · toca para gestionar</p>
             </div>
           </button>
           <GradientButton fullWidth size="lg">Save Changes</GradientButton>
@@ -271,18 +271,18 @@ export function ProfilePage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Handle */}
-            <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mt-4 mb-1" />
+            <div className="w-10 h-1 bg-[#EBEBF0] rounded-full mx-auto mt-4 mb-1" />
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
-              <h3 className="text-base font-bold text-gray-900">Mis fotos</h3>
+            <div className="flex items-center justify-between px-5 py-3 border-b border-[#EBEBF0]">
+              <h3 className="text-base font-bold text-[#1A1A2E]">Mis fotos</h3>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">{photos.length}/9</span>
+                <span className="text-xs text-[#C7C7CC]">{photos.length}/9</span>
                 <button
                   onClick={() => { setShowPhotoManager(false); setShowPhotoPicker(false) }}
-                  className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-100 transition-all active:scale-90"
+                  className="h-8 w-8 flex items-center justify-center rounded-full bg-[#EBEBF0] transition-all active:scale-90"
                 >
-                  <X size={16} className="text-gray-500" />
+                  <X size={16} className="text-[#8E8E93]" />
                 </button>
               </div>
             </div>
@@ -299,14 +299,14 @@ export function ProfilePage() {
                         <div
                           key={i}
                           className={`relative aspect-square rounded-2xl overflow-hidden ${
-                            photo ? "" : "border-2 border-dashed border-gray-200 bg-gray-50"
-                          } ${isMain && photo ? "ring-2 ring-[#3C5E82] ring-offset-1" : ""}`}
+                            photo ? "" : "border-2 border-dashed border-[#EBEBF0] bg-[#F8F8FA]"
+                          } ${isMain && photo ? "ring-2 ring-[#4A90D9] ring-offset-1" : ""}`}
                         >
                           {photo ? (
                             <>
                               <Image src={photo} alt={`Photo ${i + 1}`} fill className="object-cover" />
                               {isMain && (
-                                <div className="absolute top-1.5 left-1.5 bg-[#3C5E82] rounded-full px-1.5 py-0.5">
+                                <div className="absolute top-1.5 left-1.5 bg-[#4A90D9] rounded-full px-1.5 py-0.5">
                                   <span className="text-[9px] font-bold text-white">MAIN</span>
                                 </div>
                               )}
@@ -324,37 +324,37 @@ export function ProfilePage() {
                               onClick={() => setShowPhotoPicker(true)}
                               className="w-full h-full flex items-center justify-center transition-all active:scale-95"
                             >
-                              <Plus size={22} className="text-gray-300" />
+                              <Plus size={22} className="text-[#C7C7CC]" />
                             </button>
                           )}
                         </div>
                       )
                     })}
                   </div>
-                  <p className="text-[11px] text-center text-gray-400">La primera foto aparece en Explore · toca ✕ para eliminar</p>
+                  <p className="text-[11px] text-center text-[#C7C7CC]">La primera foto aparece en Explore · toca ✕ para eliminar</p>
                 </>
               ) : (
                 <>
                   {/* Photo picker */}
                   <button
                     onClick={() => setShowPhotoPicker(false)}
-                    className="flex items-center gap-1.5 text-sm text-[#3C5E82] font-medium mb-4"
+                    className="flex items-center gap-1.5 text-sm text-[#4A90D9] font-medium mb-4"
                   >
                     ← Volver
                   </button>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Selecciona una foto</p>
+                  <p className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider mb-3">Selecciona una foto</p>
                   <div className="grid grid-cols-3 gap-2.5">
                     {PHOTO_OPTIONS.filter((p) => !photos.includes(p)).map((url) => (
                       <button
                         key={url}
                         onClick={() => { addPhoto(url); setShowPhotoPicker(false) }}
-                        className="relative aspect-square rounded-xl overflow-hidden ring-2 ring-transparent active:ring-[#3C5E82] transition-all active:scale-95"
+                        className="relative aspect-square rounded-xl overflow-hidden ring-2 ring-transparent active:ring-[#4A90D9] transition-all active:scale-95"
                       >
                         <Image src={url} alt="" fill className="object-cover" />
                       </button>
                     ))}
                     {PHOTO_OPTIONS.filter((p) => !photos.includes(p)).length === 0 && (
-                      <p className="col-span-3 text-center text-sm text-gray-400 py-6">No hay más fotos disponibles</p>
+                      <p className="col-span-3 text-center text-sm text-[#C7C7CC] py-6">No hay más fotos disponibles</p>
                     )}
                   </div>
                 </>
@@ -368,28 +368,28 @@ export function ProfilePage() {
       {activeTab === "subscriptions" && (
         <div className="px-4 pt-4 pb-6 flex flex-col gap-3">
           {subsLoading ? (
-            <div className="flex justify-center py-12"><Loader2 size={28} className="animate-spin text-[#3C5E82]" /></div>
+            <div className="flex justify-center py-12"><Loader2 size={28} className="animate-spin text-[#4A90D9]" /></div>
           ) : subs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="rounded-full bg-gradient-to-br from-[#3C5E82]/10 to-[#5E82AC]/10 p-5 mb-4">
-                <Star size={28} className="text-[#3C5E82]" />
+              <div className="rounded-full bg-[#4A90D9]/10 p-5 mb-4">
+                <Star size={28} className="text-[#4A90D9]" />
               </div>
-              <p className="text-base font-bold text-gray-900 mb-1">No active subscriptions</p>
-              <p className="text-sm text-gray-500 max-w-[260px]">Subscribe to creators on the Feed to unlock exclusive content.</p>
+              <p className="text-base font-bold text-[#1A1A2E] mb-1">No active subscriptions</p>
+              <p className="text-sm text-[#8E8E93] max-w-[260px]">Subscribe to creators on the Feed to unlock exclusive content.</p>
             </div>
           ) : (
             subs.map((sub) => (
-              <div key={sub.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div key={sub.id} className="bg-white rounded-3xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#EBEBF0]">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] flex items-center justify-center flex-shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-[#4A90D9] flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold text-sm">{sub.creator.name.charAt(0)}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-bold text-gray-900 truncate">{sub.creator.name}</p>
+                      <p className="text-sm font-bold text-[#1A1A2E] truncate">{sub.creator.name}</p>
                       <Crown size={12} className="text-amber-500 flex-shrink-0" />
                     </div>
-                    <p className="text-xs text-gray-500 truncate">{sub.creator.major}</p>
+                    <p className="text-xs text-[#8E8E93] truncate">{sub.creator.major}</p>
                   </div>
                   <span className={`text-xs font-semibold rounded-full px-2.5 py-1 ${
                     sub.status === "ACTIVE" ? "bg-green-50 text-green-600" :
@@ -398,7 +398,7 @@ export function ProfilePage() {
                     {sub.status === "canceling" ? "Canceling" : sub.status}
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                <div className="flex items-center justify-between text-xs text-[#8E8E93] mb-3">
                   <span>{tierLabel[sub.tier] || sub.tier} · ${sub.creator.creatorMonthlyPrice}/mo</span>
                   <span>Renews {new Date(sub.currentPeriodEnd).toLocaleDateString()}</span>
                 </div>
@@ -423,28 +423,28 @@ export function ProfilePage() {
 
           {/* Not yet a creator */}
           {!user?.isCreator && !user?.creatorOnboardingStatus && (
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-3xl p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#EBEBF0]">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-400/20">
                   <Crown size={20} className="text-amber-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-900">Become a Creator</p>
-                  <p className="text-xs text-gray-500">Earn money sharing exclusive content</p>
+                  <p className="text-sm font-bold text-[#1A1A2E]">Become a Creator</p>
+                  <p className="text-xs text-[#8E8E93]">Earn money sharing exclusive content</p>
                 </div>
               </div>
               <ul className="space-y-2 mb-5">
                 {["Post exclusive content for subscribers", "Set your own monthly price ($1–$200)", "Get paid directly via Stripe", "Only 15% platform fee"].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-xs text-gray-600">
-                    <CheckCircle size={14} className="text-green-500 flex-shrink-0" />
+                  <li key={item} className="flex items-center gap-2 text-xs text-[#8E8E93]">
+                    <CheckCircle size={14} className="text-[#34C759] flex-shrink-0" />
                     {item}
                   </li>
                 ))}
               </ul>
               <div className="mb-4">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Monthly Subscription Price</label>
-                <div className="flex items-center border border-gray-200 rounded-xl bg-gray-50 overflow-hidden focus-within:border-[#3C5E82] focus-within:ring-2 focus-within:ring-[#3C5E82]/20">
-                  <span className="px-3 text-gray-500 font-medium text-sm">$</span>
+                <label className="block text-xs font-semibold text-[#8E8E93] uppercase tracking-wider mb-1.5">Monthly Subscription Price</label>
+                <div className="flex items-center border border-[#EBEBF0] rounded-xl bg-[#F8F8FA] overflow-hidden focus-within:border-[#4A90D9] focus-within:ring-2 focus-within:ring-[#4A90D9]/20">
+                  <span className="px-3 text-[#8E8E93] font-medium text-sm">$</span>
                   <input
                     type="number"
                     min={1}
@@ -452,10 +452,10 @@ export function ProfilePage() {
                     step={0.01}
                     value={monthlyPrice}
                     onChange={(e) => setMonthlyPrice(e.target.value)}
-                    className="flex-1 bg-transparent py-3 pr-4 text-sm text-gray-900 outline-none"
+                    className="flex-1 bg-transparent py-3 pr-4 text-sm text-[#1A1A2E] outline-none"
                     placeholder="9.99"
                   />
-                  <span className="px-3 text-gray-400 text-xs">/mo</span>
+                  <span className="px-3 text-[#C7C7CC] text-xs">/mo</span>
                 </div>
               </div>
               {activateError && (
@@ -470,13 +470,13 @@ export function ProfilePage() {
                   : <span className="flex items-center gap-2"><ExternalLink size={14} /> Continue to Stripe</span>
                 }
               </GradientButton>
-              <p className="text-[11px] text-gray-400 text-center mt-2">You'll be redirected to Stripe to connect your bank account</p>
+              <p className="text-[11px] text-[#C7C7CC] text-center mt-2">You'll be redirected to Stripe to connect your bank account</p>
             </div>
           )}
 
           {/* Onboarding pending / incomplete */}
           {!user?.isCreator && (user?.creatorOnboardingStatus === "PENDING" || user?.creatorOnboardingStatus === "INCOMPLETE") && (
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+            <div className="bg-amber-50 border border-amber-200 rounded-3xl p-5">
               <div className="flex items-center gap-3 mb-3">
                 <AlertCircle size={20} className="text-amber-500 flex-shrink-0" />
                 <div>
@@ -498,54 +498,54 @@ export function ProfilePage() {
           {/* Active creator dashboard */}
           {user?.isCreator && (
             dashLoading ? (
-              <div className="flex justify-center py-8"><Loader2 size={28} className="animate-spin text-[#3C5E82]" /></div>
+              <div className="flex justify-center py-8"><Loader2 size={28} className="animate-spin text-[#4A90D9]" /></div>
             ) : dashboard ? (
               <>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { icon: <Users size={16} className="text-[#3C5E82]" />, label: "Subscribers", value: String(dashboard.subscriberCount) },
-                    { icon: <DollarSign size={16} className="text-green-600" />, label: "This Month", value: `$${dashboard.monthlyRevenue.toFixed(2)}` },
+                    { icon: <Users size={16} className="text-[#4A90D9]" />, label: "Subscribers", value: String(dashboard.subscriberCount) },
+                    { icon: <DollarSign size={16} className="text-[#34C759]" />, label: "This Month", value: `$${dashboard.monthlyRevenue.toFixed(2)}` },
                     { icon: <TrendingUp size={16} className="text-amber-500" />, label: "All Time", value: `$${dashboard.totalEarnings.toFixed(2)}` },
                   ].map((stat) => (
-                    <div key={stat.label} className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 text-center">
+                    <div key={stat.label} className="bg-white rounded-3xl p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#EBEBF0] text-center">
                       <div className="flex justify-center mb-1">{stat.icon}</div>
-                      <p className="text-base font-bold text-gray-900">{stat.value}</p>
-                      <p className="text-[10px] text-gray-500 mt-0.5">{stat.label}</p>
+                      <p className="text-base font-bold text-[#1A1A2E]">{stat.value}</p>
+                      <p className="text-[10px] text-[#8E8E93] mt-0.5">{stat.label}</p>
                     </div>
                   ))}
                 </div>
 
-                <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Your Subscription Tiers</p>
+                <div className="bg-white rounded-3xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#EBEBF0]">
+                  <p className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider mb-3">Your Subscription Tiers</p>
                   {[
                     { tier: "Basic", price: user.creatorMonthlyPrice ?? 0, desc: "Subscriber-only posts" },
                     { tier: "⭐ Gold", price: (user.creatorMonthlyPrice ?? 0) * 2, desc: "Basic + Gold-tier exclusives" },
                     { tier: "👑 Premium", price: (user.creatorMonthlyPrice ?? 0) * 5, desc: "Gold + Premium-only content" },
                   ].map((t) => (
-                    <div key={t.tier} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
+                    <div key={t.tier} className="flex items-center justify-between py-2.5 border-b border-[#EBEBF0] last:border-0">
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">{t.tier}</p>
-                        <p className="text-xs text-gray-400">{t.desc}</p>
+                        <p className="text-sm font-semibold text-[#1A1A2E]">{t.tier}</p>
+                        <p className="text-xs text-[#C7C7CC]">{t.desc}</p>
                       </div>
-                      <span className="text-sm font-bold text-[#3C5E82]">${t.price.toFixed(2)}/mo</span>
+                      <span className="text-sm font-bold text-[#4A90D9]">${t.price.toFixed(2)}/mo</span>
                     </div>
                   ))}
                 </div>
 
                 <button
                   onClick={handleGetStripeDashboard}
-                  className="w-full flex items-center justify-between px-5 py-4 bg-white rounded-2xl shadow-sm border border-gray-100 transition-all active:scale-95 hover:border-[#3C5E82]/30"
+                  className="w-full flex items-center justify-between px-5 py-4 bg-white rounded-3xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#EBEBF0] transition-all active:scale-95 hover:border-[#4A90D9]/30"
                 >
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-xl bg-[#635BFF]/10">
                       <DollarSign size={16} className="text-[#635BFF]" />
                     </div>
                     <div className="text-left">
-                      <p className="text-sm font-semibold text-gray-900">Stripe Dashboard</p>
-                      <p className="text-xs text-gray-500">View payouts & manage banking</p>
+                      <p className="text-sm font-semibold text-[#1A1A2E]">Stripe Dashboard</p>
+                      <p className="text-xs text-[#8E8E93]">View payouts & manage banking</p>
                     </div>
                   </div>
-                  <ExternalLink size={16} className="text-gray-400" />
+                  <ExternalLink size={16} className="text-[#C7C7CC]" />
                 </button>
               </>
             ) : null

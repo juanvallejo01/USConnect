@@ -9,15 +9,15 @@ import { RankProvider } from "@/context/rank-context"
 import { ProfilePhotosProvider } from "@/context/profile-photos-context"
 import { MobileFrame } from "@/components/layout/mobile-frame"
 import { BottomNav, type Tab } from "@/components/navigation/bottom-nav"
-import { AuthPage } from "@/pages/Auth"
-import { ExplorePage } from "@/pages/Explore"
-import { FeedPage } from "@/pages/Feed"
-import { MatchesPage } from "@/pages/Matches"
-import { LeaderboardPage } from "@/pages/Leaderboard"
-import { NotificationsPage } from "@/pages/Notifications"
-import { ChatPage } from "@/pages/Chat"
-import { ProfilePage } from "@/pages/Profile"
-import { AdminDashboardPage } from "@/pages/AdminDashboard"
+import { AuthPage } from "@/screens/Auth"
+import { ExplorePage } from "@/screens/Explore"
+import { FeedPage } from "@/screens/Feed"
+import { MatchesPage } from "@/screens/Matches"
+import { LeaderboardPage } from "@/screens/Leaderboard"
+import { NotificationsPage } from "@/screens/Notifications"
+import { ChatPage } from "@/screens/Chat"
+import { ProfilePage } from "@/screens/Profile"
+import { AdminDashboardPage } from "@/screens/AdminDashboard"
 
 export default function Home() {
   return (
@@ -40,7 +40,7 @@ export default function Home() {
 function AppShell() {
   const { isLoggedIn, user } = useAuth()
   const { activeUserId, closeChat } = useChat()
-  const [activeTab, setActiveTab] = useState<Tab>("explore")
+  const [activeTab, setActiveTab] = useState<Tab>("feed")
   const [showAdmin, setShowAdmin] = useState(false)
   
   // Check if user is admin based on role from backend
@@ -66,13 +66,13 @@ function AppShell() {
 
   function renderScreen() {
     switch (activeTab) {
-      case "explore": return <ExplorePage />
       case "feed": return <FeedPage />
+      case "explore": return <ExplorePage />
       case "matches": return <MatchesPage />
       case "leaderboard": return <LeaderboardPage />
       case "notifications": return <NotificationsPage />
       case "profile": return <ProfilePage />
-      default: return <ExplorePage />
+      default: return <FeedPage />
     }
   }
 

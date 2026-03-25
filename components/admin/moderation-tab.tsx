@@ -26,7 +26,7 @@ export function ModerationTab() {
         </div>
       ) : (
         posts.map((post) => (
-          <div key={post.id} className="rounded-xl bg-card border border-border shadow-sm p-4">
+          <div key={post.id} className="rounded-xl bg-card border border-border cloud-shadow p-4">
             <div className="flex items-start justify-between mb-2">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">

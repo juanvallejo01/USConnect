@@ -1,9 +1,9 @@
 "use client"
 
-import { Compass, Newspaper, Trophy, User, Shield, Bell, MessageCircle } from "lucide-react"
+import { Home, Compass, MessageCircle, Trophy, User } from "lucide-react"
 import { useNotification } from "@/context/notification-context"
 
-export type Tab = "explore" | "feed" | "matches" | "leaderboard" | "notifications" | "profile" | "admin"
+export type Tab = "feed" | "explore" | "matches" | "leaderboard" | "profile" | "notifications" | "admin"
 
 interface BottomNavProps {
   activeTab: Tab
@@ -12,26 +12,22 @@ interface BottomNavProps {
 }
 
 const tabs = [
-  { id: "explore" as const, label: "Explore", icon: Compass },
-  { id: "feed" as const, label: "Feed", icon: Newspaper },
-  { id: "matches" as const, label: "Matches", icon: MessageCircle },
-  { id: "leaderboard" as const, label: "Rank", icon: Trophy },
+  { id: "feed" as const, label: "Home", icon: Home },
+  { id: "explore" as const, label: "Discover", icon: Compass },
+  { id: "matches" as const, label: "Messages", icon: MessageCircle },
+  { id: "leaderboard" as const, label: "Ranking", icon: Trophy },
   { id: "profile" as const, label: "Profile", icon: User },
 ]
 
-export function BottomNav({ activeTab, onTabChange, showAdmin = false }: BottomNavProps) {
+export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   const { unreadCount } = useNotification()
-  
-  const visibleTabs = showAdmin
-    ? [...tabs, { id: "admin" as const, label: "Admin", icon: Shield }]
-    : tabs
 
   return (
-    <nav className="border-t border-gray-200 bg-white/80 backdrop-blur-xl px-2 pb-6 pt-2" role="tablist" aria-label="Main navigation">
+    <nav className="bg-white/80 glass border-t border-border/40 px-2 pb-6 pt-2" role="tablist" aria-label="Main navigation">
       <div className="flex items-center justify-around">
-        {visibleTabs.map(({ id, label, icon: Icon, showBadge }) => {
+        {tabs.map(({ id, label, icon: Icon }) => {
           const isActive = activeTab === id
-          const hasBadge = showBadge && unreadCount > 0
+          const hasBadge = id === "matches" && unreadCount > 0
           
           return (
             <button
@@ -40,36 +36,34 @@ export function BottomNav({ activeTab, onTabChange, showAdmin = false }: BottomN
               aria-selected={isActive}
               aria-label={label}
               onClick={() => onTabChange(id)}
-              className="relative flex flex-col items-center gap-1 px-3 py-1.5 transition-colors"
+              className="relative flex flex-col items-center gap-1 px-4 py-1.5 transition-all duration-300"
             >
-              {isActive && (
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 h-[3px] w-8 rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC]" />
-              )}
-              
               <div className="relative">
                 <Icon
-                  size={20}
-                  strokeWidth={isActive ? 2.5 : 1.8}
-                  className={isActive ? "text-[#3C5E82]" : "text-gray-500"}
+                  size={22}
+                  strokeWidth={isActive ? 2.2 : 1.6}
+                  className={`transition-colors duration-300 ${isActive ? "text-[#4A90D9]" : "text-[#C7C7CC]"}`}
                 />
                 {hasBadge && (
-                  <div className="absolute -top-1 -right-1 flex items-center justify-center">
-                    {unreadCount > 9 ? (
-                      <div className="w-5 h-5 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center">
-                        <span className="text-[9px] font-bold text-white">9+</span>
-                      </div>
-                    ) : (
-                      <div className="w-4 h-4 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center">
-                        <span className="text-[10px] font-bold text-white">{unreadCount}</span>
-                      </div>
-                    )}
+                  <div className="absolute -top-1.5 -right-1.5 flex items-center justify-center">
+                    <div className="h-[18px] min-w-[18px] bg-[#FF6B6B] rounded-full flex items-center justify-center px-1">
+                      <span className="text-[9px] font-bold text-white leading-none">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>
               
-              <span className={`text-[10px] ${isActive ? "font-bold text-gray-900" : "font-medium text-gray-500"}`}>
+              <span className={`text-[10px] transition-colors duration-300 ${
+                isActive ? "font-semibold text-[#4A90D9]" : "font-medium text-[#C7C7CC]"
+              }`}>
                 {label}
               </span>
+
+              {isActive && (
+                <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 h-[3px] w-5 rounded-full bg-[#4A90D9] transition-all" />
+              )}
             </button>
           )
         })}

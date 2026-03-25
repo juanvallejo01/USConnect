@@ -14,17 +14,17 @@ export function AnalyticsTab() {
         title="Posts Per Day"
         data={[28, 35, 42, 38, 55, 47, 51]}
         max={55}
-        gradient="from-[#C62828] to-[#1565C0]"
+        gradient="from-[#FF6B6B] to-[#4A90D9]"
       />
 
       <BarChartCard
         title="Sparks Growth"
         data={[120, 145, 162, 178, 186, 198, 210]}
         max={210}
-        gradient="from-[#1565C0] to-[#42A5F5]"
+        gradient="from-[#4A90D9] to-[#4A90D9]"
       />
 
-      <div className="rounded-xl bg-card border border-border shadow-sm p-4">
+      <div className="rounded-xl bg-card border border-border cloud-shadow p-4">
         <h3 className="text-sm font-semibold text-foreground mb-3">Users by Major</h3>
         <div className="flex flex-col gap-2.5">
           {MAJOR_DISTRIBUTION.map((item) => (
@@ -32,7 +32,7 @@ export function AnalyticsTab() {
               <span className="text-xs text-foreground w-28 shrink-0 truncate">{item.major}</span>
               <div className="flex-1 h-5 bg-secondary rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#C62828] to-[#1565C0] transition-all"
+                  className="h-full rounded-full bg-gradient-to-r from-[#FF6B6B] to-[#4A90D9] transition-all"
                   style={{ width: `${item.pct}%` }}
                 />
               </div>
@@ -47,7 +47,7 @@ export function AnalyticsTab() {
 
 function EngagementCard({ label, value, change, positive }: { label: string; value: string; change: string; positive: boolean }) {
   return (
-    <div className="rounded-xl bg-card border border-border shadow-sm p-4">
+    <div className="rounded-xl bg-card border border-border cloud-shadow p-4">
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
       <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
       <p className={`text-[10px] font-semibold mt-1 ${positive ? "text-green-600" : "text-red-600"}`}>{change}</p>
@@ -58,7 +58,7 @@ function EngagementCard({ label, value, change, positive }: { label: string; val
 function BarChartCard({ title, data, max, gradient }: { title: string; data: number[]; max: number; gradient: string }) {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
   return (
-    <div className="rounded-xl bg-card border border-border shadow-sm p-4">
+    <div className="rounded-xl bg-card border border-border cloud-shadow p-4">
       <h3 className="text-sm font-semibold text-foreground mb-3">{title}</h3>
       <div className="flex items-end gap-2 h-32">
         {data.map((val, i) => (

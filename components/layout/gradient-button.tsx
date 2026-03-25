@@ -16,17 +16,17 @@ export function GradientButton({
   ...props
 }: GradientButtonProps) {
   const sizeClasses = {
-    sm: "px-4 py-2 text-xs",
-    md: "px-5 py-2.5 text-sm",
-    lg: "px-6 py-3.5 text-sm",
+    sm: "px-5 py-2 text-xs",
+    md: "px-6 py-3 text-sm",
+    lg: "px-7 py-4 text-sm",
   }
 
-  const base = `rounded-full font-semibold shadow-sm transition-all hover:shadow-md active:scale-95 ${sizeClasses[size]} ${fullWidth ? "w-full" : ""}`
+  const base = `rounded-2xl font-semibold transition-all duration-300 active:scale-[0.97] ${sizeClasses[size]} ${fullWidth ? "w-full" : ""}`
 
   if (variant === "outline") {
     return (
       <button
-        className={`${base} border border-border bg-card text-foreground hover:bg-secondary ${className}`}
+        className={`${base} border border-border bg-white text-foreground hover:bg-secondary cloud-shadow ${className}`}
         {...props}
       >
         {children}
@@ -36,7 +36,7 @@ export function GradientButton({
 
   return (
     <button
-      className={`${base} bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white ${className}`}
+      className={`${base} bg-[#4A90D9] text-white cloud-shadow-blue hover:bg-[#3A7BC8] ${className}`}
       {...props}
     >
       {children}

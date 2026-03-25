@@ -101,56 +101,59 @@ export function PostCard({
   const isOwnPost = post.user.id === currentUserId
 
   return (
-    <div className="bg-white border-b border-gray-100">
-      <div className="flex items-center gap-3 px-4 py-3">
+    <div className="bg-white rounded-3xl border border-[#EBEBF0] cloud-shadow mb-4 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-5 py-4">
         <div
           onClick={() => onUserClick?.(post.user.id)}
           className="cursor-pointer"
         >
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+          <div className="h-11 w-11 rounded-full bg-[#4A90D9] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 transition-transform duration-300 hover:scale-105">
             {post.user.name.charAt(0)}
           </div>
         </div>
         <div className="flex-1 min-w-0">
           <h3
             onClick={() => onUserClick?.(post.user.id)}
-            className="text-sm font-semibold text-gray-900 cursor-pointer hover:underline"
+            className="text-sm font-semibold text-[#1A1A2E] cursor-pointer hover:underline transition-colors duration-300"
           >
             {post.user.name}
           </h3>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-[#8E8E93]">
             {post.user.major} &middot; {getRelativeTime(post.createdAt)}
           </p>
         </div>
         {isOwnPost && onDelete && (
           <button
             onClick={() => onDelete(post.id)}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-[#F8F8FA] rounded-2xl transition-colors duration-300"
             aria-label="Delete post"
           >
-            <Trash2 size={16} className="text-gray-400" />
+            <Trash2 size={16} className="text-[#C7C7CC]" />
           </button>
         )}
       </div>
 
+      {/* Image */}
       {post.imageUrl && (
         <div className="relative w-full aspect-square">
           <Image src={post.imageUrl} alt="Post image" fill className="object-cover" />
         </div>
       )}
 
-      <div className="flex items-center gap-1 px-4 py-2">
+      {/* Action buttons */}
+      <div className="flex items-center gap-1 px-5 py-3">
         <button
           onClick={handleLike}
-          className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all active:scale-95 ${
+          className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 transition-all duration-300 active:scale-95 ${
             post.isLiked
-              ? "bg-gradient-to-r from-[#3C5E82]/10 to-[#5E82AC]/10 text-[#3C5E82]"
-              : "hover:bg-gray-50 text-gray-600"
+              ? "bg-[#FF6B6B]/10 text-[#FF6B6B]"
+              : "hover:bg-[#F8F8FA] text-[#8E8E93]"
           }`}
         >
           <Heart
             size={18}
-            className={post.isLiked ? "fill-[#3C5E82]" : ""}
+            className={post.isLiked ? "fill-[#FF6B6B]" : ""}
             strokeWidth={post.isLiked ? 0 : 2}
           />
           <span className="text-sm font-medium">{post.likesCount}</span>
@@ -158,7 +161,7 @@ export function PostCard({
 
         <button
           onClick={toggleComments}
-          className="flex items-center gap-2 rounded-full px-4 py-2 hover:bg-gray-50 text-gray-600 transition-all active:scale-95"
+          className="flex items-center gap-2 rounded-2xl px-4 py-2.5 hover:bg-[#F8F8FA] text-[#8E8E93] transition-all duration-300 active:scale-95"
         >
           <MessageSquare size={18} />
           <span className="text-sm font-medium">{post.commentsCount}</span>
@@ -167,44 +170,46 @@ export function PostCard({
         <div className="flex-1" />
 
         <button
-          className="flex items-center gap-2 rounded-full px-4 py-2 hover:bg-gray-50 text-gray-600 transition-all active:scale-95"
+          className="flex items-center gap-2 rounded-2xl px-4 py-2.5 hover:bg-[#F8F8FA] text-[#8E8E93] transition-all duration-300 active:scale-95"
           aria-label="Share"
         >
           <Share2 size={18} />
         </button>
       </div>
 
+      {/* Content */}
       {post.content && (
-        <div className="px-4 pb-2">
-          <p className="text-sm text-gray-900 leading-relaxed">
+        <div className="px-5 pb-4">
+          <p className="text-sm text-[#1A1A2E] leading-relaxed">
             <span className="font-semibold">{post.user.name}</span>{" "}
             <span className="whitespace-pre-wrap">{post.content}</span>
           </p>
         </div>
       )}
 
+      {/* Comments section */}
       {showComments && (
-        <div className="px-4 py-3 bg-gray-50/50">
+        <div className="px-5 py-4 bg-[#F8F8FA] border-t border-[#EBEBF0]">
           {comments.length > 0 ? (
             <div className="space-y-3 mb-4">
               {comments.map((comment) => (
                 <div key={comment.id} className="flex gap-2">
                   <UserAvatar src="/images/swipe-profile.jpg" alt={comment.user.name} size="xs" />
-                  <div className="flex-1 bg-white rounded-2xl px-4 py-2 border border-gray-200">
+                  <div className="flex-1 bg-white rounded-2xl px-4 py-3 border border-[#EBEBF0] cloud-shadow-sm">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-semibold text-gray-900">{comment.user.name}</span>
-                      <span className="text-xs text-gray-400">{getRelativeTime(comment.createdAt)}</span>
+                      <span className="text-xs font-semibold text-[#1A1A2E]">{comment.user.name}</span>
+                      <span className="text-xs text-[#C7C7CC]">{getRelativeTime(comment.createdAt)}</span>
                     </div>
-                    <p className="text-sm text-gray-700">{comment.content}</p>
+                    <p className="text-sm text-[#8E8E93]">{comment.content}</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 text-center mb-4">No comments yet. Be the first!</p>
+            <p className="text-sm text-[#8E8E93] text-center mb-4">No comments yet. Be the first!</p>
           )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <input
               type="text"
               value={commentInput}
@@ -216,12 +221,12 @@ export function PostCard({
                 }
               }}
               placeholder="Add a comment..."
-              className="flex-1 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm outline-none transition-all focus:border-[#5E82AC] focus:ring-2 focus:ring-[#5E82AC]/20"
+              className="flex-1 rounded-2xl border border-[#EBEBF0] bg-white px-4 py-2.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#4A90D9] focus:ring-2 focus:ring-[#4A90D9]/20"
             />
             <button
               onClick={handleAddComment}
               disabled={!commentInput.trim()}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white transition-all active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#4A90D9] text-white transition-all duration-300 active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#4A90D9]/90"
             >
               <Send size={16} />
             </button>

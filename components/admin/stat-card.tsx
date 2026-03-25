@@ -12,13 +12,13 @@ export function StatCard({
   color: string
 }) {
   return (
-    <div className="rounded-xl bg-card border border-border shadow-sm p-4">
+    <div className="rounded-xl bg-card border border-border cloud-shadow p-4">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs font-medium text-muted-foreground">{label}</p>
           <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
         </div>
-        <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${color}`}>
+        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${color}`}>
           <Icon size={18} className="text-white" />
         </div>
       </div>

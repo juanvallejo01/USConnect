@@ -32,12 +32,12 @@ export function AdminDashboardPage({ onClose }: AdminDashboardPageProps) {
 
   return (
     <MobileFrame showStatusBar={false}>
-      <div className="bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] px-5 pt-12 pb-4">
+      <div className="bg-[#4A90D9] px-5 pt-12 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-all active:scale-90"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm transition-all active:scale-90"
               aria-label="Go back"
             >
               <ArrowLeft size={18} className="text-white" />
@@ -49,7 +49,7 @@ export function AdminDashboardPage({ onClose }: AdminDashboardPageProps) {
           </div>
           <button
             onClick={handleLogout}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-all active:scale-90"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm transition-all active:scale-90"
             aria-label="Logout"
           >
             <LogOut size={18} className="text-white" />
@@ -65,8 +65,8 @@ export function AdminDashboardPage({ onClose }: AdminDashboardPageProps) {
                 onClick={() => setActiveTab(id)}
                 className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                   isActive
-                    ? "bg-white text-[#3C5E82] shadow-sm"
-                    : "bg-white/10 text-white/80 hover:bg-white/20"
+                    ? "bg-white text-[#4A90D9] shadow-sm"
+                    : "bg-white/15 text-white/80 hover:bg-white/25"
                 }`}
               >
                 <Icon size={13} />
@@ -77,7 +77,7 @@ export function AdminDashboardPage({ onClose }: AdminDashboardPageProps) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-gray-50">
+      <div className="flex-1 overflow-y-auto bg-[#F8F8FA]">
         {activeTab === "overview" && <OverviewTab />}
         {activeTab === "users" && <UsersTab />}
         {activeTab === "moderation" && <ModerationTab />}

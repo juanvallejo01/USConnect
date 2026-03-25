@@ -69,7 +69,7 @@ export function MatchesPage() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-gray-50">
+    <div className="h-full flex flex-col bg-[#F8F8FA]">
       <GradientHeader 
         title="Matches"
         subtitle={`${MOCK_MATCHES.length} ${MOCK_MATCHES.length === 1 ? 'match' : 'matches'}`}
@@ -78,11 +78,11 @@ export function MatchesPage() {
       <div className="flex-1 overflow-y-auto">
         {MOCK_MATCHES.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full px-6 py-12">
-            <div className="rounded-full bg-gradient-to-br from-[#3C5E82]/20 to-[#5E82AC]/20 p-6 mb-4">
-              <Heart size={48} className="text-[#3C5E82]" />
+            <div className="rounded-full bg-[#4A90D9]/20 p-6 mb-4">
+              <Heart size={48} className="text-[#4A90D9]" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">No matches yet</h3>
-            <p className="text-sm text-gray-500 text-center max-w-[280px]">
+            <h3 className="text-lg font-bold text-[#1A1A2E] mb-2">No matches yet</h3>
+            <p className="text-sm text-[#8E8E93] text-center max-w-[280px]">
               Start exploring and liking profiles to find your matches!
             </p>
           </div>
@@ -92,7 +92,7 @@ export function MatchesPage() {
               <button
                 key={match.id}
                 onClick={() => handleOpenChat(match)}
-                className="w-full bg-white rounded-2xl p-4 border border-gray-200 hover:border-[#5E82AC] hover:shadow-md transition-all duration-300 active:scale-98"
+                className="w-full bg-white rounded-3xl p-4 border border-[#EBEBF0] hover:border-[#4A90D9] hover:cloud-shadow-md transition-all duration-300 active:scale-98"
               >
                 <div className="flex items-center gap-3">
                   {/* Avatar */}
@@ -100,10 +100,10 @@ export function MatchesPage() {
                     <img
                       src={match.avatar}
                       alt={match.name}
-                      className="w-16 h-16 rounded-full object-cover ring-2 ring-[#5E82AC]/20"
+                      className="w-16 h-16 rounded-full object-cover ring-2 ring-[#4A90D9]/20"
                     />
                     {match.unread && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] rounded-full border-2 border-white flex items-center justify-center">
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#4A90D9] rounded-full border-2 border-white flex items-center justify-center">
                         <span className="text-[10px] font-bold text-white">!</span>
                       </div>
                     )}
@@ -112,24 +112,24 @@ export function MatchesPage() {
                   {/* Content */}
                   <div className="flex-1 min-w-0 text-left">
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <h3 className="font-semibold text-gray-900 truncate">
+                      <h3 className="font-semibold text-[#1A1A2E] truncate">
                         {match.name}
                       </h3>
                       {match.lastMessageTime && (
-                        <span className="text-xs text-gray-400 whitespace-nowrap">
+                        <span className="text-xs text-[#C7C7CC] whitespace-nowrap">
                           {getRelativeTime(match.lastMessageTime)}
                         </span>
                       )}
                     </div>
 
-                    <p className="text-xs text-gray-500 mb-1.5">{match.major}</p>
+                    <p className="text-xs text-[#8E8E93] mb-1.5">{match.major}</p>
 
                     {match.lastMessage ? (
-                      <p className={`text-sm truncate ${match.unread ? 'font-semibold text-gray-900' : 'text-gray-600'}`}>
+                      <p className={`text-sm truncate ${match.unread ? 'font-semibold text-[#1A1A2E]' : 'text-[#8E8E93]'}`}>
                         {match.lastMessage}
                       </p>
                     ) : (
-                      <div className="flex items-center gap-1.5 text-[#3C5E82]">
+                      <div className="flex items-center gap-1.5 text-[#4A90D9]">
                         <MessageCircle size={14} />
                         <span className="text-sm font-medium">Start chatting</span>
                       </div>

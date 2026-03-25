@@ -305,7 +305,7 @@ export function FeedPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full bg-[#F8F8FA]">
       <GradientHeader
         title="Campus Feed"
         subtitle="What's happening at USC"
@@ -321,38 +321,38 @@ export function FeedPage() {
       />
 
       {/* Create Post Button - Sticky */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
+      <div className="sticky top-0 z-10 bg-white border-b border-[#EBEBF0] px-4 py-3.5">
         <button
           onClick={() => setShowCreatePost(true)}
-          className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors"
+          className="w-full flex items-center gap-3 px-5 py-3.5 bg-[#F8F8FA] hover:bg-[#EBEBF0] rounded-3xl transition-colors duration-300"
         >
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] flex items-center justify-center flex-shrink-0">
+          <div className="h-10 w-10 rounded-full bg-[#4A90D9] flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">
               {user?.name?.charAt(0).toUpperCase() || "U"}
             </span>
           </div>
-          <span className="text-gray-500 text-sm flex-1 text-left">Share something with your campus...</span>
-          <Plus size={20} className="text-[#3C5E82]" />
+          <span className="text-[#8E8E93] text-sm flex-1 text-left">Share something with your campus...</span>
+          <Plus size={20} className="text-[#4A90D9]" />
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3C5E82]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4A90D9]"></div>
           </div>
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="rounded-full bg-gradient-to-br from-[#3C5E82]/20 to-[#5E82AC]/20 p-6 mb-4">
-              <Plus size={32} className="text-[#3C5E82]" />
+            <div className="rounded-full bg-[#4A90D9]/10 p-6 mb-4">
+              <Plus size={32} className="text-[#4A90D9]" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">No posts yet</h3>
-            <p className="text-sm text-gray-500 text-center max-w-[280px] mb-4">
+            <h3 className="text-lg font-bold text-[#1A1A2E] mb-2">No posts yet</h3>
+            <p className="text-sm text-[#8E8E93] text-center max-w-[280px] mb-4">
               Be the first to share something with the campus community!
             </p>
             <button
               onClick={() => setShowCreatePost(true)}
-              className="px-6 py-2.5 bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white rounded-full font-medium text-sm transition-all active:scale-95"
+              className="px-6 py-2.5 bg-[#4A90D9] text-white rounded-full font-medium text-sm cloud-shadow transition-all duration-300 active:scale-95"
             >
               Create Post
             </button>
@@ -367,34 +367,34 @@ export function FeedPage() {
 
               if (isLocked) {
                 return (
-                  <div key={post.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div key={post.id} className="bg-white rounded-3xl cloud-shadow border border-[#EBEBF0] overflow-hidden">
                     {/* Blurred preview */}
-                    <div className="relative h-36 bg-gradient-to-br from-[#3C5E82]/10 to-[#5E82AC]/10 flex flex-col items-center justify-center gap-2 select-none">
-                      <div className="flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-[#3C5E82] to-[#5E82AC]">
+                    <div className="relative h-36 bg-[#4A90D9]/8 flex flex-col items-center justify-center gap-2 select-none">
+                      <div className="flex items-center justify-center h-12 w-12 rounded-full bg-[#4A90D9]">
                         <Lock size={22} className="text-white" />
                       </div>
-                      <p className="text-sm font-bold text-gray-700">Exclusive Content</p>
-                      <p className="text-xs text-gray-500">Subscribe to {post.user.name} to unlock</p>
+                      <p className="text-sm font-bold text-[#1A1A2E]">Exclusive Content</p>
+                      <p className="text-xs text-[#8E8E93]">Subscribe to {post.user.name} to unlock</p>
                     </div>
                     {/* Creator info + subscribe CTA */}
-                    <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
+                    <div className="flex items-center justify-between px-4 py-3 border-t border-[#EBEBF0]">
                       <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] flex items-center justify-center flex-shrink-0">
+                        <div className="h-8 w-8 rounded-full bg-[#4A90D9] flex items-center justify-center flex-shrink-0">
                           <span className="text-white text-xs font-bold">{post.user.name.charAt(0)}</span>
                         </div>
                         <div>
                           <div className="flex items-center gap-1">
-                            <span className="text-xs font-bold text-gray-900">{post.user.name}</span>
+                            <span className="text-xs font-bold text-[#1A1A2E]">{post.user.name}</span>
                             <Crown size={10} className="text-amber-500" />
                           </div>
-                          <span className="text-[10px] text-gray-400">
+                          <span className="text-[10px] text-[#C7C7CC]">
                             {post.accessLevel === "TIER_GOLD" ? "⭐ Gold" : post.accessLevel === "TIER_PREMIUM" ? "👑 Premium" : "Subscribers only"}
                           </span>
                         </div>
                       </div>
                       <button
                         onClick={() => setSelectedUserId(post.user.id)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white text-xs font-semibold transition-all active:scale-95"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#4A90D9] text-white text-xs font-semibold cloud-shadow transition-all duration-300 active:scale-95"
                       >
                         <Star size={11} /> Subscribe
                       </button>
@@ -422,23 +422,23 @@ export function FeedPage() {
 
       {showCreatePost && (
         <div className="absolute inset-0 z-50 flex items-end bg-black/50 backdrop-blur-sm">
-          <div className="w-full bg-white rounded-t-3xl max-h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div className="w-full bg-white rounded-t-[32px] max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#EBEBF0]">
               <button
                 onClick={() => {
                   setShowCreatePost(false)
                   setNewPostContent("")
                   handleRemoveAllImages()
                 }}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-[#F8F8FA] rounded-full transition-colors duration-300"
               >
-                <X size={20} className="text-gray-500" />
+                <X size={20} className="text-[#8E8E93]" />
               </button>
-              <h2 className="text-base font-bold text-gray-900">New Post</h2>
+              <h2 className="text-base font-bold text-[#1A1A2E]">New Post</h2>
               <button
                 onClick={handleCreatePost}
                 disabled={creating || (!!newPostContent.trim() && selectedImages.length === 0)}
-                className="px-4 py-1.5 bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white rounded-full font-semibold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-1.5 bg-[#4A90D9] text-white rounded-full font-semibold text-sm cloud-shadow transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {creating ? "Posting..." : "Share"}
               </button>
@@ -446,21 +446,21 @@ export function FeedPage() {
 
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] flex items-center justify-center flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-[#4A90D9] flex items-center justify-center flex-shrink-0">
                   <span className="text-white font-bold text-sm">
                     {user?.name?.charAt(0).toUpperCase() || "U"}
                   </span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-900">{user?.name || "User"}</p>
-                  <p className="text-xs text-gray-500">{(user as any)?.major || "USC Student"}</p>
+                  <p className="text-sm font-semibold text-[#1A1A2E]">{user?.name || "User"}</p>
+                  <p className="text-xs text-[#8E8E93]">{(user as any)?.major || "USC Student"}</p>
                 </div>
                 {/* Access level selector — only visible for creators */}
                 {isCreator && (
                   <select
                     value={accessLevel}
                     onChange={(e) => setAccessLevel(e.target.value as AccessLevel)}
-                    className="text-xs font-semibold rounded-full px-3 py-1.5 border border-gray-200 bg-white text-gray-700 outline-none focus:border-[#3C5E82] transition-colors"
+                    className="text-xs font-semibold rounded-full px-3 py-1.5 border border-[#EBEBF0] bg-white text-[#1A1A2E] outline-none focus:border-[#4A90D9] transition-colors duration-300"
                   >
                     <option value="PUBLIC">🌍 Public</option>
                     <option value="SUBSCRIBERS">🔒 Subscribers</option>
@@ -475,7 +475,7 @@ export function FeedPage() {
                 onChange={(e) => setNewPostContent(e.target.value)}
                 placeholder={selectedImages.length > 0 ? "Write a caption..." : "Add an image first to write a caption..."}
                 rows={imagePreviews.length > 0 ? 3 : 5}
-                className="w-full border-none bg-transparent px-0 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none resize-none"
+                className="w-full border-none bg-transparent px-0 py-2 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none resize-none"
                 autoFocus
                 disabled={selectedImages.length === 0}
               />
@@ -489,7 +489,7 @@ export function FeedPage() {
               )}
 
               {imagePreviews.length > 0 && (
-                <div className="relative w-full rounded-2xl overflow-hidden mt-4 bg-gray-100">
+                <div className="relative w-full rounded-2xl overflow-hidden mt-4 bg-[#EBEBF0]">
                   <div className="relative w-full aspect-square">
                     <Image
                       src={imagePreviews[currentPreviewIndex]}
@@ -539,7 +539,7 @@ export function FeedPage() {
                           key={index}
                           onClick={() => setCurrentPreviewIndex(index)}
                           className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all ${
-                            index === currentPreviewIndex ? "ring-2 ring-[#3C5E82] scale-105" : "opacity-60"
+                            index === currentPreviewIndex ? "ring-2 ring-[#4A90D9] scale-105" : "opacity-60"
                           }`}
                         >
                           <Image src={preview} alt={`Thumb ${index + 1}`} fill className="object-cover" />
@@ -551,7 +551,7 @@ export function FeedPage() {
                   {imagePreviews.length < 10 && (
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full py-3 bg-white border-t border-gray-200 text-sm font-medium text-[#3C5E82] hover:bg-[#5E82AC]/10 transition-colors"
+                      className="w-full py-3 bg-white border-t border-[#EBEBF0] text-sm font-medium text-[#4A90D9] hover:bg-[#4A90D9]/8 transition-colors duration-300"
                     >
                       + Add More Photos ({imagePreviews.length}/10)
                     </button>
@@ -562,14 +562,14 @@ export function FeedPage() {
               {imagePreviews.length === 0 && (
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full mt-4 rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 hover:border-[#5E82AC] hover:bg-[#5E82AC]/5 transition-all"
+                  className="w-full mt-4 rounded-2xl border-2 border-dashed border-[#C7C7CC] bg-[#F8F8FA] px-4 py-10 hover:border-[#4A90D9] hover:bg-[#4A90D9]/5 transition-all duration-300"
                 >
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="p-3 rounded-full bg-gradient-to-br from-[#3C5E82]/20 to-[#5E82AC]/20">
-                      <ImageIcon size={24} className="text-[#3C5E82]" />
+                  <div className="flex flex-col items-center gap-2.5">
+                    <div className="p-3.5 rounded-full bg-[#4A90D9]/10">
+                      <ImageIcon size={24} className="text-[#4A90D9]" />
                     </div>
-                    <p className="text-sm font-medium text-gray-900">Add Photos</p>
-                    <p className="text-xs text-gray-500">JPG, PNG • Up to 10 photos • Max 5MB each</p>
+                    <p className="text-sm font-medium text-[#1A1A2E]">Add Photos</p>
+                    <p className="text-xs text-[#8E8E93]">JPG, PNG • Up to 10 photos • Max 5MB each</p>
                   </div>
                 </button>
               )}

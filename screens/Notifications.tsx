@@ -20,7 +20,7 @@ export function NotificationsPage() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-gray-50">
+    <div className="h-full flex flex-col bg-[#F8F8FA]">
       <GradientHeader 
         title="Notifications"
       />
@@ -31,7 +31,7 @@ export function NotificationsPage() {
           <div className="p-4 flex justify-end">
             <button
               onClick={markAllAsRead}
-              className="text-sm text-[#3C5E82] hover:text-[#3C5E82]/80 font-medium transition-colors"
+              className="text-sm text-[#4A90D9] hover:text-[#4A90D9]/80 font-medium transition-colors"
             >
               Mark all as read
             </button>
@@ -42,11 +42,11 @@ export function NotificationsPage() {
         <div className="px-4 pb-4 space-y-3">
           {notifications.length === 0 ? (
             <div className="text-center py-16">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Bell className="w-10 h-10 text-gray-400" />
+              <div className="w-20 h-20 bg-[#F2F2F7] rounded-full flex items-center justify-center mx-auto mb-4">
+                <Bell className="w-10 h-10 text-[#C7C7CC]" />
               </div>
-              <p className="text-gray-500 text-sm">No notifications yet</p>
-              <p className="text-gray-400 text-xs mt-1">
+              <p className="text-[#8E8E93] text-sm">No notifications yet</p>
+              <p className="text-[#C7C7CC] text-xs mt-1">
                 You'll be notified when you get a match
               </p>
             </div>
@@ -54,9 +54,9 @@ export function NotificationsPage() {
             notifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`bg-white rounded-3xl p-5 shadow-sm border border-gray-100 transition-all duration-300 ${
+                className={`bg-white rounded-3xl p-5 cloud-shadow border border-[#EBEBF0] transition-all duration-300 ${
                   !notification.read 
-                    ? "ring-2 ring-[#5E82AC]/30 bg-gradient-to-br from-[#3C5E82]/5 to-[#5E82AC]/5" 
+                    ? "ring-2 ring-[#4A90D9]/30 bg-[#4A90D9]/5" 
                     : ""
                 }`}
               >
@@ -69,29 +69,29 @@ export function NotificationsPage() {
                       className="w-14 h-14 rounded-full object-cover"
                     />
                     {!notification.read && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-[#3C5E82] to-[#5E82AC] rounded-full border-2 border-white" />
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#4A90D9] rounded-full border-2 border-white" />
                     )}
                   </div>
 
                   {/* Content */}
                   <div className="flex-1">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-[#1A1A2E]">
                         You matched with {notification.matchedWithName} 🎉
                       </h3>
-                      <span className="text-xs text-gray-400 whitespace-nowrap">
+                      <span className="text-xs text-[#C7C7CC] whitespace-nowrap">
                         {getRelativeTime(notification.createdAt)}
                       </span>
                     </div>
 
-                    <p className="text-sm text-gray-600 mb-3">
+                    <p className="text-sm text-[#8E8E93] mb-3">
                       Start a conversation and get to know each other!
                     </p>
 
                     {/* Action button */}
                     <button
                       onClick={() => handleStartChat(notification.matchedWithId, notification.id)}
-                      className="w-full bg-gradient-to-r from-[#3C5E82] to-[#5E82AC] text-white py-2.5 px-4 rounded-full font-medium text-sm flex items-center justify-center gap-2 hover:from-[#3C5E82]/90 hover:to-[#5E82AC]/90 transition-all duration-300 active:scale-95"
+                      className="w-full bg-[#4A90D9] text-white py-2.5 px-4 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 hover:bg-[#4A90D9]/90 cloud-shadow-blue transition-all duration-300 active:scale-95"
                     >
                       <MessageCircle className="w-4 h-4" />
                       Start Chat

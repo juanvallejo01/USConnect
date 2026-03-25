@@ -15,7 +15,7 @@ export function OverviewTab() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-sm text-gray-500">Loading statistics...</div>
+        <div className="text-sm text-[#8E8E93]">Loading statistics...</div>
       </div>
     )
   }
@@ -29,12 +29,12 @@ export function OverviewTab() {
   }
 
   const adminStats = [
-    { label: "Total Users", value: stats.totalUsers.toString(), icon: Users, color: "from-[#3C5E82] to-[#5E82AC]" },
-    { label: "Active Users", value: stats.activeUsers.toString(), icon: Activity, color: "from-[#5E82AC] to-[#F97316]" },
-    { label: "Total Likes", value: stats.totalLikes.toString(), icon: Heart, color: "from-[#5E82AC] to-[#EF4444]" },
-    { label: "Total Matches", value: stats.totalMatches.toString(), icon: TrendingUp, color: "from-[#3C5E82] to-[#6366F1]" },
-    { label: "Messages", value: stats.totalMessages.toString(), icon: MessageSquare, color: "from-[#F59E0B] to-[#5E82AC]" },
-    { label: "Match Rate", value: `${Math.round(stats.matchRate * 100)}%`, icon: Percent, color: "from-[#3C5E82] to-[#A855F7]" },
+    { label: "Total Users", value: stats.totalUsers.toString(), icon: Users, color: "bg-[#4A90D9]" },
+    { label: "Active Users", value: stats.activeUsers.toString(), icon: Activity, color: "bg-gradient-to-br from-[#4A90D9] to-[#F97316]" },
+    { label: "Total Likes", value: stats.totalLikes.toString(), icon: Heart, color: "bg-gradient-to-br from-[#4A90D9] to-[#EF4444]" },
+    { label: "Total Matches", value: stats.totalMatches.toString(), icon: TrendingUp, color: "bg-gradient-to-br from-[#4A90D9] to-[#6366F1]" },
+    { label: "Messages", value: stats.totalMessages.toString(), icon: MessageSquare, color: "bg-gradient-to-br from-[#F59E0B] to-[#4A90D9]" },
+    { label: "Match Rate", value: `${Math.round(stats.matchRate * 100)}%`, icon: Percent, color: "bg-gradient-to-br from-[#4A90D9] to-[#A855F7]" },
   ]
 
   return (
@@ -45,19 +45,19 @@ export function OverviewTab() {
         ))}
       </div>
 
-      <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Recent Activity</h3>
+      <div className="rounded-xl bg-white border border-[#EBEBF0] cloud-shadow p-4">
+        <h3 className="text-sm font-semibold text-[#1A1A2E] mb-3">Recent Activity</h3>
         <div className="flex flex-col gap-3">
           {recentActivity.map((item, i) => (
             <div key={i} className="flex items-center gap-3">
               <div className={`h-2 w-2 rounded-full ${
-                item.type === "user" ? "bg-[#3C5E82]" :
-                item.type === "match" ? "bg-[#5E82AC]" :
-                item.type === "like" ? "bg-[#5E82AC]" :
-                "bg-gray-400"
+                item.type === "user" ? "bg-[#4A90D9]" :
+                item.type === "match" ? "bg-[#4A90D9]" :
+                item.type === "like" ? "bg-[#4A90D9]" :
+                "bg-[#C7C7CC]"
               }`} />
-              <p className="flex-1 text-xs text-gray-900">{item.text}</p>
-              <span className="text-[10px] text-gray-500 shrink-0">{item.time}</span>
+              <p className="flex-1 text-xs text-[#1A1A2E]">{item.text}</p>
+              <span className="text-[10px] text-[#8E8E93] shrink-0">{item.time}</span>
             </div>
           ))}
         </div>

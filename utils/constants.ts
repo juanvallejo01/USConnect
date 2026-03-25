@@ -1,11 +1,14 @@
 export const BRAND = {
   name: "Campus Circle",
-  gradientFrom: "#8B5CF6",
-  gradientTo: "#EC4899",
-  gradientClass: "bg-gradient-to-r from-[#8B5CF6] to-[#EC4899]",
-  gradientClassBr: "bg-gradient-to-br from-[#8B5CF6] to-[#EC4899]",
-  purple: "#8B5CF6",
-  pink: "#EC4899",
+  primary: "#4A90D9",
+  primaryLight: "#6BA3E0",
+  accent: "#FF6B6B",
+  lavender: "#B8A9C9",
+  mint: "#7DD3C0",
+  peach: "#FBBF96",
+  background: "#F8F8FA",
+  foreground: "#1A1A2E",
+  muted: "#8E8E93",
 } as const
 
 export interface UserProfile {
