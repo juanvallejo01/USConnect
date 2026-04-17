@@ -5,6 +5,7 @@ import { Plus, X, Image as ImageIcon, Trash2, Lock, Crown, Star } from "lucide-r
 import Image from "next/image"
 import { GradientHeader } from "@/components/layout/gradient-header"
 import { PostCard } from "@/components/feed/post-card"
+import { PostCardSkeletonList } from "@/components/feed/post-card-skeleton"
 import { UserProfile } from "./UserProfile"
 import { useAuth } from "@/context/auth-context"
 import { FEED_POSTS } from "@/utils/constants"
@@ -68,7 +69,8 @@ export function FeedPage() {
         const data = await response.json()
         setPosts(data)
       } else {
-        console.error("Failed to load feed")
+        const errorBody = await response.text()
+        console.error(`Failed to load feed: ${response.status} ${response.statusText}`, errorBody)
       }
     } catch (error) {
       console.error("Failed to load feed:", error)
@@ -324,7 +326,7 @@ export function FeedPage() {
       <div className="sticky top-0 z-10 bg-white border-b border-[#EBEBF0] px-4 py-3">
         <button
           onClick={() => setShowCreatePost(true)}
-          className="w-full flex items-center gap-3"
+          className="w-full flex items-center gap-3 micro-press"
         >
           <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#4A90D9] to-[#357ABD] flex items-center justify-center flex-shrink-0 ring-2 ring-[#4A90D9]/20">
             <span className="text-white font-bold text-xs">
@@ -339,9 +341,7 @@ export function FeedPage() {
 
       <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4A90D9]"></div>
-          </div>
+          <PostCardSkeletonList count={4} />
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4">
             <div className="rounded-full bg-[#4A90D9]/10 p-6 mb-4">
@@ -353,13 +353,13 @@ export function FeedPage() {
             </p>
             <button
               onClick={() => setShowCreatePost(true)}
-              className="px-6 py-2.5 bg-[#4A90D9] text-white rounded-full font-medium text-sm cloud-shadow transition-all duration-300 active:scale-95"
+              className="px-6 py-2.5 bg-[#4A90D9] text-white rounded-full font-medium text-sm cloud-shadow micro-press micro-hover focus-ring"
             >
               Create Post
             </button>
           </div>
         ) : (
-          <div className="flex flex-col">
+          <div className="flex flex-col fade-in-up">
             {posts.map((post) => {
               // Determine if this VIP post is locked for the current viewer
               const isVip = post.accessLevel !== "PUBLIC"
@@ -423,8 +423,17 @@ export function FeedPage() {
       </div>
 
       {showCreatePost && (
-        <div className="absolute inset-0 z-50 flex items-end bg-black/50 backdrop-blur-sm">
-          <div className="w-full bg-white rounded-t-[32px] max-h-[90vh] flex flex-col">
+        <div 
+          className="absolute inset-0 z-50 flex items-end bg-black/50 backdrop-blur-sm modal-backdrop"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowCreatePost(false)
+              setNewPostContent("")
+              handleRemoveAllImages()
+            }
+          }}
+        >
+          <div className="w-full bg-white rounded-t-[32px] max-h-[90vh] flex flex-col modal-enter">
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#EBEBF0]">
               <button
                 onClick={() => {
@@ -432,7 +441,7 @@ export function FeedPage() {
                   setNewPostContent("")
                   handleRemoveAllImages()
                 }}
-                className="p-2 hover:bg-[#F8F8FA] rounded-full transition-colors duration-300"
+                className="p-2 hover:bg-[#F8F8FA] rounded-full micro-press micro-hover"
               >
                 <X size={20} className="text-[#8E8E93]" />
               </button>
@@ -440,7 +449,7 @@ export function FeedPage() {
               <button
                 onClick={handleCreatePost}
                 disabled={creating || (!!newPostContent.trim() && selectedImages.length === 0)}
-                className="px-4 py-1.5 bg-[#4A90D9] text-white rounded-full font-semibold text-sm cloud-shadow transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-1.5 bg-[#4A90D9] text-white rounded-full font-semibold text-sm cloud-shadow micro-press focus-ring disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {creating ? "Posting..." : "Share"}
               </button>

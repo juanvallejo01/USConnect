@@ -7,8 +7,10 @@ import { NotificationProvider } from "@/context/notification-context"
 import { ChatProvider, useChat } from "@/context/chat-context"
 import { RankProvider } from "@/context/rank-context"
 import { ProfilePhotosProvider } from "@/context/profile-photos-context"
+import { ToastProvider } from "@/context/toast-context"
 import { MobileFrame } from "@/components/layout/mobile-frame"
 import { BottomNav, type Tab } from "@/components/navigation/bottom-nav"
+import { PageTransition } from "@/components/layout/page-transition"
 import { AuthPage } from "@/screens/Auth"
 import { ExplorePage } from "@/screens/Explore"
 import { FeedPage } from "@/screens/Feed"
@@ -22,17 +24,19 @@ import { AdminDashboardPage } from "@/screens/AdminDashboard"
 export default function Home() {
   return (
     <AuthProvider>
-      <ProfilePhotosProvider>
-        <MatchProvider>
-          <NotificationProvider>
-            <ChatProvider>
-              <RankProvider>
-                <AppShell />
-              </RankProvider>
-            </ChatProvider>
-          </NotificationProvider>
-        </MatchProvider>
-      </ProfilePhotosProvider>
+      <ToastProvider>
+        <ProfilePhotosProvider>
+          <MatchProvider>
+            <NotificationProvider>
+              <ChatProvider>
+                <RankProvider>
+                  <AppShell />
+                </RankProvider>
+              </ChatProvider>
+            </NotificationProvider>
+          </MatchProvider>
+        </ProfilePhotosProvider>
+      </ToastProvider>
     </AuthProvider>
   )
 }
@@ -59,20 +63,57 @@ function AppShell() {
   if (activeUserId !== null) {
     return (
       <MobileFrame>
-        <ChatPage />
+        <PageTransition pageKey={`chat-${activeUserId}`}>
+          <ChatPage />
+        </PageTransition>
       </MobileFrame>
     )
   }
 
   function renderScreen() {
     switch (activeTab) {
-      case "feed": return <FeedPage />
-      case "explore": return <ExplorePage />
-      case "matches": return <MatchesPage />
-      case "leaderboard": return <LeaderboardPage />
-      case "notifications": return <NotificationsPage />
-      case "profile": return <ProfilePage />
-      default: return <FeedPage />
+      case "feed": 
+        return (
+          <PageTransition pageKey="feed">
+            <FeedPage />
+          </PageTransition>
+        )
+      case "explore": 
+        return (
+          <PageTransition pageKey="explore">
+            <ExplorePage />
+          </PageTransition>
+        )
+      case "matches": 
+        return (
+          <PageTransition pageKey="matches">
+            <MatchesPage />
+          </PageTransition>
+        )
+      case "leaderboard": 
+        return (
+          <PageTransition pageKey="leaderboard">
+            <LeaderboardPage />
+          </PageTransition>
+        )
+      case "notifications": 
+        return (
+          <PageTransition pageKey="notifications">
+            <NotificationsPage />
+          </PageTransition>
+        )
+      case "profile": 
+        return (
+          <PageTransition pageKey="profile">
+            <ProfilePage />
+          </PageTransition>
+        )
+      default: 
+        return (
+          <PageTransition pageKey="feed">
+            <FeedPage />
+          </PageTransition>
+        )
     }
   }
 

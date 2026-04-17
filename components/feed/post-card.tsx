@@ -145,7 +145,7 @@ export function PostCard({
         <div className="flex items-center gap-4">
           <button
             onClick={handleLike}
-            className="flex items-center gap-1.5 transition-all duration-200 active:scale-90"
+            className="flex items-center gap-1.5 micro-press focus-ring"
           >
             <Heart
               size={24}
@@ -158,13 +158,13 @@ export function PostCard({
 
           <button
             onClick={toggleComments}
-            className="transition-all duration-200 active:scale-90"
+            className="micro-press focus-ring"
           >
             <MessageSquare size={22} className="text-[#262626] hover:text-[#8E8E93] transition-colors duration-200" strokeWidth={1.8} />
           </button>
 
           <button
-            className="transition-all duration-200 active:scale-90"
+            className="micro-press focus-ring"
             aria-label="Share"
           >
             <Send size={22} className="text-[#262626] hover:text-[#8E8E93] transition-colors duration-200 -rotate-12" strokeWidth={1.8} />
@@ -174,7 +174,7 @@ export function PostCard({
         <div className="flex-1" />
 
         <button
-          className="transition-all duration-200 active:scale-90"
+          className="micro-press focus-ring"
           aria-label="Save"
         >
           <Share2 size={22} className="text-[#262626] hover:text-[#8E8E93] transition-colors duration-200" strokeWidth={1.8} />
@@ -246,7 +246,7 @@ export function PostCard({
             <button
               onClick={handleAddComment}
               disabled={!commentInput.trim()}
-              className="text-[#4A90D9] font-bold text-[13px] transition-opacity duration-200 disabled:opacity-30"
+              className="text-[#4A90D9] font-bold text-[13px] micro-press focus-ring disabled:opacity-30"
             >
               Post
             </button>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { X, Heart, MessageSquare, MapPin, Calendar, Award } from "lucide-react"
 import { PostCard } from "@/components/feed/post-card"
+import { UserProfileSkeleton } from "@/components/profile/user-profile-skeleton"
 
 interface UserProfileProps {
   userId: string
@@ -114,11 +115,7 @@ export function UserProfile({ userId, onClose }: UserProfileProps) {
   }
 
   if (loading) {
-    return (
-      <div className="absolute inset-0 z-50 bg-[#F8F8FA] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3C5E82]"></div>
-      </div>
-    )
+    return <UserProfileSkeleton />
   }
 
   if (!user) {
@@ -128,7 +125,7 @@ export function UserProfile({ userId, onClose }: UserProfileProps) {
   const joinDate = new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 
   return (
-    <div className="absolute inset-0 z-50 bg-[#F8F8FA] overflow-y-auto animate-fadeIn">
+    <div className="absolute inset-0 z-50 bg-[#F8F8FA] overflow-y-auto page-enter">
       {/* Header */}
       <div className="relative">
         {/* Cover gradient */}

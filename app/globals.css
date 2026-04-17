@@ -145,9 +145,265 @@
   100% { background-position: 200% 0; }
 }
 
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #E8E8ED 0%,
+    #F5F5F7 20%,
+    #E8E8ED 40%,
+    #E8E8ED 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-6px); }
+}
+
+/* Liquid Glass animations */
+@keyframes blob-morph {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: rotate(0deg) scale(1);
+  }
+  33% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    transform: rotate(120deg) scale(1.05);
+  }
+  66% {
+    border-radius: 50% 30% 50% 60% / 30% 50% 70% 50%;
+    transform: rotate(240deg) scale(0.95);
+  }
+}
+
+@keyframes blob-morph-reverse {
+  0%, 100% {
+    border-radius: 30% 70% 50% 50% / 40% 50% 60% 50%;
+    transform: rotate(0deg) scale(1);
+  }
+  33% {
+    border-radius: 60% 40% 30% 60% / 70% 30% 50% 60%;
+    transform: rotate(-120deg) scale(1.08);
+  }
+  66% {
+    border-radius: 40% 50% 60% 40% / 60% 70% 40% 50%;
+    transform: rotate(-240deg) scale(0.92);
+  }
+}
+
+@keyframes shimmer-slide {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+@keyframes liquid-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Microinteractions — Performance Optimized
+   ═══════════════════════════════════════════ */
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes success-pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Page & Navigation Transitions
+   ═══════════════════════════════════════════ */
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes page-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes modal-backdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-indicator {
+  from {
+    transform: translateX(var(--from-x, 0));
+  }
+  to {
+    transform: translateX(var(--to-x, 0));
+  }
+}
+
+@keyframes checkmark-draw {
+  0% {
+    stroke-dashoffset: 20;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+/* Utility classes */
+.micro-press {
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.micro-press:active {
+  transform: scale(0.95);
+}
+
+.micro-hover {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shake {
+  animation: shake 400ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+.success-pulse {
+  animation: success-pulse 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-in-up {
+  animation: fade-in-up 300ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.page-enter {
+  animation: page-enter 250ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.page-exit {
+  animation: page-exit 200ms cubic-bezier(0.4, 0, 0.6, 1) both;
+}
+
+.modal-enter {
+  animation: modal-enter 250ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.modal-backdrop {
+  animation: modal-backdrop 200ms ease-out both;
+}
+
+.checkmark-draw {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  animation: checkmark-draw 400ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+/* Focus ring for accessibility */
+.focus-ring {
+  outline: none;
+  transition: box-shadow 150ms ease-out;
+}
+
+.focus-ring:focus-visible {
+  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.3);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .micro-press:active {
+    transform: none;
+  }
+}
+
+.animate-blob-morph {
+  animation: blob-morph 8s ease-in-out infinite;
+}
+
+.animate-blob-morph-reverse {
+  animation: blob-morph-reverse 8s ease-in-out infinite;
+}
+
+.animate-shimmer-slide {
+  animation: shimmer-slide 2s ease-in-out infinite;
+}
+
+.animate-liquid-pulse {
+  animation: liquid-pulse 2s ease-in-out infinite;
 }
 
 .animate-fadeIn {

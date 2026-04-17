@@ -1,21 +1,79 @@
+"use client"
+
 import * as React from 'react'
-
 import { cn } from '@/lib/utils'
+import { Check, AlertCircle } from 'lucide-react'
 
-function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
-  return (
-    <input
-      type={type}
-      data-slot="input"
-      className={cn(
-        'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-        className,
-      )}
-      {...props}
-    />
-  )
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  error?: boolean
+  success?: boolean
+  errorMessage?: string
 }
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, error, success, errorMessage, ...props }, ref) => {
+    const [shouldShake, setShouldShake] = React.useState(false)
+
+    React.useEffect(() => {
+      if (error) {
+        setShouldShake(true)
+        const timer = setTimeout(() => setShouldShake(false), 400)
+        return () => clearTimeout(timer)
+      }
+    }, [error])
+
+    return (
+      <div className="relative w-full">
+        <input
+          type={type}
+          className={cn(
+            "flex h-12 w-full rounded-2xl border bg-white px-4 py-3 text-sm text-[#1A1A2E]",
+            "placeholder:text-[#C7C7CC] outline-none",
+            "transition-all duration-200 ease-out",
+            "focus-ring",
+            // Default state
+            !error && !success && "border-[#EBEBF0] focus:border-[#4A90D9]",
+            // Error state
+            error && "border-[#FF3B30] focus:border-[#FF3B30]",
+            // Success state
+            success && "border-[#34C759] focus:border-[#34C759]",
+            // Shake animation
+            shouldShake && "shake",
+            // Disabled state
+            props.disabled && "opacity-50 cursor-not-allowed bg-[#F5F5F7]",
+            className
+          )}
+          ref={ref}
+          {...props}
+        />
+        
+        {/* Success indicator */}
+        {success && !error && (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            <div className="h-5 w-5 rounded-full bg-[#34C759] flex items-center justify-center success-pulse">
+              <Check size={12} className="text-white checkmark-draw" strokeWidth={3} />
+            </div>
+          </div>
+        )}
+
+        {/* Error indicator */}
+        {error && (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            <AlertCircle size={20} className="text-[#FF3B30]" />
+          </div>
+        )}
+
+        {/* Error message */}
+        {error && errorMessage && (
+          <p className="text-xs text-[#FF3B30] mt-1.5 px-1 fade-in-up">
+            {errorMessage}
+          </p>
+        )}
+      </div>
+    )
+  }
+)
+
+Input.displayName = "Input"
 
 export { Input }

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Trophy, Medal, Award, Heart, TrendingUp, Users, Crown, Flame, Sparkles, X } from "lucide-react"
 import { UserProfile } from "./UserProfile"
 import { UserAvatar } from "@/components/layout/user-avatar"
+import { LeaderboardSkeletonList } from "@/components/leaderboard/leaderboard-skeleton"
 
 interface UserRanking {
   rank: number
@@ -140,14 +141,14 @@ export function LeaderboardPage() {
   return (
     <div className="flex h-full flex-col bg-[#F8F8FA]">
       {/* ── Header ── */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#4A90D9] via-[#5A9DE5] to-[#6BB0F0] px-5 pt-12 pb-7">
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#4A90D9] via-[#5A9DE5] to-[#6BB0F0] px-5 pt-14 pb-6">
         {/* Decorative circles */}
         <div className="absolute -top-6 -right-6 h-28 w-28 rounded-full bg-white/[0.06]" />
         <div className="absolute top-16 -left-10 h-20 w-20 rounded-full bg-white/[0.04]" />
         <div className="absolute bottom-2 right-12 h-12 w-12 rounded-full bg-white/[0.05]" />
 
         <div className="relative z-10">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 mb-5">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
               <Trophy size={20} className="text-white" />
             </div>
@@ -158,7 +159,7 @@ export function LeaderboardPage() {
           </div>
 
           {/* Segmented Toggle */}
-          <div className="mt-5 flex gap-1.5 bg-white/[0.12] backdrop-blur-md rounded-2xl p-1.5">
+          <div className="flex gap-1.5 bg-white/[0.12] backdrop-blur-md rounded-2xl p-1.5">
             <button
               onClick={() => setRankingType('users')}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-[13px] font-semibold transition-all duration-300 ${
@@ -187,15 +188,11 @@ export function LeaderboardPage() {
 
       {/* ── Content ── */}
       {loading ? (
-        <div className="flex-1 flex flex-col items-center justify-center gap-3">
-          <div className="relative h-12 w-12">
-            <div className="absolute inset-0 rounded-full border-[3px] border-[#EBEBF0]" />
-            <div className="absolute inset-0 rounded-full border-[3px] border-[#4A90D9] border-t-transparent animate-spin" />
-          </div>
-          <p className="text-sm text-[#8E8E93] font-medium">Loading rankings...</p>
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+          <LeaderboardSkeletonList count={7} />
         </div>
       ) : rankingType === 'users' ? (
-        <>
+        <div className="fade-in-up flex-1 flex flex-col overflow-hidden">
           {/* ── Podium — Top 3 ── */}
           {topThree.length > 0 && (
             <div className="px-4 pt-6 pb-4 bg-white border-b border-[#EBEBF0]/60">
@@ -338,9 +335,9 @@ export function LeaderboardPage() {
               ))}
             </div>
           </div>
-        </>
+        </div>
       ) : (
-        <>
+        <div className="fade-in-up flex-1 flex flex-col overflow-hidden">
           {/* ── Posts Ranking ── */}
           <div className="flex-1 overflow-y-auto px-4 py-4">
             <div className="flex items-center gap-2 mb-3 px-1">
@@ -402,18 +399,18 @@ export function LeaderboardPage() {
               ))}
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {/* ── Winning Post Modal ── */}
       {selectedUser && selectedUser.topPost && (
         <div
           onClick={() => setSelectedUser(null)}
-          className="absolute inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn"
+          className="absolute inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md modal-backdrop"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md bg-white rounded-t-[28px] sm:rounded-[28px] sm:mx-5 overflow-hidden animate-slideUp"
+            className="relative w-full max-w-md bg-white rounded-t-[28px] sm:rounded-[28px] sm:mx-5 overflow-hidden modal-enter"
             style={{ boxShadow: '0 -8px 40px rgba(0,0,0,0.15)' }}
           >
             {/* Modal header */}
