@@ -14,6 +14,7 @@ type ProfileType = (typeof PROFILES)[number]
 export function ExplorePage() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(null)
+  const [canUndo, setCanUndo] = useState(false)
   const [showMatchModal, setShowMatchModal] = useState(false)
   const [matchedProfile, setMatchedProfile] = useState<ProfileType | null>(null)
   const [showNotifications, setShowNotifications] = useState(false)
@@ -46,11 +47,15 @@ export function ExplorePage() {
     setTimeout(() => {
       setSwipeDirection(null)
       setCurrentIndex((prev) => prev + 1)
+      setCanUndo(true)
     }, 300)
   }
 
   function handleUndo() {
-    if (currentIndex > 0) setCurrentIndex((prev) => prev - 1)
+    if (currentIndex > 0 && canUndo) {
+      setCurrentIndex((prev) => prev - 1)
+      setCanUndo(false)
+    }
   }
 
   function handleOpenChat() {
@@ -131,7 +136,7 @@ export function ExplorePage() {
         {/* Undo — small, tertiary */}
         <button
           onClick={handleUndo}
-          disabled={currentIndex === 0}
+          disabled={currentIndex === 0 || !canUndo}
           className="flex h-[52px] w-[52px] items-center justify-center rounded-[28px] bg-white transition-all active:scale-90 disabled:opacity-30"
           style={{ boxShadow: "0 2px 16px rgba(245,167,66,0.2)" }}
         >

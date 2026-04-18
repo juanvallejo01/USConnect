@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Hide scrollbar for carousel */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* ═══════════════════════════════════════════
    Cloud UI — Design System Tokens
    Instagram-inspired, premium university social

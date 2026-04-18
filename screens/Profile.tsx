@@ -110,7 +110,6 @@ export function ProfilePage() {
           </button>
           <GradientButton fullWidth size="lg">Save Changes</GradientButton>
         </div>
-      )}
 
       {/* ── PHOTO MANAGER SHEET ── */}
       {showPhotoManager && (

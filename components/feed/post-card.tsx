@@ -1,8 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Heart, MessageSquare, Send, Share2, Trash2 } from "lucide-react"
 import Image from "next/image"
+
+function parseImages(imageUrl?: string): string[] {
+  if (!imageUrl) return []
+  try {
+    const parsed = JSON.parse(imageUrl)
+    if (Array.isArray(parsed)) return parsed
+  } catch { /* not JSON, single URL */ }
+  return [imageUrl]
+}
 
 interface Post {
   id: string
@@ -51,6 +60,10 @@ export function PostCard({
   const [commentInput, setCommentInput] = useState("")
   const [comments, setComments] = useState<Comment[]>([])
   const [loadingComments, setLoadingComments] = useState(false)
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const images = parseImages(post.imageUrl)
 
   const handleLike = () => {
     if (post.isLiked) {
@@ -133,10 +146,46 @@ export function PostCard({
         )}
       </div>
 
-      {/* Image — edge to edge */}
-      {post.imageUrl && (
-        <div className="relative w-full aspect-square bg-[#F0F0F5]">
-          <Image src={post.imageUrl} alt="Post image" fill className="object-cover" />
+      {/* Image carousel — swipeable like Instagram */}
+      {images.length > 0 && (
+        <div className="relative w-full">
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
+            onScroll={(e) => {
+              const el = e.currentTarget
+              const index = Math.round(el.scrollLeft / el.clientWidth)
+              setActiveImageIndex(index)
+            }}
+          >
+            {images.map((url, i) => (
+              <div key={i} className="relative w-full aspect-square flex-shrink-0 snap-center bg-[#F0F0F5]">
+                <Image src={url} alt={`Post image ${i + 1}`} fill className="object-cover" />
+              </div>
+            ))}
+          </div>
+          {/* Dot indicators */}
+          {images.length > 1 && (
+            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+              {images.map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-[6px] rounded-full transition-all duration-200 ${
+                    i === activeImageIndex
+                      ? "w-[6px] bg-white shadow-[0_0_4px_rgba(0,0,0,0.3)]"
+                      : "w-[6px] bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+          {/* Counter badge */}
+          {images.length > 1 && (
+            <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-white">{activeImageIndex + 1}/{images.length}</span>
+            </div>
+          )}
         </div>
       )}
 

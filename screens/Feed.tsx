@@ -124,15 +124,9 @@ export function FeedPage() {
   const handleCreatePost = async () => {
     if (creating) return
     
-    // Validación: Si hay descripción, debe haber imagen
-    if (newPostContent.trim() && selectedImages.length === 0) {
-      alert('Please add an image to your post')
-      return
-    }
-
-    // Validación: Debe haber al menos imagen o texto
-    if (!newPostContent.trim() && selectedImages.length === 0) {
-      alert('Please add content or an image to your post')
+    // Debe haber al menos una imagen
+    if (selectedImages.length === 0) {
+      alert('Please add at least one image to your post')
       return
     }
     
@@ -154,7 +148,11 @@ export function FeedPage() {
         },
         body: JSON.stringify({
           content: newPostContent.trim(),
-          imageUrl: imagePreviews.length > 0 ? imagePreviews[0] : undefined,
+          imageUrl: imagePreviews.length > 1
+            ? JSON.stringify(imagePreviews)
+            : imagePreviews.length === 1
+              ? imagePreviews[0]
+              : undefined,
         }),
       })
 
@@ -392,7 +390,7 @@ export function FeedPage() {
               <h2 className="text-base font-bold text-[#1A1A2E]">New Post</h2>
               <button
                 onClick={handleCreatePost}
-                disabled={creating || (!!newPostContent.trim() && selectedImages.length === 0)}
+                disabled={creating || selectedImages.length === 0}
                 className="px-4 py-1.5 bg-[#4A90D9] text-white rounded-full font-semibold text-sm cloud-shadow micro-press focus-ring disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {creating ? "Posting..." : "Share"}
