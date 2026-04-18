@@ -8,11 +8,6 @@ export interface User {
   likesCount: number;
   createdAt: string;
   avatar?: string; // For frontend display
-  isCreator?: boolean;
-  creatorSince?: string;
-  creatorMonthlyPrice?: number;
-  creatorOnboardingStatus?: 'NONE' | 'PENDING' | 'INCOMPLETE' | 'ACTIVE';
-  stripeAccountId?: string;
 }
 
 export interface AuthResponse {

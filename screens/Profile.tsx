@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react"
 import {
-  Camera, LogOut, Heart, Star, Crown, Lock,
-  ExternalLink, CheckCircle, AlertCircle, Loader2,
-  Users, DollarSign, TrendingUp, Plus, X,
+  Camera, LogOut, Heart, Plus, X,
 } from "lucide-react"
 import Image from "next/image"
 import { GradientButton } from "@/components/layout/gradient-button"
@@ -13,145 +11,22 @@ import { useRank } from "@/context/rank-context"
 import { DEFAULT_INTERESTS } from "@/utils/constants"
 import { useProfilePhotos, AVAILABLE_PHOTOS as PHOTO_OPTIONS } from "@/context/profile-photos-context"
 
-type TabId = "account" | "subscriptions" | "creator"
-
-interface ActiveSub {
-  id: string
-  tier: string
-  status: string
-  currentPeriodEnd: string
-  creator: { id: string; name: string; major: string; creatorMonthlyPrice: number }
-}
-
-interface CreatorDashboard {
-  subscriberCount: number
-  monthlyRevenue: number
-  totalEarnings: number
-}
-
 export function ProfilePage() {
   const { user, logout } = useAuth()
   const { getUserRank } = useRank()
   const { likesReceived } = getUserRank(1)
 
-  const [activeTab, setActiveTab] = useState<TabId>("account")
   const [bio, setBio] = useState("Film major who loves golden hour shots and exploring LA coffee shops.")
   const [selectedInterests, setSelectedInterests] = useState<string[]>(["Photography", "Design", "Film", "Coffee"])
   const [showPhotoManager, setShowPhotoManager] = useState(false)
   const [showPhotoPicker, setShowPhotoPicker] = useState(false)
   const { photos, addPhoto, removePhoto } = useProfilePhotos()
 
-  const [monthlyPrice, setMonthlyPrice] = useState("9.99")
-  const [activating, setActivating] = useState(false)
-  const [activateError, setActivateError] = useState<string | null>(null)
-
-  const [dashboard, setDashboard] = useState<CreatorDashboard | null>(null)
-  const [dashLoading, setDashLoading] = useState(false)
-
-  const [subs, setSubs] = useState<ActiveSub[]>([])
-  const [subsLoading, setSubsLoading] = useState(false)
-  const [cancellingId, setCancellingId] = useState<string | null>(null)
-
   function toggleInterest(interest: string) {
     setSelectedInterests((prev) =>
       prev.includes(interest) ? prev.filter((i) => i !== interest) : [...prev, interest]
     )
   }
-
-  useEffect(() => {
-    if (activeTab === "creator" && user?.isCreator && !dashboard) loadDashboard()
-    if (activeTab === "subscriptions") loadSubscriptions()
-  }, [activeTab, user?.isCreator])
-
-  async function loadDashboard() {
-    try {
-      setDashLoading(true)
-      const token = localStorage.getItem("accessToken")
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/creator/dashboard`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) setDashboard(await res.json())
-    } finally { setDashLoading(false) }
-  }
-
-  async function loadSubscriptions() {
-    try {
-      setSubsLoading(true)
-      const token = localStorage.getItem("accessToken")
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/subscriptions/mine`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) setSubs(await res.json())
-    } finally { setSubsLoading(false) }
-  }
-
-  async function handleActivateCreator() {
-    const price = parseFloat(monthlyPrice)
-    if (isNaN(price) || price < 1 || price > 200) {
-      setActivateError("Price must be between $1 and $200")
-      return
-    }
-    try {
-      setActivating(true)
-      setActivateError(null)
-      const token = localStorage.getItem("accessToken")
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/creator/activate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ monthlyPrice: price }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || "Activation failed")
-      window.location.href = data.onboardingUrl
-    } catch (err: any) {
-      setActivateError(err.message)
-    } finally {
-      setActivating(false)
-    }
-  }
-
-  async function handleRefreshOnboarding() {
-    try {
-      setActivating(true)
-      const token = localStorage.getItem("accessToken")
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/creator/onboarding/refresh`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
-      if (res.ok) window.location.href = data.onboardingUrl
-    } finally { setActivating(false) }
-  }
-
-  async function handleGetStripeDashboard() {
-    const token = localStorage.getItem("accessToken")
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/creator/stripe-dashboard`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    const data = await res.json()
-    if (res.ok) window.open(data.url, "_blank")
-  }
-
-  async function handleCancelSub(subId: string) {
-    if (!confirm("Cancel subscription? You'll keep access until the billing period ends.")) return
-    try {
-      setCancellingId(subId)
-      const token = localStorage.getItem("accessToken")
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/subscriptions/${subId}/cancel`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) setSubs((prev) => prev.map((s) => s.id === subId ? { ...s, status: "canceling" } : s))
-    } finally { setCancellingId(null) }
-  }
-
-  const tierLabel: Record<string, string> = { BASIC: "Basic", GOLD: "⭐ Gold", PREMIUM: "👑 Premium" }
-
-  const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
-    { id: "account", label: "Account", icon: <Camera size={14} /> },
-    { id: "subscriptions", label: "Subscriptions", icon: <Star size={14} /> },
-    { id: "creator", label: "Creator", icon: <Crown size={14} /> },
-  ]
 
   return (
     <div className="flex flex-col h-full bg-[#F8F8FA] overflow-y-auto">
@@ -178,11 +53,6 @@ export function ProfilePage() {
         </div>
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-bold text-[#1A1A2E]">{user?.name || "User"}</h2>
-          {user?.isCreator && (
-            <span className="flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-400 px-2 py-0.5 text-[10px] font-bold text-white shadow">
-              <Crown size={10} /> Creator
-            </span>
-          )}
         </div>
         <p className="text-sm text-[#8E8E93] mt-0.5">{user?.major || "USC Student"}</p>
         <div className="mt-3 flex items-center gap-2 rounded-full bg-[#4A90D9] px-4 py-1.5 shadow-[0_4px_16px_rgba(74,144,217,0.2)]">
@@ -191,25 +61,8 @@ export function ProfilePage() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-[#EBEBF0] mx-4 mb-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-semibold transition-colors border-b-2 ${
-              activeTab === tab.id ? "border-[#4A90D9] text-[#4A90D9]" : "border-transparent text-[#C7C7CC] hover:text-[#8E8E93]"
-            }`}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── ACCOUNT TAB ── */}
-      {activeTab === "account" && (
-        <div className="px-6 pt-4 pb-6 flex flex-col gap-4">
+      {/* ── ACCOUNT ── */}
+      <div className="px-6 pt-4 pb-6 flex flex-col gap-4">
           <div>
             <label htmlFor="bio" className="block text-xs font-semibold text-[#8E8E93] uppercase tracking-wider mb-2">About You</label>
             <textarea
@@ -361,195 +214,6 @@ export function ProfilePage() {
               )}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ── SUBSCRIPTIONS TAB ── */}
-      {activeTab === "subscriptions" && (
-        <div className="px-4 pt-4 pb-6 flex flex-col gap-3">
-          {subsLoading ? (
-            <div className="flex justify-center py-12"><Loader2 size={28} className="animate-spin text-[#4A90D9]" /></div>
-          ) : subs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="rounded-full bg-[#4A90D9]/10 p-5 mb-4">
-                <Star size={28} className="text-[#4A90D9]" />
-              </div>
-              <p className="text-base font-bold text-[#1A1A2E] mb-1">No active subscriptions</p>
-              <p className="text-sm text-[#8E8E93] max-w-[260px]">Subscribe to creators on the Feed to unlock exclusive content.</p>
-            </div>
-          ) : (
-            subs.map((sub) => (
-              <div key={sub.id} className="bg-white rounded-3xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#EBEBF0]">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="h-10 w-10 rounded-full bg-[#4A90D9] flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-sm">{sub.creator.name.charAt(0)}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-bold text-[#1A1A2E] truncate">{sub.creator.name}</p>
-                      <Crown size={12} className="text-amber-500 flex-shrink-0" />
-                    </div>
-                    <p className="text-xs text-[#8E8E93] truncate">{sub.creator.major}</p>
-                  </div>
-                  <span className={`text-xs font-semibold rounded-full px-2.5 py-1 ${
-                    sub.status === "ACTIVE" ? "bg-green-50 text-green-600" :
-                    sub.status === "canceling" ? "bg-amber-50 text-amber-600" : "bg-red-50 text-red-500"
-                  }`}>
-                    {sub.status === "canceling" ? "Canceling" : sub.status}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-[#8E8E93] mb-3">
-                  <span>{tierLabel[sub.tier] || sub.tier} · ${sub.creator.creatorMonthlyPrice}/mo</span>
-                  <span>Renews {new Date(sub.currentPeriodEnd).toLocaleDateString()}</span>
-                </div>
-                {sub.status === "ACTIVE" && (
-                  <button
-                    onClick={() => handleCancelSub(sub.id)}
-                    disabled={cancellingId === sub.id}
-                    className="w-full py-2 rounded-xl border border-red-200 text-red-500 text-xs font-semibold transition-all active:scale-95 hover:bg-red-50 disabled:opacity-50"
-                  >
-                    {cancellingId === sub.id ? "Canceling..." : "Cancel Subscription"}
-                  </button>
-                )}
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {/* ── CREATOR TAB ── */}
-      {activeTab === "creator" && (
-        <div className="px-4 pt-4 pb-6 flex flex-col gap-4">
-
-          {/* Not yet a creator */}
-          {!user?.isCreator && !user?.creatorOnboardingStatus && (
-            <div className="bg-white rounded-3xl p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#EBEBF0]">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-400/20">
-                  <Crown size={20} className="text-amber-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-[#1A1A2E]">Become a Creator</p>
-                  <p className="text-xs text-[#8E8E93]">Earn money sharing exclusive content</p>
-                </div>
-              </div>
-              <ul className="space-y-2 mb-5">
-                {["Post exclusive content for subscribers", "Set your own monthly price ($1–$200)", "Get paid directly via Stripe", "Only 15% platform fee"].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-xs text-[#8E8E93]">
-                    <CheckCircle size={14} className="text-[#34C759] flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <div className="mb-4">
-                <label className="block text-xs font-semibold text-[#8E8E93] uppercase tracking-wider mb-1.5">Monthly Subscription Price</label>
-                <div className="flex items-center border border-[#EBEBF0] rounded-xl bg-[#F8F8FA] overflow-hidden focus-within:border-[#4A90D9] focus-within:ring-2 focus-within:ring-[#4A90D9]/20">
-                  <span className="px-3 text-[#8E8E93] font-medium text-sm">$</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={200}
-                    step={0.01}
-                    value={monthlyPrice}
-                    onChange={(e) => setMonthlyPrice(e.target.value)}
-                    className="flex-1 bg-transparent py-3 pr-4 text-sm text-[#1A1A2E] outline-none"
-                    placeholder="9.99"
-                  />
-                  <span className="px-3 text-[#C7C7CC] text-xs">/mo</span>
-                </div>
-              </div>
-              {activateError && (
-                <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-xl p-3 mb-3">
-                  <AlertCircle size={14} className="text-red-500 flex-shrink-0" />
-                  <p className="text-xs text-red-600">{activateError}</p>
-                </div>
-              )}
-              <GradientButton fullWidth onClick={handleActivateCreator} disabled={activating}>
-                {activating
-                  ? <span className="flex items-center gap-2"><Loader2 size={14} className="animate-spin" /> Setting up...</span>
-                  : <span className="flex items-center gap-2"><ExternalLink size={14} /> Continue to Stripe</span>
-                }
-              </GradientButton>
-              <p className="text-[11px] text-[#C7C7CC] text-center mt-2">You'll be redirected to Stripe to connect your bank account</p>
-            </div>
-          )}
-
-          {/* Onboarding pending / incomplete */}
-          {!user?.isCreator && (user?.creatorOnboardingStatus === "PENDING" || user?.creatorOnboardingStatus === "INCOMPLETE") && (
-            <div className="bg-amber-50 border border-amber-200 rounded-3xl p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <AlertCircle size={20} className="text-amber-500 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-bold text-amber-800">Complete your Stripe setup</p>
-                  <p className="text-xs text-amber-600">Your account is pending — finish onboarding to go live</p>
-                </div>
-              </div>
-              <button
-                onClick={handleRefreshOnboarding}
-                disabled={activating}
-                className="w-full py-2.5 rounded-xl bg-amber-500 text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-95 hover:bg-amber-600 disabled:opacity-50"
-              >
-                {activating ? <Loader2 size={14} className="animate-spin" /> : <ExternalLink size={14} />}
-                Continue Stripe Onboarding
-              </button>
-            </div>
-          )}
-
-          {/* Active creator dashboard */}
-          {user?.isCreator && (
-            dashLoading ? (
-              <div className="flex justify-center py-8"><Loader2 size={28} className="animate-spin text-[#4A90D9]" /></div>
-            ) : dashboard ? (
-              <>
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { icon: <Users size={16} className="text-[#4A90D9]" />, label: "Subscribers", value: String(dashboard.subscriberCount) },
-                    { icon: <DollarSign size={16} className="text-[#34C759]" />, label: "This Month", value: `$${dashboard.monthlyRevenue.toFixed(2)}` },
-                    { icon: <TrendingUp size={16} className="text-amber-500" />, label: "All Time", value: `$${dashboard.totalEarnings.toFixed(2)}` },
-                  ].map((stat) => (
-                    <div key={stat.label} className="bg-white rounded-3xl p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#EBEBF0] text-center">
-                      <div className="flex justify-center mb-1">{stat.icon}</div>
-                      <p className="text-base font-bold text-[#1A1A2E]">{stat.value}</p>
-                      <p className="text-[10px] text-[#8E8E93] mt-0.5">{stat.label}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="bg-white rounded-3xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#EBEBF0]">
-                  <p className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider mb-3">Your Subscription Tiers</p>
-                  {[
-                    { tier: "Basic", price: user.creatorMonthlyPrice ?? 0, desc: "Subscriber-only posts" },
-                    { tier: "⭐ Gold", price: (user.creatorMonthlyPrice ?? 0) * 2, desc: "Basic + Gold-tier exclusives" },
-                    { tier: "👑 Premium", price: (user.creatorMonthlyPrice ?? 0) * 5, desc: "Gold + Premium-only content" },
-                  ].map((t) => (
-                    <div key={t.tier} className="flex items-center justify-between py-2.5 border-b border-[#EBEBF0] last:border-0">
-                      <div>
-                        <p className="text-sm font-semibold text-[#1A1A2E]">{t.tier}</p>
-                        <p className="text-xs text-[#C7C7CC]">{t.desc}</p>
-                      </div>
-                      <span className="text-sm font-bold text-[#4A90D9]">${t.price.toFixed(2)}/mo</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  onClick={handleGetStripeDashboard}
-                  className="w-full flex items-center justify-between px-5 py-4 bg-white rounded-3xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#EBEBF0] transition-all active:scale-95 hover:border-[#4A90D9]/30"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-[#635BFF]/10">
-                      <DollarSign size={16} className="text-[#635BFF]" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-semibold text-[#1A1A2E]">Stripe Dashboard</p>
-                      <p className="text-xs text-[#8E8E93]">View payouts & manage banking</p>
-                    </div>
-                  </div>
-                  <ExternalLink size={16} className="text-[#C7C7CC]" />
-                </button>
-              </>
-            ) : null
-          )}
         </div>
       )}
     </div>

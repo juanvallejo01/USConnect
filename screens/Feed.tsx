@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Plus, X, Image as ImageIcon, Trash2, Lock, Crown, Star } from "lucide-react"
+import { Plus, X, Image as ImageIcon, Trash2 } from "lucide-react"
 import Image from "next/image"
 import { GradientHeader } from "@/components/layout/gradient-header"
 import { PostCard } from "@/components/feed/post-card"
@@ -10,23 +10,18 @@ import { UserProfile } from "./UserProfile"
 import { useAuth } from "@/context/auth-context"
 import { FEED_POSTS } from "@/utils/constants"
 
-type AccessLevel = "PUBLIC" | "SUBSCRIBERS" | "TIER_GOLD" | "TIER_PREMIUM"
-
 interface Post {
   id: string
   content: string
   imageUrl?: string
-  accessLevel: AccessLevel
   likesCount: number
   commentsCount: number
   isLiked: boolean
-  isSubscribed?: boolean
   createdAt: string
   user: {
     id: string
     name: string
     major: string
-    isCreator?: boolean
   }
 }
 
@@ -37,14 +32,11 @@ export function FeedPage() {
   const [showCreatePost, setShowCreatePost] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [newPostContent, setNewPostContent] = useState("")
-  const [accessLevel, setAccessLevel] = useState<AccessLevel>("PUBLIC")
   const [selectedImages, setSelectedImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
   const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0)
   const [creating, setCreating] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const isCreator = (user as any)?.isCreator === true
 
   useEffect(() => {
     loadFeed()
@@ -163,7 +155,6 @@ export function FeedPage() {
         body: JSON.stringify({
           content: newPostContent.trim(),
           imageUrl: imagePreviews.length > 0 ? imagePreviews[0] : undefined,
-          accessLevel,
         }),
       })
 
@@ -175,7 +166,6 @@ export function FeedPage() {
         setSelectedImages([])
         setImagePreviews([])
         setCurrentPreviewIndex(0)
-        setAccessLevel("PUBLIC")
         setShowCreatePost(false)
       } else {
         const error = await response.json()
@@ -360,52 +350,7 @@ export function FeedPage() {
           </div>
         ) : (
           <div className="flex flex-col fade-in-up">
-            {posts.map((post) => {
-              // Determine if this VIP post is locked for the current viewer
-              const isVip = post.accessLevel !== "PUBLIC"
-              const isOwnPost = post.user.id === user?.id
-              const isLocked = isVip && !isOwnPost && !post.isSubscribed
-
-              if (isLocked) {
-                return (
-                  <div key={post.id} className="bg-white border-b border-[#EBEBF0]">
-                    {/* Creator header */}
-                    <div className="flex items-center gap-3 px-4 py-3">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#4A90D9] to-[#357ABD] flex items-center justify-center flex-shrink-0 ring-2 ring-[#4A90D9]/20">
-                        <span className="text-white text-sm font-bold">{post.user.name.charAt(0)}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[13px] font-bold text-[#1A1A2E]">{post.user.name}</span>
-                          <Crown size={12} className="text-amber-500" />
-                        </div>
-                        <span className="text-[11px] text-[#8E8E93]">
-                          {post.accessLevel === "TIER_GOLD" ? "⭐ Gold Tier" : post.accessLevel === "TIER_PREMIUM" ? "👑 Premium Tier" : "Subscribers only"}
-                        </span>
-                      </div>
-                    </div>
-                    {/* Locked overlay */}
-                    <div className="relative w-full aspect-[4/3] bg-gradient-to-b from-[#E8EFF8] to-[#D4E2F4] flex flex-col items-center justify-center gap-3 select-none">
-                      <div className="absolute inset-0 backdrop-blur-sm bg-white/30" />
-                      <div className="relative z-10 flex flex-col items-center gap-3">
-                        <div className="flex items-center justify-center h-14 w-14 rounded-full bg-white/80 backdrop-blur-sm shadow-lg">
-                          <Lock size={24} className="text-[#4A90D9]" />
-                        </div>
-                        <p className="text-sm font-bold text-[#1A1A2E]">Exclusive Content</p>
-                        <p className="text-xs text-[#8E8E93]">Subscribe to {post.user.name} to unlock</p>
-                        <button
-                          onClick={() => setSelectedUserId(post.user.id)}
-                          className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#4A90D9] text-white text-xs font-bold shadow-md transition-all duration-300 active:scale-95 mt-1"
-                        >
-                          <Star size={12} /> Subscribe
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )
-              }
-
-              return (
+            {posts.map((post) => (
                 <PostCard
                   key={post.id}
                   post={post}
@@ -416,8 +361,7 @@ export function FeedPage() {
                   onDelete={handleDelete}
                   onUserClick={setSelectedUserId}
                 />
-              )
-            })}
+            ))}
           </div>
         )}
       </div>
@@ -466,19 +410,6 @@ export function FeedPage() {
                   <p className="text-sm font-semibold text-[#1A1A2E]">{user?.name || "User"}</p>
                   <p className="text-xs text-[#8E8E93]">{(user as any)?.major || "USC Student"}</p>
                 </div>
-                {/* Access level selector — only visible for creators */}
-                {isCreator && (
-                  <select
-                    value={accessLevel}
-                    onChange={(e) => setAccessLevel(e.target.value as AccessLevel)}
-                    className="text-xs font-semibold rounded-full px-3 py-1.5 border border-[#EBEBF0] bg-white text-[#1A1A2E] outline-none focus:border-[#4A90D9] transition-colors duration-300"
-                  >
-                    <option value="PUBLIC">🌍 Public</option>
-                    <option value="SUBSCRIBERS">🔒 Subscribers</option>
-                    <option value="TIER_GOLD">⭐ Gold</option>
-                    <option value="TIER_PREMIUM">👑 Premium</option>
-                  </select>
-                )}
               </div>
 
               <textarea
