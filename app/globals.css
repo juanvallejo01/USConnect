@@ -7,6 +7,67 @@
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* ══════════════════════════════════════════
+   DARK MODE — Premium deep-navy theme
+══════════════════════════════════════════ */
+html.dark {
+  color-scheme: dark;
+
+  /* Design token overrides */
+  --background: #0F0F1A;
+  --foreground: #EEEEF8;
+  --card: #1A1A28;
+  --card-foreground: #EEEEF8;
+  --popover: #1A1A28;
+  --popover-foreground: #EEEEF8;
+  --secondary: #151523;
+  --secondary-foreground: #EEEEF8;
+  --muted: #131320;
+  --muted-foreground: #9898AA;
+  --border: #252538;
+  --input: #252538;
+  --ring: #5B9FE8;
+}
+
+/* ── Page-level backgrounds ── */
+html.dark .bg-\[#F8F8FA\] { background-color: #0F0F1A; }
+html.dark .bg-\[#F0F0F5\] { background-color: #08080F; }
+
+/* ── Card / surface ── */
+html.dark .bg-white       { background-color: #1A1A28; }
+html.dark .bg-\[#F2F2F7\] { background-color: #13131E; }
+html.dark .bg-\[#EBEBF0\] { background-color: #252538; }
+html.dark .bg-\[#4A90D9\]\/5 { background-color: rgba(91,159,232,0.08) !important; }
+
+/* ── Text ── */
+html.dark .text-\[#1A1A2E\] { color: #EEEEF8; }
+html.dark .text-\[#8E8E93\] { color: #9898AA; }
+html.dark .text-\[#C7C7CC\] { color: #6E6E82; }
+
+/* ── Borders ── */
+html.dark .border-\[#EBEBF0\] { border-color: #252538; }
+html.dark .ring-offset-\[#F8F8FA\] { --tw-ring-offset-color: #0F0F1A; }
+
+/* ── Form inputs ── */
+html.dark textarea,
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+  background-color: #1A1A28 !important;
+  color: #EEEEF8 !important;
+  border-color: #252538 !important;
+}
+html.dark textarea::placeholder,
+html.dark input::placeholder { color: #6E6E82 !important; }
+
+/* ── Bottom nav gradient ── */
+html.dark .bottom-nav-glass {
+  background: linear-gradient(to bottom,
+    rgba(15,15,26,0.97),
+    rgba(15,15,26,0.93),
+    rgba(15,15,26,0.97)) !important;
+  border-color: #252538 !important;
+  box-shadow: 0 -1px 0 #252538 !important;
+}
+
 /* ═══════════════════════════════════════════
    Cloud UI — Design System Tokens
    Instagram-inspired, premium university social

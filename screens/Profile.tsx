@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react"
 import {
-  Camera, LogOut, Heart, Plus, X,
+  Camera, LogOut, Heart, Plus, X, Moon, Sun,
 } from "lucide-react"
 import Image from "next/image"
+import { useTheme } from "next-themes"
 import { GradientButton } from "@/components/layout/gradient-button"
 import { useAuth } from "@/context/auth-context"
 import { useRank } from "@/context/rank-context"
@@ -15,12 +16,18 @@ export function ProfilePage() {
   const { user, logout } = useAuth()
   const { getUserRank } = useRank()
   const { likesReceived } = getUserRank(1)
+  const { theme, setTheme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
 
   const [bio, setBio] = useState("Film major who loves golden hour shots and exploring LA coffee shops.")
   const [selectedInterests, setSelectedInterests] = useState<string[]>(["Photography", "Design", "Film", "Coffee"])
   const [showPhotoManager, setShowPhotoManager] = useState(false)
   const [showPhotoPicker, setShowPhotoPicker] = useState(false)
   const { photos, addPhoto, removePhoto } = useProfilePhotos()
+
+  useEffect(() => { setMounted(true) }, [])
+
+  const isDark = resolvedTheme === "dark"
 
   function toggleInterest(interest: string) {
     setSelectedInterests((prev) =>
@@ -108,6 +115,38 @@ export function ProfilePage() {
               <p className="text-xs text-[#C7C7CC]">{photos.length} foto{photos.length !== 1 ? "s" : ""} · toca para gestionar</p>
             </div>
           </button>
+          {/* Dark mode toggle */}
+          <div className="flex items-center justify-between w-full rounded-2xl border border-[#EBEBF0] bg-white px-5 py-4">
+            <div className="flex items-center gap-3">
+              <div className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300 ${isDark ? "bg-[#1A1A28] shadow-[0_0_16px_rgba(91,159,232,0.25)]" : "bg-[#FFF8E7]"}`}>
+                {mounted && isDark
+                  ? <Moon size={16} className="text-[#5B9FE8]" />
+                  : <Sun size={16} className="text-[#FF9F0A]" />}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#1A1A2E]">Modo oscuro</p>
+                <p className="text-xs text-[#8E8E93]">{mounted && isDark ? "Activado" : "Desactivado"}</p>
+              </div>
+            </div>
+
+            {/* Toggle switch */}
+            <button
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+              className={`relative h-7 w-12 rounded-full transition-all duration-300 focus:outline-none ${
+                isDark
+                  ? "bg-[#4A90D9] shadow-[0_0_12px_rgba(74,144,217,0.4)]"
+                  : "bg-[#EBEBF0]"
+              }`}
+              aria-label="Toggle dark mode"
+            >
+              <span
+                className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow-md transition-all duration-300 ease-spring ${
+                  isDark ? "translate-x-[22px]" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </div>
+
           <GradientButton fullWidth size="lg">Save Changes</GradientButton>
         </div>
 

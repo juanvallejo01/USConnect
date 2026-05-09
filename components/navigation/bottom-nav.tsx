@@ -28,7 +28,7 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   const indicatorPosition = activeIndex * 100 // 100% per tab to move across full width
 
   return (
-    <nav className="relative bg-gradient-to-b from-white/95 via-white/90 to-white/95 backdrop-blur-2xl border-t border-[#EBEBF0]/60 px-2 pb-6 pt-3 shadow-[0_-2px_20px_rgba(0,0,0,0.03)]" role="tablist" aria-label="Main navigation">
+    <nav className="bottom-nav-glass relative bg-gradient-to-b from-white/95 via-white/90 to-white/95 backdrop-blur-2xl border-t border-[#EBEBF0]/60 px-2 pb-6 pt-3 shadow-[0_-2px_20px_rgba(0,0,0,0.03)]" role="tablist" aria-label="Main navigation">
       {/* Sliding indicator */}
       <div className="absolute top-0 left-0 right-0 h-0.5 overflow-hidden">
         <div 
