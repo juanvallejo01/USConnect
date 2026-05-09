@@ -31,7 +31,7 @@ export function LeaderboardRow({
       className={`flex items-center gap-3 rounded-2xl p-3.5 transition-all duration-300 hover:scale-[1.02] cursor-pointer animate-rankSlideIn ${
         isTopThree
           ? "bg-gradient-to-r from-[#4A90D9]/[0.06] to-[#B8A9C9]/[0.06] border border-[#4A90D9]/15"
-          : "bg-white border border-[#EBEBF0]/80 hover:border-[#4A90D9]/20 hover:cloud-shadow-md"
+          : "bg-white dark:bg-[#1A1A28] border border-[#EBEBF0]/80 dark:border-[#252538] hover:border-[#4A90D9]/20 hover:cloud-shadow-md"
       }`}
       style={{ animationDelay: `${delay}ms` }}
     >
@@ -39,8 +39,8 @@ export function LeaderboardRow({
         {isTopThree ? (
           <RankBadge rank={rank} size="md" />
         ) : (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F2F2F7]">
-            <span className="text-xs font-bold text-[#8E8E93]">#{rank}</span>
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F2F2F7] dark:bg-[#252538]">
+            <span className="text-xs font-bold text-[#8E8E93] dark:text-[#9898AA]">#{rank}</span>
           </div>
         )}
       </div>
@@ -53,13 +53,13 @@ export function LeaderboardRow({
         className={`rounded-xl px-3 py-1.5 flex items-center gap-1.5 transition-all ${
           isTopThree
             ? "bg-gradient-to-r from-[#4A90D9] to-[#6BA5E2] cloud-shadow-blue"
-            : "bg-[#F2F2F7]"
+            : "bg-[#F2F2F7] dark:bg-[#252538]"
         }`}
       >
         <Heart size={10} className={isTopThree ? "text-white" : "text-[#FF6B6B]"} fill="currentColor" />
         <p
           className={`text-xs font-bold ${
-            isTopThree ? "text-white" : "text-[#1A1A2E]"
+            isTopThree ? "text-white" : "text-[#1A1A2E] dark:text-white"
           }`}
         >
           {campusRank.toLocaleString()}

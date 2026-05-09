@@ -131,13 +131,13 @@ export function ExplorePage() {
       </div>
 
       {/* ── ACTION BUTTONS ROW ── */}
-      <div className="bg-[#F8F8FA] flex items-center justify-center gap-8 px-8 py-5 border-t border-[#EBEBF0] cloud-shadow">
+      <div className="bg-[#F8F8FA] dark:bg-[#0F0F14] flex items-center justify-center gap-8 px-8 py-5 border-t border-[#EBEBF0] dark:border-[#1E1E2C] cloud-shadow">
 
         {/* Undo — small, tertiary */}
         <button
           onClick={handleUndo}
           disabled={currentIndex === 0 || !canUndo}
-          className="flex h-[52px] w-[52px] items-center justify-center rounded-[28px] bg-white transition-all active:scale-90 disabled:opacity-30"
+          className="flex h-[52px] w-[52px] items-center justify-center rounded-[28px] bg-white dark:bg-[#1C1C28] transition-all active:scale-90 disabled:opacity-30"
           style={{ boxShadow: "0 2px 16px rgba(245,167,66,0.2)" }}
         >
           <RotateCcw size={22} className="text-[#F5A742]" strokeWidth={2.2} />
@@ -146,7 +146,7 @@ export function ExplorePage() {
         {/* Nope — primary action */}
         <button
           onClick={() => handleSwipe("left")}
-          className="flex h-[64px] w-[64px] items-center justify-center rounded-[28px] bg-white transition-all active:scale-90"
+          className="flex h-[64px] w-[64px] items-center justify-center rounded-[28px] bg-white dark:bg-[#1C1C28] transition-all active:scale-90"
           style={{ boxShadow: "0 2px 16px rgba(255,68,88,0.2)" }}
         >
           <X size={28} className="text-[#FF4458]" strokeWidth={2.8} />
@@ -156,7 +156,7 @@ export function ExplorePage() {
         <button
           onClick={() => handleSwipe("right")}
           disabled={alreadyLiked}
-          className="flex h-[72px] w-[72px] items-center justify-center rounded-[28px] bg-white transition-all active:scale-90 disabled:opacity-35"
+          className="flex h-[72px] w-[72px] items-center justify-center rounded-[28px] bg-white dark:bg-[#1C1C28] transition-all active:scale-90 disabled:opacity-35"
           style={{ boxShadow: "0 4px 20px rgba(76,217,100,0.25)" }}
         >
           <Heart size={32} className="text-[#4CD964]" fill="#4CD964" />
@@ -165,11 +165,11 @@ export function ExplorePage() {
 
       {/* ── NOTIFICATIONS PANEL ── */}
       {showNotifications && (
-        <div className={`absolute inset-0 bg-[#F8F8FA] z-40 overflow-hidden ${isClosingNotifications ? "animate-slideOut" : "animate-slideDown"}`}>
+        <div className={`absolute inset-0 bg-[#F8F8FA] dark:bg-[#07070B] z-40 overflow-hidden ${isClosingNotifications ? "animate-slideOut" : "animate-slideDown"}`}>
           <div className="h-full overflow-y-auto">
             <div className="p-5 pt-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-[#1A1A2E]">Notifications</h2>
+                <h2 className="text-xl font-bold text-[#1A1A2E] dark:text-white">Notifications</h2>
                 <button onClick={handleCloseNotifications} className="p-1 text-[#8E8E93]">
                   <X size={24} />
                 </button>
@@ -195,7 +195,7 @@ export function ExplorePage() {
                   notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`p-4 rounded-2xl border ${notification.read ? "bg-white border-[#EBEBF0]" : "bg-[#4A90D9]/5 border-[#4A90D9]/20"}`}
+                      className={`p-4 rounded-2xl border ${notification.read ? "bg-white dark:bg-[#0F0F14] border-[#EBEBF0] dark:border-[#1E1E2C]" : "bg-[#4A90D9]/5 dark:bg-[#4A90D9]/10 border-[#4A90D9]/20"}`}
                     >
                       <div className="flex items-start gap-3">
                         <img
@@ -204,7 +204,7 @@ export function ExplorePage() {
                           className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-[#1A1A2E]">
+                          <p className="text-sm text-[#1A1A2E] dark:text-[#E0E0F0]">
                             <span className="font-bold">{(notification as any).userName}</span>{" "}
                             {notification.type === "MATCH" ? "matched with you!" : (notification as any).message}
                           </p>
@@ -245,7 +245,7 @@ export function ExplorePage() {
       {/* ── MATCH MODAL ── */}
       {showMatchModal && matchedProfile && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="relative mx-5 w-full max-w-sm bg-white rounded-[32px] p-8 cloud-shadow-lg">
+          <div className="relative mx-5 w-full max-w-sm bg-white dark:bg-[#0F0F14] rounded-[32px] p-8 cloud-shadow-lg">
             <div className="absolute inset-0 overflow-hidden rounded-[32px] pointer-events-none">
               {[...Array(30)].map((_, i) => (
                 <div
@@ -278,7 +278,7 @@ export function ExplorePage() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowMatchModal(false)}
-                  className="flex-1 py-3 px-4 rounded-2xl border-2 border-[#EBEBF0] text-[#1A1A2E] font-semibold transition-all active:scale-95"
+                  className="flex-1 py-3 px-4 rounded-2xl border-2 border-[#EBEBF0] dark:border-[#1E1E2C] text-[#1A1A2E] dark:text-white font-semibold transition-all active:scale-95"
                 >
                   Keep Swiping
                 </button>

@@ -8,65 +8,91 @@
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ══════════════════════════════════════════
-   DARK MODE — Premium deep-navy theme
+   DARK MODE — Deep black premium theme
+   Surface hierarchy:
+     Page bg    : #07070B  (near-pure black)
+     Card       : #0F0F14  (slightly lifted)
+     Elevated   : #161620  (modals, sheets)
+     Input/chip : #1C1C28  (interactive surfaces)
+     Border     : #1E1E2C  (subtle separators)
 ══════════════════════════════════════════ */
 html.dark {
   color-scheme: dark;
 
-  /* Design token overrides */
-  --background: #0F0F1A;
-  --foreground: #EEEEF8;
-  --card: #1A1A28;
-  --card-foreground: #EEEEF8;
-  --popover: #1A1A28;
-  --popover-foreground: #EEEEF8;
-  --secondary: #151523;
-  --secondary-foreground: #EEEEF8;
-  --muted: #131320;
-  --muted-foreground: #9898AA;
-  --border: #252538;
-  --input: #252538;
-  --ring: #5B9FE8;
-
-  /* Hardcoded-color overrides via attribute selector (Tailwind v4 safe) */
-  background-color: #0F0F1A;
-  color: #EEEEF8;
+  --background:          #07070B;
+  --foreground:          #F2F2FA;
+  --card:                #0F0F14;
+  --card-foreground:     #F2F2FA;
+  --popover:             #161620;
+  --popover-foreground:  #F2F2FA;
+  --secondary:           #0D0D12;
+  --secondary-foreground:#F2F2FA;
+  --muted:               #0A0A0F;
+  --muted-foreground:    #8A8AA8;
+  --border:              #1E1E2C;
+  --input:               #1C1C28;
+  --ring:                #5B9FE8;
+  --primary:             #5B9FE8;
 }
 
-/* ── Page / surface overrides ── */
-html.dark body             { background-color: #0F0F1A; color: #EEEEF8; }
-html.dark [class*="bg-white"]   { background-color: #1A1A28 !important; }
-html.dark [class*="bg-[#F8F8FA]"],
-html.dark [class*="bg-[#F0F0F5]"],
-html.dark [class*="bg-[#F2F2F7]"] { background-color: #0F0F1A !important; }
-html.dark [class*="bg-[#EBEBF0]"] { background-color: #252538 !important; }
+/* ── Page & container backgrounds ── */
+html.dark body                                { background-color: #07070B; color: #F2F2FA; }
+html.dark [class~="bg-white"]                 { background-color: #0F0F14 !important; }
+html.dark [class*="bg-[#FAFAFA]"]             { background-color: #07070B !important; }
+html.dark [class*="bg-[#F8F8FA]"]             { background-color: #07070B !important; }
+html.dark [class*="bg-[#F0F0F5]"]             { background-color: #030305 !important; }
+html.dark [class*="bg-[#F2F2F7]"]             { background-color: #1C1C28 !important; }
+html.dark [class*="bg-[#EBEBF0]"]             { background-color: #1E1E2C !important; }
 
-/* ── Text overrides ── */
-html.dark [class*="text-[#1A1A2E]"] { color: #EEEEF8 !important; }
-html.dark [class*="text-[#8E8E93]"] { color: #9898AA !important; }
-html.dark [class*="text-[#C7C7CC]"] { color: #6E6E82 !important; }
+/* ── Text ── */
+html.dark [class*="text-[#1A1A2E]"]           { color: #F2F2FA !important; }
+html.dark [class*="text-[#262626]"]           { color: #F2F2FA !important; }
+html.dark [class*="text-[#8E8E93]"]           { color: #8A8AA8 !important; }
+html.dark [class*="text-[#C7C7CC]"]           { color: #55556A !important; }
 
-/* ── Border overrides ── */
-html.dark [class*="border-[#EBEBF0]"] { border-color: #252538 !important; }
+/* ── Borders ── */
+html.dark [class*="border-[#EBEBF0]"]         { border-color: #1E1E2C !important; }
+html.dark [class*="border-[#F2F2F7]"]         { border-color: #1C1C28 !important; }
 
-/* ── Form inputs ── */
+/* ── Form inputs & textareas ── */
 html.dark textarea,
 html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
-  background-color: #1A1A28 !important;
-  color: #EEEEF8 !important;
-  border-color: #252538 !important;
+  background-color: #1C1C28 !important;
+  color: #F2F2FA !important;
+  border-color: #1E1E2C !important;
 }
 html.dark textarea::placeholder,
-html.dark input::placeholder { color: #6E6E82 !important; }
+html.dark input::placeholder { color: #55556A !important; }
+html.dark textarea:focus,
+html.dark input:focus { border-color: #5B9FE8 !important; }
 
-/* ── Bottom nav gradient ── */
+/* ── Bottom nav ── */
 html.dark .bottom-nav-glass {
   background: linear-gradient(to bottom,
-    rgba(15,15,26,0.97),
-    rgba(15,15,26,0.93),
-    rgba(15,15,26,0.97)) !important;
-  border-color: #252538 !important;
-  box-shadow: 0 -1px 0 #252538 !important;
+    rgba(7,7,11,0.98),
+    rgba(7,7,11,0.95)) !important;
+  border-color: #1E1E2C !important;
+  box-shadow: 0 -1px 0 #1E1E2C, 0 -8px 24px rgba(0,0,0,0.6) !important;
+}
+
+/* ── Outer frame (behind the phone) ── */
+html.dark .dark\:bg-\[#030305\] { background-color: #030305 !important; }
+
+/* ── Cards & list rows ── */
+html.dark [class*="bg-gradient-to-r"][class*="4A90D9/[0.06]"] {
+  background: linear-gradient(to right, rgba(91,159,232,0.06), rgba(184,169,201,0.06)) !important;
+}
+
+/* ── Sheet / modal backdrop ── */
+html.dark [class~="bg-white"][class*="rounded-t-3xl"] { background-color: #161620 !important; }
+
+/* ── Skeleton shimmer adjusted for dark ── */
+html.dark .skeleton-shimmer {
+  background: linear-gradient(90deg,
+    #0F0F14 25%,
+    #1C1C28 50%,
+    #0F0F14 75%) !important;
+  background-size: 200% 100% !important;
 }
 
 /* ═══════════════════════════════════════════

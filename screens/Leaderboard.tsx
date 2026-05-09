@@ -122,8 +122,8 @@ export function LeaderboardPage() {
         )
       default:
         return (
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F2F2F7]">
-            <span className="text-xs font-bold text-[#8E8E93]">#{rank}</span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F2F2F7] dark:bg-[#252538]">
+            <span className="text-xs font-bold text-[#8E8E93] dark:text-[#9898AA]">#{rank}</span>
           </div>
         )
     }
@@ -139,7 +139,7 @@ export function LeaderboardPage() {
   }
 
   return (
-    <div className="flex h-full flex-col bg-[#F8F8FA]">
+    <div className="flex h-full flex-col bg-[#F8F8FA] dark:bg-[#07070B]">
       {/* ── Header ── */}
       <div className="relative overflow-hidden bg-gradient-to-br from-[#4A90D9] via-[#5A9DE5] to-[#6BB0F0] px-5 pt-14 pb-6">
         {/* Decorative circles */}
@@ -195,7 +195,7 @@ export function LeaderboardPage() {
         <div className="fade-in-up flex-1 flex flex-col overflow-hidden">
           {/* ── Podium — Top 3 ── */}
           {topThree.length > 0 && (
-            <div className="px-4 pt-6 pb-4 bg-white border-b border-[#EBEBF0]/60">
+            <div className="px-4 pt-6 pb-4 bg-white dark:bg-[#0F0F14] border-b border-[#EBEBF0]/60 dark:border-[#1E1E2C]">
               <div className="flex items-end justify-center gap-2">
                 {/* 2nd Place */}
                 {topThree[1] && (
@@ -206,7 +206,7 @@ export function LeaderboardPage() {
                   >
                     <div className="relative mb-2">
                       <div className="h-[60px] w-[60px] rounded-full bg-gradient-to-br from-slate-200 to-slate-400 p-[2.5px]">
-                        <div className="h-full w-full rounded-full bg-[#4A90D9] flex items-center justify-center text-white font-bold text-lg">
+                        <div className="h-full w-full rounded-full bg-gradient-to-br from-slate-500 to-slate-700 dark:from-slate-600 dark:to-slate-800 flex items-center justify-center text-white font-bold text-lg">
                           {topThree[1].name.charAt(0)}
                         </div>
                       </div>
@@ -217,15 +217,15 @@ export function LeaderboardPage() {
                         </div>
                       </div>
                     </div>
-                    <h3 className="text-[13px] font-bold text-[#1A1A2E] truncate max-w-[90px] text-center">{topThree[1].name.split(' ')[0]}</h3>
-                    <p className="text-[10px] text-[#8E8E93] truncate max-w-[80px] text-center mt-0.5">{topThree[1].major}</p>
-                    <div className="mt-2 rounded-xl bg-[#F2F2F7] px-3 py-1 flex items-center gap-1">
+                    <h3 className="text-[13px] font-bold text-[#1A1A2E] dark:text-white truncate max-w-[90px] text-center">{topThree[1].name.split(' ')[0]}</h3>
+                    <p className="text-[10px] text-[#8E8E93] dark:text-[#8A8AA8] truncate max-w-[80px] text-center mt-0.5">{topThree[1].major}</p>
+                    <div className="mt-2 rounded-xl bg-[#F2F2F7] dark:bg-[#252538] px-3 py-1 flex items-center gap-1">
                       <Heart size={9} className="text-[#FF6B6B]" fill="currentColor" />
-                      <span className="text-[11px] font-bold text-[#1A1A2E]">{topThree[1].weeklyLikes}</span>
+                      <span className="text-[11px] font-bold text-[#1A1A2E] dark:text-white">{topThree[1].weeklyLikes}</span>
                     </div>
                     {/* Podium block */}
-                    <div className="mt-3 w-full h-16 bg-gradient-to-t from-slate-200 to-slate-100 rounded-t-2xl flex items-center justify-center border border-slate-200/60">
-                      <span className="text-2xl font-black text-slate-400">2</span>
+                    <div className="mt-3 w-full h-16 bg-gradient-to-t from-slate-600/40 to-slate-500/20 dark:from-slate-700 dark:to-slate-600/40 rounded-t-2xl flex items-center justify-center border border-slate-300/30 dark:border-slate-600/40">
+                      <span className="text-2xl font-black text-slate-400 dark:text-slate-300">2</span>
                     </div>
                   </div>
                 )}
@@ -253,15 +253,15 @@ export function LeaderboardPage() {
                         </div>
                       </div>
                     </div>
-                    <h3 className="text-[14px] font-extrabold text-[#1A1A2E] truncate max-w-[100px] text-center">{topThree[0].name.split(' ')[0]}</h3>
-                    <p className="text-[10px] text-[#8E8E93] truncate max-w-[90px] text-center mt-0.5">{topThree[0].major}</p>
+                    <h3 className="text-[14px] font-extrabold text-[#1A1A2E] dark:text-white truncate max-w-[100px] text-center">{topThree[0].name.split(' ')[0]}</h3>
+                    <p className="text-[10px] text-[#8E8E93] dark:text-[#8A8AA8] truncate max-w-[90px] text-center mt-0.5">{topThree[0].major}</p>
                     <div className="mt-2 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 px-3.5 py-1.5 flex items-center gap-1.5"
                       style={{ boxShadow: '0 3px 12px rgba(255,215,0,0.3)' }}>
                       <Heart size={10} className="text-white" fill="currentColor" />
                       <span className="text-[12px] font-bold text-white">{topThree[0].weeklyLikes}</span>
                     </div>
                     {/* Podium block — tallest */}
-                    <div className="mt-3 w-full h-24 bg-gradient-to-t from-yellow-200 to-yellow-50 rounded-t-2xl flex items-center justify-center border border-yellow-200/60">
+                    <div className="mt-3 w-full h-24 bg-gradient-to-t from-yellow-500/30 to-yellow-400/10 dark:from-yellow-600/30 dark:to-yellow-500/10 rounded-t-2xl flex items-center justify-center border border-yellow-300/30 dark:border-yellow-500/20">
                       <span className="text-3xl font-black text-yellow-500">1</span>
                     </div>
                   </div>
@@ -276,7 +276,7 @@ export function LeaderboardPage() {
                   >
                     <div className="relative mb-2">
                       <div className="h-[56px] w-[56px] rounded-full bg-gradient-to-br from-amber-400 to-orange-500 p-[2.5px]">
-                        <div className="h-full w-full rounded-full bg-[#4A90D9] flex items-center justify-center text-white font-bold text-base">
+                        <div className="h-full w-full rounded-full bg-gradient-to-br from-amber-600 to-orange-700 dark:from-amber-700 dark:to-orange-800 flex items-center justify-center text-white font-bold text-base">
                           {topThree[2].name.charAt(0)}
                         </div>
                       </div>
@@ -287,15 +287,15 @@ export function LeaderboardPage() {
                         </div>
                       </div>
                     </div>
-                    <h3 className="text-[13px] font-bold text-[#1A1A2E] truncate max-w-[85px] text-center">{topThree[2].name.split(' ')[0]}</h3>
-                    <p className="text-[10px] text-[#8E8E93] truncate max-w-[75px] text-center mt-0.5">{topThree[2].major}</p>
-                    <div className="mt-2 rounded-xl bg-[#F2F2F7] px-3 py-1 flex items-center gap-1">
+                    <h3 className="text-[13px] font-bold text-[#1A1A2E] dark:text-white truncate max-w-[85px] text-center">{topThree[2].name.split(' ')[0]}</h3>
+                    <p className="text-[10px] text-[#8E8E93] dark:text-[#8A8AA8] truncate max-w-[75px] text-center mt-0.5">{topThree[2].major}</p>
+                    <div className="mt-2 rounded-xl bg-[#F2F2F7] dark:bg-[#252538] px-3 py-1 flex items-center gap-1">
                       <Heart size={9} className="text-[#FF6B6B]" fill="currentColor" />
-                      <span className="text-[11px] font-bold text-[#1A1A2E]">{topThree[2].weeklyLikes}</span>
+                      <span className="text-[11px] font-bold text-[#1A1A2E] dark:text-white">{topThree[2].weeklyLikes}</span>
                     </div>
                     {/* Podium block */}
-                    <div className="mt-3 w-full h-12 bg-gradient-to-t from-amber-200 to-amber-50 rounded-t-2xl flex items-center justify-center border border-amber-200/60">
-                      <span className="text-xl font-black text-amber-500">3</span>
+                    <div className="mt-3 w-full h-12 bg-gradient-to-t from-amber-500/30 to-amber-400/10 dark:from-amber-700/30 dark:to-amber-600/10 rounded-t-2xl flex items-center justify-center border border-amber-300/30 dark:border-amber-500/20">
+                      <span className="text-xl font-black text-amber-400 dark:text-amber-300">3</span>
                     </div>
                   </div>
                 )}
@@ -316,7 +316,7 @@ export function LeaderboardPage() {
                 <div
                   key={user.id}
                   onClick={() => setSelectedUser(user)}
-                  className="flex items-center gap-3 rounded-2xl bg-white p-3.5 border border-[#EBEBF0]/80 transition-all duration-300 hover:border-[#4A90D9]/20 hover:shadow-[0_4px_20px_rgba(74,144,217,0.08)] hover:scale-[1.01] cursor-pointer animate-rankSlideIn"
+                  className="flex items-center gap-3 rounded-2xl bg-white dark:bg-[#0F0F14] p-3.5 border border-[#EBEBF0]/80 dark:border-[#1E1E2C] transition-all duration-300 hover:border-[#4A90D9]/20 hover:shadow-[0_4px_20px_rgba(74,144,217,0.08)] hover:scale-[1.01] cursor-pointer animate-rankSlideIn"
                   style={{ animationDelay: `${200 + index * 60}ms` }}
                 >
                   {getRankDisplay(user.rank)}
@@ -324,12 +324,12 @@ export function LeaderboardPage() {
                     {user.name.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-[#1A1A2E] truncate">{user.name}</h3>
-                    <p className="text-[11px] text-[#8E8E93] truncate">{user.major}</p>
+                    <h3 className="text-sm font-semibold text-[#1A1A2E] dark:text-white truncate">{user.name}</h3>
+                    <p className="text-[11px] text-[#8E8E93] dark:text-[#8A8AA8] truncate">{user.major}</p>
                   </div>
-                  <div className="rounded-xl bg-[#F2F2F7] px-3 py-1.5 flex items-center gap-1.5">
+                  <div className="rounded-xl bg-[#F2F2F7] dark:bg-[#1C1C28] px-3 py-1.5 flex items-center gap-1.5">
                     <Heart size={10} className="text-[#FF6B6B]" fill="currentColor" />
-                    <span className="text-xs font-bold text-[#1A1A2E]">{user.weeklyLikes}</span>
+                    <span className="text-xs font-bold text-[#1A1A2E] dark:text-white">{user.weeklyLikes}</span>
                   </div>
                 </div>
               ))}
@@ -348,7 +348,7 @@ export function LeaderboardPage() {
               {postsRanking.map((post, index) => (
                 <div
                   key={post.id}
-                  className="bg-white rounded-2xl border border-[#EBEBF0]/80 overflow-hidden transition-all duration-300 hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] animate-rankSlideIn"
+                  className="bg-white dark:bg-[#0F0F14] rounded-2xl border border-[#EBEBF0]/80 dark:border-[#1E1E2C] overflow-hidden transition-all duration-300 hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] animate-rankSlideIn"
                   style={{ animationDelay: `${index * 80}ms` }}
                 >
                   {/* Post header */}
@@ -364,15 +364,15 @@ export function LeaderboardPage() {
                         {post.user.name.charAt(0)}
                       </div>
                       <div className="min-w-0">
-                        <h3 className="text-[13px] font-semibold text-[#1A1A2E] truncate hover:text-[#4A90D9] transition-colors">{post.user.name}</h3>
-                        <p className="text-[10px] text-[#8E8E93]">{post.user.major}</p>
+                        <h3 className="text-[13px] font-semibold text-[#1A1A2E] dark:text-white truncate hover:text-[#4A90D9] transition-colors">{post.user.name}</h3>
+                        <p className="text-[10px] text-[#8E8E93] dark:text-[#8A8AA8]">{post.user.major}</p>
                       </div>
                     </div>
                   </div>
                   
                   {/* Post content */}
                   <div className="px-4 pb-3">
-                    <p className="text-[13px] text-[#1A1A2E] leading-relaxed line-clamp-3">{post.content}</p>
+                    <p className="text-[13px] text-[#1A1A2E] dark:text-[#E0E0F0] leading-relaxed line-clamp-3">{post.content}</p>
                   </div>
 
                   {/* Post image */}
@@ -385,7 +385,7 @@ export function LeaderboardPage() {
                   )}
                   
                   {/* Post footer */}
-                  <div className="flex items-center justify-between px-4 py-3 bg-[#FAFAFA] border-t border-[#EBEBF0]/50">
+                  <div className="flex items-center justify-between px-4 py-3 bg-[#FAFAFA] dark:bg-[#161620] border-t border-[#EBEBF0]/50 dark:border-[#1E1E2C]">
                     <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF6B6B] to-[#FF8E8E] rounded-xl px-3 py-1.5"
                       style={{ boxShadow: '0 2px 8px rgba(255,107,107,0.25)' }}>
                       <Heart size={11} className="text-white" fill="currentColor" />
@@ -410,7 +410,7 @@ export function LeaderboardPage() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md bg-white rounded-t-[28px] sm:rounded-[28px] sm:mx-5 overflow-hidden modal-enter"
+            className="relative w-full max-w-md bg-white dark:bg-[#0F0F14] rounded-t-[28px] sm:rounded-[28px] sm:mx-5 overflow-hidden modal-enter"
             style={{ boxShadow: '0 -8px 40px rgba(0,0,0,0.15)' }}
           >
             {/* Modal header */}
@@ -452,10 +452,10 @@ export function LeaderboardPage() {
                   />
                 </div>
               )}
-              <p className="text-[14px] text-[#1A1A2E] leading-relaxed whitespace-pre-wrap">
+              <p className="text-[14px] text-[#1A1A2E] dark:text-[#E0E0F0] leading-relaxed whitespace-pre-wrap">
                 {selectedUser.topPost.content}
               </p>
-              <div className="mt-4 flex items-center justify-between pt-3 border-t border-[#EBEBF0]/60">
+              <div className="mt-4 flex items-center justify-between pt-3 border-t border-[#EBEBF0]/60 dark:border-[#1E1E2C]">
                 <span className="text-[12px] text-[#C7C7CC] font-medium">
                   {new Date(selectedUser.topPost.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                 </span>
@@ -485,7 +485,7 @@ export function LeaderboardPage() {
       )}
 
       {/* ── Info Footer ── */}
-      <div className="border-t border-[#EBEBF0]/50 bg-white/80 backdrop-blur-sm px-5 py-2.5">
+      <div className="border-t border-[#EBEBF0]/50 dark:border-[#1E1E2C] bg-white/80 dark:bg-[#0F0F14]/90 backdrop-blur-sm px-5 py-2.5">
         <p className="text-[10px] text-center text-[#C7C7CC] font-medium">
           {rankingType === 'users'
             ? '⚡ Rankings reset every Monday · Based on likes received'
