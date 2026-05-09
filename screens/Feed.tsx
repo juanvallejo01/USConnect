@@ -3,12 +3,15 @@
 import { useState, useEffect, useRef } from "react"
 import { Plus, X, Image as ImageIcon, Trash2 } from "lucide-react"
 import Image from "next/image"
+import { Caveat } from "next/font/google"
 import { GradientHeader } from "@/components/layout/gradient-header"
 import { PostCard } from "@/components/feed/post-card"
 import { PostCardSkeletonList } from "@/components/feed/post-card-skeleton"
 import { UserProfile } from "./UserProfile"
 import { useAuth } from "@/context/auth-context"
 import { FEED_POSTS } from "@/utils/constants"
+
+const caveat = Caveat({ subsets: ["latin"], weight: ["700"] })
 
 interface Post {
   id: string
@@ -297,7 +300,7 @@ export function FeedPage() {
   return (
     <div className="flex flex-col h-full bg-[#FAFAFA]">
       <GradientHeader
-        title="Campus Feed"
+        title={<span className={`${caveat.className} text-3xl leading-none tracking-normal`}>Ve!</span>}
         subtitle="What's happening at USC"
         rightAction={
           <button

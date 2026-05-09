@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Heart, MessageSquare, Send, Share2, Trash2 } from "lucide-react"
+import { Heart, MessageSquare, Share2, Trash2 } from "lucide-react"
 import Image from "next/image"
 
 function parseImages(imageUrl?: string): string[] {
@@ -211,20 +211,22 @@ export function PostCard({
           >
             <MessageSquare size={22} className="text-[#262626] hover:text-[#8E8E93] transition-colors duration-200" strokeWidth={1.8} />
           </button>
-
-          <button
-            className="micro-press focus-ring"
-            aria-label="Share"
-          >
-            <Send size={22} className="text-[#262626] hover:text-[#8E8E93] transition-colors duration-200 -rotate-12" strokeWidth={1.8} />
-          </button>
         </div>
 
         <div className="flex-1" />
 
         <button
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({
+                title: `${post.user.name} en Ve!`,
+                text: post.content || "Mira esta publicación en Ve!",
+                url: window.location.href,
+              }).catch(() => {})
+            }
+          }}
           className="micro-press focus-ring"
-          aria-label="Save"
+          aria-label="Compartir"
         >
           <Share2 size={22} className="text-[#262626] hover:text-[#8E8E93] transition-colors duration-200" strokeWidth={1.8} />
         </button>
