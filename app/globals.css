@@ -76,7 +76,7 @@ html.dark .bottom-nav-glass {
 }
 
 /* ── Outer frame (behind the phone) ── */
-html.dark .dark\:bg-\[#030305\] { background-color: #030305 !important; }
+html.dark .outer-frame-bg { background-color: #030305 !important; }
 
 /* ── Cards & list rows ── */
 html.dark [class*="bg-gradient-to-r"][class*="4A90D9/[0.06]"] {
