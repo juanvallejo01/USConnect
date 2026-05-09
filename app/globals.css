@@ -37,7 +37,6 @@ html.dark .bg-\[#F0F0F5\] { background-color: #08080F; }
 html.dark .bg-white       { background-color: #1A1A28; }
 html.dark .bg-\[#F2F2F7\] { background-color: #13131E; }
 html.dark .bg-\[#EBEBF0\] { background-color: #252538; }
-html.dark .bg-\[#4A90D9\]\/5 { background-color: rgba(91,159,232,0.08) !important; }
 
 /* ── Text ── */
 html.dark .text-\[#1A1A2E\] { color: #EEEEF8; }
