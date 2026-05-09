@@ -27,25 +27,27 @@ html.dark {
   --border: #252538;
   --input: #252538;
   --ring: #5B9FE8;
+
+  /* Hardcoded-color overrides via attribute selector (Tailwind v4 safe) */
+  background-color: #0F0F1A;
+  color: #EEEEF8;
 }
 
-/* ── Page-level backgrounds ── */
-html.dark .bg-\[#F8F8FA\] { background-color: #0F0F1A; }
-html.dark .bg-\[#F0F0F5\] { background-color: #08080F; }
+/* ── Page / surface overrides ── */
+html.dark body             { background-color: #0F0F1A; color: #EEEEF8; }
+html.dark [class*="bg-white"]   { background-color: #1A1A28 !important; }
+html.dark [class*="bg-[#F8F8FA]"],
+html.dark [class*="bg-[#F0F0F5]"],
+html.dark [class*="bg-[#F2F2F7]"] { background-color: #0F0F1A !important; }
+html.dark [class*="bg-[#EBEBF0]"] { background-color: #252538 !important; }
 
-/* ── Card / surface ── */
-html.dark .bg-white       { background-color: #1A1A28; }
-html.dark .bg-\[#F2F2F7\] { background-color: #13131E; }
-html.dark .bg-\[#EBEBF0\] { background-color: #252538; }
+/* ── Text overrides ── */
+html.dark [class*="text-[#1A1A2E]"] { color: #EEEEF8 !important; }
+html.dark [class*="text-[#8E8E93]"] { color: #9898AA !important; }
+html.dark [class*="text-[#C7C7CC]"] { color: #6E6E82 !important; }
 
-/* ── Text ── */
-html.dark .text-\[#1A1A2E\] { color: #EEEEF8; }
-html.dark .text-\[#8E8E93\] { color: #9898AA; }
-html.dark .text-\[#C7C7CC\] { color: #6E6E82; }
-
-/* ── Borders ── */
-html.dark .border-\[#EBEBF0\] { border-color: #252538; }
-html.dark .ring-offset-\[#F8F8FA\] { --tw-ring-offset-color: #0F0F1A; }
+/* ── Border overrides ── */
+html.dark [class*="border-[#EBEBF0]"] { border-color: #252538 !important; }
 
 /* ── Form inputs ── */
 html.dark textarea,

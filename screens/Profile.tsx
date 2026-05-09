@@ -40,9 +40,23 @@ export function ProfilePage() {
       {/* Header */}
       <div className="px-6 pt-4 pb-2 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-[#1A1A2E]">Profile</h1>
-        <button onClick={logout} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#EBEBF0] transition-colors">
-          <LogOut size={20} className="text-[#8E8E93]" />
-        </button>
+        <div className="flex items-center gap-1.5">
+          {/* Dark mode subtle toggle */}
+          {mounted && (
+            <button
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+              className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#EBEBF0] transition-all active:scale-90"
+              aria-label="Toggle dark mode"
+            >
+              {isDark
+                ? <Sun size={18} className="text-[#9898AA]" />
+                : <Moon size={18} className="text-[#8E8E93]" />}
+            </button>
+          )}
+          <button onClick={logout} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#EBEBF0] transition-colors">
+            <LogOut size={20} className="text-[#8E8E93]" />
+          </button>
+        </div>
       </div>
 
       {/* Avatar */}
@@ -115,38 +129,6 @@ export function ProfilePage() {
               <p className="text-xs text-[#C7C7CC]">{photos.length} foto{photos.length !== 1 ? "s" : ""} · toca para gestionar</p>
             </div>
           </button>
-          {/* Dark mode toggle */}
-          <div className="flex items-center justify-between w-full rounded-2xl border border-[#EBEBF0] bg-white px-5 py-4">
-            <div className="flex items-center gap-3">
-              <div className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300 ${isDark ? "bg-[#1A1A28] shadow-[0_0_16px_rgba(91,159,232,0.25)]" : "bg-[#FFF8E7]"}`}>
-                {mounted && isDark
-                  ? <Moon size={16} className="text-[#5B9FE8]" />
-                  : <Sun size={16} className="text-[#FF9F0A]" />}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-[#1A1A2E]">Modo oscuro</p>
-                <p className="text-xs text-[#8E8E93]">{mounted && isDark ? "Activado" : "Desactivado"}</p>
-              </div>
-            </div>
-
-            {/* Toggle switch */}
-            <button
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className={`relative h-7 w-12 rounded-full transition-all duration-300 focus:outline-none ${
-                isDark
-                  ? "bg-[#4A90D9] shadow-[0_0_12px_rgba(74,144,217,0.4)]"
-                  : "bg-[#EBEBF0]"
-              }`}
-              aria-label="Toggle dark mode"
-            >
-              <span
-                className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow-md transition-all duration-300 ease-spring ${
-                  isDark ? "translate-x-[22px]" : "translate-x-0.5"
-                }`}
-              />
-            </button>
-          </div>
-
           <GradientButton fullWidth size="lg">Save Changes</GradientButton>
         </div>
 
