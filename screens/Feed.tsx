@@ -9,6 +9,7 @@ import { PostCard } from "@/components/feed/post-card"
 import { PostCardSkeletonList } from "@/components/feed/post-card-skeleton"
 import { UserProfile } from "./UserProfile"
 import { useAuth } from "@/context/auth-context"
+import { postsApi } from "@/lib/api-client"
 import { FEED_POSTS } from "@/utils/constants"
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["700"] })
@@ -48,25 +49,8 @@ export function FeedPage() {
   const loadFeed = async () => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('accessToken')
-      if (!token) {
-        setLoading(false)
-        return
-      }
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/feed`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setPosts(data)
-      } else {
-        const errorBody = await response.text()
-        console.error(`Failed to load feed: ${response.status} ${response.statusText}`, errorBody)
-      }
+      const data = await postsApi.getFeed()
+      setPosts(data)
     } catch (error) {
       console.error("Failed to load feed:", error)
     } finally {
@@ -135,46 +119,25 @@ export function FeedPage() {
     
     try {
       setCreating(true)
-      const token = localStorage.getItem('accessToken')
-      if (!token) {
-        alert('Please log in to create a post')
-        return
-      }
 
-      // Por ahora solo enviamos el contenido de texto
-      // TODO: Implementar subida de imágenes
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          content: newPostContent.trim(),
-          imageUrl: imagePreviews.length > 1
-            ? JSON.stringify(imagePreviews)
-            : imagePreviews.length === 1
-              ? imagePreviews[0]
-              : undefined,
-        }),
+      const newPost = await postsApi.createPost({
+        content: newPostContent.trim(),
+        imageUrl: imagePreviews.length > 1
+          ? JSON.stringify(imagePreviews)
+          : imagePreviews.length === 1
+            ? imagePreviews[0]
+            : undefined,
       })
 
-      if (response.ok) {
-        const newPost = await response.json()
-        // Agregar el nuevo post al principio de la lista
-        setPosts([newPost, ...posts])
-        setNewPostContent("")
-        setSelectedImages([])
-        setImagePreviews([])
-        setCurrentPreviewIndex(0)
-        setShowCreatePost(false)
-      } else {
-        const error = await response.json()
-        alert(error.message || 'Failed to create post')
-      }
-    } catch (error) {
+      setPosts([newPost, ...posts])
+      setNewPostContent("")
+      setSelectedImages([])
+      setImagePreviews([])
+      setCurrentPreviewIndex(0)
+      setShowCreatePost(false)
+    } catch (error: any) {
       console.error("Failed to create post:", error)
-      alert('Failed to create post')
+      alert(error?.response?.data?.message || 'Failed to create post')
     } finally {
       setCreating(false)
     }
@@ -182,30 +145,12 @@ export function FeedPage() {
 
   const handleLike = async (postId: string) => {
     try {
-      const token = localStorage.getItem('accessToken')
-      if (!token) return
-
-      // Optimistic update
       setPosts(posts.map((p) =>
         p.id === postId ? { ...p, isLiked: true, likesCount: p.likesCount + 1 } : p
       ))
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/like`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (!response.ok) {
-        // Revert on error
-        setPosts(posts.map((p) =>
-          p.id === postId ? { ...p, isLiked: false, likesCount: p.likesCount - 1 } : p
-        ))
-      }
+      await postsApi.likePost(postId)
     } catch (error) {
       console.error("Failed to like post:", error)
-      // Revert on error
       setPosts(posts.map((p) =>
         p.id === postId ? { ...p, isLiked: false, likesCount: p.likesCount - 1 } : p
       ))
@@ -214,30 +159,12 @@ export function FeedPage() {
 
   const handleUnlike = async (postId: string) => {
     try {
-      const token = localStorage.getItem('accessToken')
-      if (!token) return
-
-      // Optimistic update
       setPosts(posts.map((p) =>
         p.id === postId ? { ...p, isLiked: false, likesCount: p.likesCount - 1 } : p
       ))
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/like`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (!response.ok) {
-        // Revert on error
-        setPosts(posts.map((p) =>
-          p.id === postId ? { ...p, isLiked: true, likesCount: p.likesCount + 1 } : p
-        ))
-      }
+      await postsApi.unlikePost(postId)
     } catch (error) {
       console.error("Failed to unlike post:", error)
-      // Revert on error
       setPosts(posts.map((p) =>
         p.id === postId ? { ...p, isLiked: true, likesCount: p.likesCount + 1 } : p
       ))
@@ -246,23 +173,10 @@ export function FeedPage() {
 
   const handleComment = async (postId: string, content: string) => {
     try {
-      const token = localStorage.getItem('accessToken')
-      if (!token) return
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/comment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ content }),
-      })
-
-      if (response.ok) {
-        setPosts(posts.map((p) =>
-          p.id === postId ? { ...p, commentsCount: p.commentsCount + 1 } : p
-        ))
-      }
+      await postsApi.addComment(postId, content)
+      setPosts(posts.map((p) =>
+        p.id === postId ? { ...p, commentsCount: p.commentsCount + 1 } : p
+      ))
     } catch (error) {
       console.error("Failed to add comment:", error)
     }
@@ -270,23 +184,9 @@ export function FeedPage() {
 
   const handleDelete = async (postId: string) => {
     if (!confirm("Are you sure you want to delete this post?")) return
-    
     try {
-      const token = localStorage.getItem('accessToken')
-      if (!token) return
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok) {
-        setPosts(posts.filter((p) => p.id !== postId))
-      } else {
-        alert('Failed to delete post')
-      }
+      await postsApi.deletePost(postId)
+      setPosts(posts.filter((p) => p.id !== postId))
     } catch (error) {
       console.error("Failed to delete post:", error)
       alert('Failed to delete post')

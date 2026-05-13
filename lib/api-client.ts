@@ -326,4 +326,36 @@ export const adminApi = {
   },
 };
 
+export const postsApi = {
+  getFeed: async (page = 1, limit = 20) => {
+    const response = await api.get('/posts/feed', { params: { page, limit } });
+    return response.data;
+  },
+
+  createPost: async (data: { content: string; imageUrl?: string }) => {
+    const response = await api.post('/posts', data);
+    return response.data;
+  },
+
+  likePost: async (postId: string) => {
+    const response = await api.post(`/posts/${postId}/like`);
+    return response.data;
+  },
+
+  unlikePost: async (postId: string) => {
+    const response = await api.delete(`/posts/${postId}/like`);
+    return response.data;
+  },
+
+  addComment: async (postId: string, content: string) => {
+    const response = await api.post(`/posts/${postId}/comment`, { content });
+    return response.data;
+  },
+
+  deletePost: async (postId: string) => {
+    const response = await api.delete(`/posts/${postId}`);
+    return response.data;
+  },
+};
+
 export default api;
