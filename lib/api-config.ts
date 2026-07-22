@@ -18,6 +18,7 @@ export const ENDPOINTS = {
   deleteAccount: '/users/me',
   getUser: (id: string) => `/users/${id}`,
   getRandomUsers: '/users/random',
+  searchUsers: '/users/search',
   
   // Likes
   createLike: '/likes',

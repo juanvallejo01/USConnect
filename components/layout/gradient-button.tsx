@@ -36,7 +36,7 @@ export function GradientButton({
 
   return (
     <button
-      className={`${base} bg-[#4A90D9] text-white cloud-shadow-blue hover:bg-[#3A7BC8] hover:shadow-lg focus-ring ${className}`}
+      className={`${base} bg-gradient-to-r from-[#000000] to-[#404040] text-white cloud-shadow-blue hover:from-[#B8941F] hover:to-[#171717] hover:shadow-lg focus-ring ${className}`}
       {...props}
     >
       {children}

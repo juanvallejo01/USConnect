@@ -2,16 +2,17 @@
 
 import { useState, useRef, useEffect } from "react"
 import { ArrowLeft, Send, Lock } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { UserAvatar } from "@/components/layout/user-avatar"
 import { ChatBubble } from "@/components/chat/chat-bubble"
 import { useChat } from "@/context/chat-context"
 
 export function ChatPage() {
-  const { activeUser, sendMessage, closeChat, getMessages, activeUserId, canChatWith } = useChat()
+  const t = useTranslations("chat")
+  const { activeUser, sendMessage, closeChat, messages, activeUserId, canChatWith, loadingMessages, sending } = useChat()
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
-  
-  const messages = activeUserId ? getMessages(activeUserId) : []
+
   const canSend = activeUserId ? canChatWith(activeUserId) : false
 
   useEffect(() => {
@@ -22,11 +23,13 @@ export function ChatPage() {
     return null
   }
 
-  function handleSend() {
-    if (!input.trim() || !canSend) return
-    const success = sendMessage(input.trim())
-    if (success) {
-      setInput("")
+  async function handleSend() {
+    if (!input.trim() || !canSend || sending) return
+    const text = input.trim()
+    setInput("")
+    const success = await sendMessage(text)
+    if (!success) {
+      setInput(text)
     }
   }
 
@@ -36,7 +39,7 @@ export function ChatPage() {
         <button
           onClick={closeChat}
           className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#F2F2F7] transition-all duration-300 active:scale-90"
-          aria-label="Go back"
+          aria-label={t("goBack")}
         >
           <ArrowLeft size={20} className="text-[#1A1A2E]" />
         </button>
@@ -44,7 +47,7 @@ export function ChatPage() {
         <div className="flex-1 min-w-0">
           <h2 className="text-[15px] font-semibold text-[#1A1A2E] truncate">{activeUser.name}</h2>
           <p className="text-xs text-[#8E8E93]">
-            {canSend ? "Active now" : "Not matched yet"}
+            {canSend ? t("activeNow") : t("notMatchedYet")}
           </p>
         </div>
       </div>
@@ -55,10 +58,18 @@ export function ChatPage() {
             <div className="rounded-full bg-[#F2F2F7] p-4 mb-4">
               <Lock size={32} className="text-[#C7C7CC]" />
             </div>
-            <h3 className="text-lg font-semibold text-[#1A1A2E] mb-2">Match Required</h3>
+            <h3 className="text-lg font-semibold text-[#1A1A2E] mb-2">{t("matchRequiredTitle")}</h3>
             <p className="text-sm text-[#8E8E93] text-center max-w-[240px]">
-              You need to match with {activeUser.name} to start chatting. Both users must like each other.
+              {t("matchRequiredBody", { name: activeUser.name })}
             </p>
+          </div>
+        ) : loadingMessages ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#000000] border-t-transparent" />
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center px-8">
+            <p className="text-sm text-[#8E8E93]">{t("youMatched", { name: activeUser.name })}</p>
           </div>
         ) : (
           <div className="flex flex-col gap-2.5">
@@ -75,14 +86,14 @@ export function ChatPage() {
         {!canSend && (
           <div className="mb-2 rounded-full bg-[#FF9F0A]/8 border border-[#FF9F0A]/20 px-4 py-2 animate-pulse">
             <p className="text-xs text-amber-800 text-center">
-              Match required to start chat
+              {t("matchRequiredBanner")}
             </p>
           </div>
         )}
         <div className="flex items-center gap-3">
           <input
             type="text"
-            placeholder={canSend ? "Message..." : "Match required..."}
+            placeholder={canSend ? t("messagePlaceholder") : t("matchRequiredPlaceholder")}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
@@ -94,17 +105,17 @@ export function ChatPage() {
             disabled={!canSend}
             className={`flex-1 rounded-full border px-5 py-3 text-sm outline-none transition-all duration-300 ${
               canSend
-                ? "border-[#EBEBF0] bg-[#F2F2F7] text-[#1A1A2E] placeholder:text-[#8E8E93] focus:border-[#4A90D9] focus:ring-2 focus:ring-[#4A90D9]/20 focus:bg-white"
+                ? "border-[#EBEBF0] bg-[#F2F2F7] text-[#1A1A2E] placeholder:text-[#8E8E93] focus:border-[#000000] focus:ring-2 focus:ring-[#000000]/20 focus:bg-white"
                 : "border-[#EBEBF0] bg-[#F2F2F7] text-[#C7C7CC] placeholder:text-[#C7C7CC] cursor-not-allowed"
             }`}
           />
           <button
             onClick={handleSend}
-            disabled={!input.trim() || !canSend}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#4A90D9] cloud-shadow-blue transition-all duration-300 hover:shadow-lg active:scale-90 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed disabled:active:scale-100"
-            aria-label="Send message"
+            disabled={!input.trim() || !canSend || sending}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary cloud-shadow-blue transition-all duration-300 hover:shadow-lg active:scale-90 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed disabled:active:scale-100"
+            aria-label={t("sendMessage")}
           >
-            <Send size={18} className="text-white ml-0.5" />
+            <Send size={18} className="text-primary-foreground ml-0.5" />
           </button>
         </div>
       </div>

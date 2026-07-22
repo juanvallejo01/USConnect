@@ -42,8 +42,8 @@ export function RankBadge({ rank, size = "md" }: RankBadgeProps) {
 
   if (!rankConfig) {
     return (
-      <div className={`${sizeClasses[size]} flex items-center justify-center rounded-full bg-[#F2F2F7] dark:bg-[#1C1C28]`}>
-        <span className="text-xs font-extrabold text-[#8E8E93] dark:text-[#8A8AA8]">
+      <div className={`${sizeClasses[size]} flex items-center justify-center rounded-full bg-[#F2F2F7] dark:bg-[#1C1C1E]`}>
+        <span className="text-xs font-extrabold text-[#8E8E93] dark:text-[#A8A398]">
           {rank}
         </span>
       </div>

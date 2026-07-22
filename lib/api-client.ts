@@ -216,6 +216,13 @@ export const usersApi = {
     });
     return response.data;
   },
+
+  searchUsers: async (query: string) => {
+    const response = await api.get(ENDPOINTS.searchUsers, {
+      params: { q: query },
+    });
+    return response.data;
+  },
 };
 
 export const likesApi = {
@@ -349,6 +356,18 @@ export const postsApi = {
 
   addComment: async (postId: string, content: string) => {
     const response = await api.post(`/posts/${postId}/comment`, { content });
+    return response.data;
+  },
+
+  getComments: async (postId: string, limit?: number, offset?: number) => {
+    const response = await api.get(`/posts/${postId}/comments`, {
+      params: { limit, offset },
+    });
+    return response.data;
+  },
+
+  deleteComment: async (commentId: string) => {
+    const response = await api.delete(`/posts/comments/${commentId}`);
     return response.data;
   },
 

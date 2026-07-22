@@ -2,9 +2,12 @@
 
 import { useState } from "react"
 import { AlertTriangle, Eye, Trash2, ShieldCheck } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { REPORTED_POSTS } from "@/utils/constants"
 
 export function ModerationTab() {
+  const t = useTranslations("adminModeration")
+  const tReasons = useTranslations("adminModeration.reasons")
   const [posts, setPosts] = useState(REPORTED_POSTS)
 
   function handleRemove(id: number) {
@@ -14,15 +17,15 @@ export function ModerationTab() {
   return (
     <div className="flex flex-col gap-3 p-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">Reported Content</h3>
+        <h3 className="text-sm font-semibold text-foreground">{t("reportedContent")}</h3>
         <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">
-          {posts.length} pending
+          {t("pendingCount", { count: posts.length })}
         </span>
       </div>
       {posts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 rounded-xl bg-card border border-border">
           <ShieldCheck size={40} className="text-muted-foreground/30 mb-3" />
-          <p className="text-sm font-medium text-muted-foreground">All clear! No pending reports.</p>
+          <p className="text-sm font-medium text-muted-foreground">{t("allClear")}</p>
         </div>
       ) : (
         posts.map((post) => (
@@ -32,10 +35,10 @@ export function ModerationTab() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs font-semibold text-foreground">{post.user}</span>
                   <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700">
-                    {post.reports} reports
+                    {t("reportsCount", { count: post.reports })}
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground">{post.reason}</p>
+                <p className="text-xs text-muted-foreground">{tReasons(post.reason)}</p>
               </div>
               <span className="text-[10px] text-muted-foreground shrink-0">{post.time}</span>
             </div>
@@ -44,16 +47,16 @@ export function ModerationTab() {
             </div>
             <div className="flex items-center gap-2">
               <button className="flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-border active:scale-95">
-                <Eye size={12} /> Review
+                <Eye size={12} /> {t("review")}
               </button>
               <button className="flex items-center gap-1.5 rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-200 active:scale-95">
-                <AlertTriangle size={12} /> Warn User
+                <AlertTriangle size={12} /> {t("warnUser")}
               </button>
               <button
                 onClick={() => handleRemove(post.id)}
                 className="flex items-center gap-1.5 rounded-lg bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-200 active:scale-95"
               >
-                <Trash2 size={12} /> Remove
+                <Trash2 size={12} /> {t("remove")}
               </button>
             </div>
           </div>

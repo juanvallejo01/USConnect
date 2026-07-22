@@ -1,144 +1,127 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react"
+import { messagesApi } from "@/lib/api-client"
+import { useAuth } from "./auth-context"
 import { useMatch } from "./match-context"
 
 export interface ChatMessage {
-  id: number
+  id: string
   text: string
   sent: boolean
   time: string
 }
 
 export interface ChatUser {
-  id: number
+  id: string
   name: string
-  avatar: string
+  avatar?: string
   major: string
 }
 
-export interface Conversation {
-  userId: number
-  messages: ChatMessage[]
-}
-
 interface ChatState {
-  conversations: Map<number, ChatMessage[]>
-  activeUserId: number | null
+  activeUser: ChatUser | null
+  activeUserId: string | null
+  messages: ChatMessage[]
+  sending: boolean
+  loadingMessages: boolean
   openChat: (user: ChatUser) => boolean
   closeChat: () => void
-  sendMessage: (text: string) => boolean
-  getMessages: (userId: number) => ChatMessage[]
-  activeUser: ChatUser | null
-  canChatWith: (userId: number) => boolean
+  sendMessage: (text: string) => Promise<boolean>
+  canChatWith: (userId: string) => boolean
 }
 
 const ChatContext = createContext<ChatState | null>(null)
 
-// Initial chat data for matched users
-const INITIAL_CHATS: Record<number, ChatMessage[]> = {
-  2: [
-    { id: 1, text: "Hey! I saw you're in the CS program too?", sent: false, time: "4:30 PM" },
-    { id: 2, text: "Yeah! Loving it so far. What's your focus?", sent: true, time: "4:31 PM" },
-  ],
-  3: [
-    { id: 1, text: "Did you finish the art history essay?", sent: false, time: "11:20 AM" },
-    { id: 2, text: "Almost! Just need the conclusion", sent: true, time: "11:25 AM" },
-  ],
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
 }
 
 export function ChatProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth()
   const { canChat } = useMatch()
-  const [conversations, setConversations] = useState<Map<number, ChatMessage[]>>(
-    new Map(Object.entries(INITIAL_CHATS).map(([k, v]) => [Number(k), v]))
-  )
-  const [activeUserId, setActiveUserId] = useState<number | null>(null)
   const [activeUser, setActiveUser] = useState<ChatUser | null>(null)
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [sending, setSending] = useState(false)
+  const [loadingMessages, setLoadingMessages] = useState(false)
 
-  const canChatWith = useCallback(
-    (userId: number): boolean => {
-      // Assuming current user is ID 1
-      return canChat(1, userId)
+  const canChatWith = useCallback((userId: string) => canChat(userId), [canChat])
+
+  const loadMessages = useCallback(
+    async (otherUserId: string) => {
+      if (!user) return
+      setLoadingMessages(true)
+      try {
+        const data = await messagesApi.getConversation(otherUserId)
+        setMessages(
+          data.map((m: { id: string; content: string; senderId: string; createdAt: string }) => ({
+            id: m.id,
+            text: m.content,
+            sent: m.senderId === user.id,
+            time: formatTime(m.createdAt),
+          }))
+        )
+      } catch (error) {
+        console.error("Failed to load conversation:", error)
+        setMessages([])
+      } finally {
+        setLoadingMessages(false)
+      }
     },
-    [canChat]
+    [user]
   )
 
   const openChat = useCallback(
-    (user: ChatUser): boolean => {
-      // Check if users are matched
-      if (!canChatWith(user.id)) {
+    (chatUser: ChatUser): boolean => {
+      if (!canChatWith(chatUser.id)) {
         console.warn("Cannot chat - users are not matched")
         return false
       }
-
-      setActiveUserId(user.id)
-      setActiveUser(user)
-      
-      // Initialize conversation if it doesn't exist
-      setConversations((prev) => {
-        if (!prev.has(user.id)) {
-          const newMap = new Map(prev)
-          newMap.set(user.id, [])
-          return newMap
-        }
-        return prev
-      })
-
+      setActiveUser(chatUser)
+      setMessages([])
+      loadMessages(chatUser.id)
       return true
     },
-    [canChatWith]
+    [canChatWith, loadMessages]
   )
 
   const closeChat = useCallback(() => {
-    setActiveUserId(null)
     setActiveUser(null)
+    setMessages([])
   }, [])
 
   const sendMessage = useCallback(
-    (text: string): boolean => {
-      if (!text.trim() || activeUserId === null) return false
-
-      // Double-check match status
-      if (!canChatWith(activeUserId)) {
-        console.warn("Cannot send message - users are not matched")
+    async (text: string): Promise<boolean> => {
+      if (!text.trim() || !activeUser || !canChatWith(activeUser.id)) return false
+      setSending(true)
+      try {
+        const message = await messagesApi.sendMessage({ receiverId: activeUser.id, content: text.trim() })
+        setMessages((prev) => [
+          ...prev,
+          { id: message.id, text: message.content, sent: true, time: formatTime(message.createdAt) },
+        ])
+        return true
+      } catch (error) {
+        console.error("Failed to send message:", error)
         return false
+      } finally {
+        setSending(false)
       }
-
-      setConversations((prev) => {
-        const newMap = new Map(prev)
-        const messages = newMap.get(activeUserId) || []
-        const newMessage: ChatMessage = {
-          id: messages.length + 1,
-          text: text.trim(),
-          sent: true,
-          time: "Now",
-        }
-        newMap.set(activeUserId, [...messages, newMessage])
-        return newMap
-      })
-
-      return true
     },
-    [activeUserId, canChatWith]
-  )
-
-  const getMessages = useCallback(
-    (userId: number): ChatMessage[] => {
-      return conversations.get(userId) || []
-    },
-    [conversations]
+    [activeUser, canChatWith]
   )
 
   return (
     <ChatContext.Provider
       value={{
-        conversations,
-        activeUserId,
+        activeUser,
+        activeUserId: activeUser?.id ?? null,
+        messages,
+        sending,
+        loadingMessages,
         openChat,
         closeChat,
         sendMessage,
-        getMessages,
-        activeUser,
         canChatWith,
       }}
     >

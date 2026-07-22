@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 export function StatCard({
   label,
@@ -27,6 +28,7 @@ export function StatCard({
 }
 
 export function StatusBadge({ status }: { status: "active" | "suspended" | "banned" }) {
+  const t = useTranslations("adminUsers.status")
   const styles = {
     active: "bg-green-100 text-green-700",
     suspended: "bg-amber-100 text-amber-700",
@@ -34,7 +36,7 @@ export function StatusBadge({ status }: { status: "active" | "suspended" | "bann
   }
   return (
     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${styles[status]}`}>
-      {status}
+      {t(status)}
     </span>
   )
 }

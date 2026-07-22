@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 
 interface GradientHeaderProps {
   title: ReactNode
-  subtitle?: string
+  subtitle?: ReactNode
   rightAction?: ReactNode
 }
 
@@ -10,9 +10,13 @@ export function GradientHeader({ title, subtitle, rightAction }: GradientHeaderP
   return (
     <div className="relative px-6 pt-4 pb-4 bg-background border-b border-border/60">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex-1 min-w-0">
           <div className="text-xl font-bold text-foreground tracking-tight">{title}</div>
-          {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+          {subtitle && (
+            typeof subtitle === "string"
+              ? <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+              : <div className="mt-2">{subtitle}</div>
+          )}
         </div>
         {rightAction}
       </div>

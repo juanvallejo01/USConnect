@@ -3,6 +3,9 @@
 import { useState, useRef } from "react"
 import { Heart, MessageSquare, Share2, Trash2 } from "lucide-react"
 import Image from "next/image"
+import { useTranslations } from "next-intl"
+import { postsApi } from "@/lib/api-client"
+import { formatRelativeTime } from "@/utils/relative-time"
 
 function parseImages(imageUrl?: string): string[] {
   if (!imageUrl) return []
@@ -52,10 +55,12 @@ export function PostCard({
   currentUserId: string
   onLike: (postId: string) => void
   onUnlike: (postId: string) => void
-  onComment: (postId: string, content: string) => void
+  onComment: (postId: string, content: string) => Promise<Comment>
   onDelete?: (postId: string) => void
   onUserClick?: (userId: string) => void
 }) {
+  const t = useTranslations("post")
+  const tTime = useTranslations("time")
   const [showComments, setShowComments] = useState(false)
   const [commentInput, setCommentInput] = useState("")
   const [comments, setComments] = useState<Comment[]>([])
@@ -73,18 +78,44 @@ export function PostCard({
     }
   }
 
-  const handleAddComment = () => {
-    if (!commentInput.trim()) return
-    onComment(post.id, commentInput.trim())
+  const [postingComment, setPostingComment] = useState(false)
+
+  const handleAddComment = async () => {
+    if (!commentInput.trim() || postingComment) return
+    const content = commentInput.trim()
     setCommentInput("")
+    setPostingComment(true)
+    try {
+      const comment = await onComment(post.id, content)
+      setComments((prev) => [...prev, comment])
+    } catch (error) {
+      console.error("Failed to add comment:", error)
+      setCommentInput(content)
+    } finally {
+      setPostingComment(false)
+    }
   }
 
   const loadComments = async () => {
-    if (comments.length > 0) return
     setLoadingComments(true)
-    // Load comments from API
-    // For now, empty
-    setLoadingComments(false)
+    try {
+      const data: Comment[] = await postsApi.getComments(post.id)
+      // Backend returns newest-first; show oldest-first like a normal thread
+      setComments([...data].reverse())
+    } catch (error) {
+      console.error("Failed to load comments:", error)
+    } finally {
+      setLoadingComments(false)
+    }
+  }
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await postsApi.deleteComment(commentId)
+      setComments((prev) => prev.filter((c) => c.id !== commentId))
+    } catch (error) {
+      console.error("Failed to delete comment:", error)
+    }
   }
 
   const toggleComments = () => {
@@ -94,21 +125,7 @@ export function PostCard({
     setShowComments(!showComments)
   }
 
-  const getRelativeTime = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffMins < 1) return "Just now"
-    if (diffMins < 60) return `${diffMins}m ago`
-    if (diffHours < 24) return `${diffHours}h ago`
-    if (diffDays === 1) return "Yesterday"
-    if (diffDays < 7) return `${diffDays}d ago`
-    return date.toLocaleDateString()
-  }
+  const getRelativeTime = (dateString: string) => formatRelativeTime(dateString, tTime)
 
   const isOwnPost = post.user.id === currentUserId
 
@@ -120,14 +137,14 @@ export function PostCard({
           onClick={() => onUserClick?.(post.user.id)}
           className="cursor-pointer"
         >
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#4A90D9] to-[#357ABD] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 ring-2 ring-[#4A90D9]/20 transition-transform duration-300 hover:scale-105">
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#000000] to-[#404040] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 ring-2 ring-[#000000]/20 transition-transform duration-300 hover:scale-105">
             {post.user.name.charAt(0)}
           </div>
         </div>
         <div className="flex-1 min-w-0">
           <h3
             onClick={() => onUserClick?.(post.user.id)}
-            className="text-[13px] font-bold text-[#1A1A2E] cursor-pointer hover:text-[#4A90D9] transition-colors duration-200 leading-tight"
+            className="text-[13px] font-bold text-[#1A1A2E] cursor-pointer hover:text-[#000000] transition-colors duration-200 leading-tight"
           >
             {post.user.name}
           </h3>
@@ -139,7 +156,7 @@ export function PostCard({
           <button
             onClick={() => onDelete(post.id)}
             className="p-2 hover:bg-[#F8F8FA] rounded-full transition-colors duration-200"
-            aria-label="Delete post"
+            aria-label={t("deletePost")}
           >
             <Trash2 size={16} className="text-[#C7C7CC]" />
           </button>
@@ -199,7 +216,7 @@ export function PostCard({
             <Heart
               size={24}
               className={`transition-colors duration-200 ${
-                post.isLiked ? "fill-[#FF3B5C] text-[#FF3B5C]" : "text-[#262626] hover:text-[#8E8E93]"
+                post.isLiked ? "fill-[#000000] text-[#000000] dark:fill-white dark:text-white" : "text-[#262626] hover:text-[#8E8E93]"
               }`}
               strokeWidth={post.isLiked ? 0 : 1.8}
             />
@@ -220,13 +237,13 @@ export function PostCard({
             if (navigator.share) {
               navigator.share({
                 title: `${post.user.name} en Ve!`,
-                text: post.content || "Mira esta publicación en Ve!",
+                text: post.content || t("shareText"),
                 url: window.location.href,
               }).catch(() => {})
             }
           }}
           className="micro-press focus-ring"
-          aria-label="Compartir"
+          aria-label={t("share")}
         >
           <Share2 size={22} className="text-[#262626] hover:text-[#8E8E93] transition-colors duration-200" strokeWidth={1.8} />
         </button>
@@ -235,7 +252,7 @@ export function PostCard({
       {/* Likes count */}
       {post.likesCount > 0 && (
         <div className="px-4 pb-1">
-          <p className="text-[13px] font-bold text-[#1A1A2E]">{post.likesCount.toLocaleString()} {post.likesCount === 1 ? 'like' : 'likes'}</p>
+          <p className="text-[13px] font-bold text-[#1A1A2E]">{t("likes", { count: post.likesCount })}</p>
         </div>
       )}
 
@@ -252,32 +269,48 @@ export function PostCard({
       {/* View comments link */}
       {post.commentsCount > 0 && !showComments && (
         <button onClick={toggleComments} className="px-4 pb-2">
-          <p className="text-[13px] text-[#8E8E93]">View all {post.commentsCount} comments</p>
+          <p className="text-[13px] text-[#8E8E93]">{t("viewAllComments", { count: post.commentsCount })}</p>
         </button>
       )}
 
       {/* Comments section */}
       {showComments && (
         <div className="px-4 pb-3">
-          {comments.length > 0 ? (
+          {loadingComments ? (
+            <div className="flex justify-center py-4">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#000000] border-t-transparent" />
+            </div>
+          ) : comments.length > 0 ? (
             <div className="space-y-2.5 mb-3">
-              {comments.map((comment) => (
-                <div key={comment.id} className="flex gap-2.5 items-start">
-                  <div className="h-7 w-7 rounded-full bg-[#4A90D9]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-[10px] font-bold text-[#4A90D9]">{comment.user.name.charAt(0)}</span>
+              {comments.map((comment) => {
+                const canDelete = comment.user.id === currentUserId || isOwnPost
+                return (
+                  <div key={comment.id} className="flex gap-2.5 items-start group">
+                    <div className="h-7 w-7 rounded-full bg-[#000000]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-[10px] font-bold text-[#000000]">{comment.user.name.charAt(0)}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] text-[#1A1A2E] leading-[1.4]">
+                        <span className="font-bold">{comment.user.name}</span>{" "}
+                        <span className="font-normal">{comment.content}</span>
+                      </p>
+                      <span className="text-[11px] text-[#C7C7CC] mt-0.5 block">{getRelativeTime(comment.createdAt)}</span>
+                    </div>
+                    {canDelete && (
+                      <button
+                        onClick={() => handleDeleteComment(comment.id)}
+                        className="opacity-0 group-hover:opacity-100 p-1 text-[#C7C7CC] hover:text-[#FF3B30] transition-all duration-200 flex-shrink-0"
+                        aria-label={t("deleteComment")}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] text-[#1A1A2E] leading-[1.4]">
-                      <span className="font-bold">{comment.user.name}</span>{" "}
-                      <span className="font-normal">{comment.content}</span>
-                    </p>
-                    <span className="text-[11px] text-[#C7C7CC] mt-0.5 block">{getRelativeTime(comment.createdAt)}</span>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           ) : (
-            <p className="text-[13px] text-[#8E8E93] mb-3">No comments yet. Be the first!</p>
+            <p className="text-[13px] text-[#8E8E93] mb-3">{t("noComments")}</p>
           )}
 
           <div className="flex items-center gap-3 border-t border-[#EBEBF0] pt-3">
@@ -291,15 +324,15 @@ export function PostCard({
                   handleAddComment()
                 }
               }}
-              placeholder="Add a comment..."
+              placeholder={t("addComment")}
               className="flex-1 bg-transparent text-[13px] text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none"
             />
             <button
               onClick={handleAddComment}
-              disabled={!commentInput.trim()}
-              className="text-[#4A90D9] font-bold text-[13px] micro-press focus-ring disabled:opacity-30"
+              disabled={!commentInput.trim() || postingComment}
+              className="text-[#000000] font-bold text-[13px] micro-press focus-ring disabled:opacity-30"
             >
-              Post
+              {t("post")}
             </button>
           </div>
         </div>

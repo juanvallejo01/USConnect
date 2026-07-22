@@ -1,18 +1,17 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Plus, X, Image as ImageIcon, Trash2 } from "lucide-react"
+import { Plus, X, Image as ImageIcon, Trash2, Camera, Search } from "lucide-react"
 import Image from "next/image"
-import { Caveat } from "next/font/google"
+import { useTranslations } from "next-intl"
 import { GradientHeader } from "@/components/layout/gradient-header"
+import { Logo } from "@/components/layout/logo"
 import { PostCard } from "@/components/feed/post-card"
 import { PostCardSkeletonList } from "@/components/feed/post-card-skeleton"
 import { UserProfile } from "./UserProfile"
 import { useAuth } from "@/context/auth-context"
-import { postsApi } from "@/lib/api-client"
+import { postsApi, usersApi } from "@/lib/api-client"
 import { FEED_POSTS } from "@/utils/constants"
-
-const caveat = Caveat({ subsets: ["latin"], weight: ["700"] })
 
 interface Post {
   id: string
@@ -29,7 +28,14 @@ interface Post {
   }
 }
 
+interface SearchResult {
+  id: string
+  name: string
+  major: string
+}
+
 export function FeedPage() {
+  const t = useTranslations("feed")
   const { user } = useAuth()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
@@ -40,11 +46,45 @@ export function FeedPage() {
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
   const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0)
   const [creating, setCreating] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [searching, setSearching] = useState(false)
+  const [showSearchResults, setShowSearchResults] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     loadFeed()
   }, [])
+
+  useEffect(() => {
+    const query = searchQuery.trim()
+    if (!query) {
+      setSearchResults([])
+      setSearching(false)
+      return
+    }
+    setSearching(true)
+    const timeout = setTimeout(async () => {
+      try {
+        const data = await usersApi.searchUsers(query)
+        setSearchResults(data)
+      } catch (error) {
+        console.error("Failed to search users:", error)
+        setSearchResults([])
+      } finally {
+        setSearching(false)
+      }
+    }, 300)
+    return () => clearTimeout(timeout)
+  }, [searchQuery])
+
+  const handleSelectSearchResult = (id: string) => {
+    setSelectedUserId(id)
+    setSearchQuery("")
+    setSearchResults([])
+    setShowSearchResults(false)
+  }
 
   const loadFeed = async () => {
     try {
@@ -62,7 +102,7 @@ export function FeedPage() {
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
     if (selectedImages.length + files.length > 10) {
-      alert("You can only upload up to 10 images per post")
+      alert(t("alerts.maxImages"))
       return
     }
     const validFiles: File[] = []
@@ -113,7 +153,7 @@ export function FeedPage() {
     
     // Debe haber al menos una imagen
     if (selectedImages.length === 0) {
-      alert('Please add at least one image to your post')
+      alert(t("alerts.needImage"))
       return
     }
     
@@ -137,7 +177,7 @@ export function FeedPage() {
       setShowCreatePost(false)
     } catch (error: any) {
       console.error("Failed to create post:", error)
-      alert(error?.response?.data?.message || 'Failed to create post')
+      alert(error?.response?.data?.message || t("alerts.createFailed"))
     } finally {
       setCreating(false)
     }
@@ -172,24 +212,21 @@ export function FeedPage() {
   }
 
   const handleComment = async (postId: string, content: string) => {
-    try {
-      await postsApi.addComment(postId, content)
-      setPosts(posts.map((p) =>
-        p.id === postId ? { ...p, commentsCount: p.commentsCount + 1 } : p
-      ))
-    } catch (error) {
-      console.error("Failed to add comment:", error)
-    }
+    const comment = await postsApi.addComment(postId, content)
+    setPosts(posts.map((p) =>
+      p.id === postId ? { ...p, commentsCount: p.commentsCount + 1 } : p
+    ))
+    return comment
   }
 
   const handleDelete = async (postId: string) => {
-    if (!confirm("Are you sure you want to delete this post?")) return
+    if (!confirm(t("alerts.deleteConfirm"))) return
     try {
       await postsApi.deletePost(postId)
       setPosts(posts.filter((p) => p.id !== postId))
     } catch (error) {
       console.error("Failed to delete post:", error)
-      alert('Failed to delete post')
+      alert(t("alerts.deleteFailed"))
     }
   }
 
@@ -200,13 +237,56 @@ export function FeedPage() {
   return (
     <div className="flex flex-col h-full bg-[#FAFAFA]">
       <GradientHeader
-        title={<span className={`${caveat.className} text-3xl leading-none tracking-normal`}>Ve!</span>}
-        subtitle="What's happening at USC"
+        title={<Logo size="md" className="text-black dark:text-white" />}
+        subtitle={
+          <div className="relative">
+            <div className="relative">
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setShowSearchResults(true) }}
+                onFocus={() => setShowSearchResults(true)}
+                onBlur={() => setTimeout(() => setShowSearchResults(false), 150)}
+                placeholder={t("searchPlaceholder")}
+                className="w-full rounded-full border border-[#EBEBF0] bg-white pl-9 pr-3 py-2 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none focus:border-[#000000] transition-colors duration-300"
+              />
+            </div>
+
+            {showSearchResults && searchQuery.trim() && (
+              <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl border border-[#EBEBF0] shadow-lg overflow-hidden z-20 max-h-72 overflow-y-auto">
+                {searching ? (
+                  <p className="px-4 py-3 text-sm text-[#8E8E93]">{t("searching")}</p>
+                ) : searchResults.length === 0 ? (
+                  <p className="px-4 py-3 text-sm text-[#8E8E93]">{t("noPeopleFound")}</p>
+                ) : (
+                  searchResults.map((result) => (
+                    <button
+                      key={result.id}
+                      onMouseDown={() => handleSelectSearchResult(result.id)}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#F8F8FA] transition-colors duration-200 text-left"
+                    >
+                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#000000] to-[#404040] flex items-center justify-center flex-shrink-0">
+                        <span className="text-white font-bold text-xs">
+                          {result.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-[#1A1A2E] truncate">{result.name}</p>
+                        <p className="text-xs text-[#8E8E93] truncate">{result.major}</p>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        }
         rightAction={
           <button
             onClick={() => setShowCreatePost(true)}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-all active:scale-90"
-            aria-label="Create post"
+            aria-label={t("createPost")}
           >
             <Plus size={20} className="text-white" strokeWidth={2.5} />
           </button>
@@ -219,13 +299,13 @@ export function FeedPage() {
           onClick={() => setShowCreatePost(true)}
           className="w-full flex items-center gap-3 micro-press"
         >
-          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#4A90D9] to-[#357ABD] flex items-center justify-center flex-shrink-0 ring-2 ring-[#4A90D9]/20">
+          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#000000] to-[#404040] flex items-center justify-center flex-shrink-0 ring-2 ring-[#000000]/20">
             <span className="text-white font-bold text-xs">
               {user?.name?.charAt(0).toUpperCase() || "U"}
             </span>
           </div>
           <div className="flex-1 text-left border border-[#DBDBDB] rounded-full px-4 py-2">
-            <span className="text-[#8E8E93] text-[13px]">What&apos;s on your mind?</span>
+            <span className="text-[#8E8E93] text-[13px]">{t("whatsOnYourMind")}</span>
           </div>
         </button>
       </div>
@@ -235,18 +315,18 @@ export function FeedPage() {
           <PostCardSkeletonList count={4} />
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4">
-            <div className="rounded-full bg-[#4A90D9]/10 p-6 mb-4">
-              <Plus size={32} className="text-[#4A90D9]" />
+            <div className="rounded-full bg-[#000000]/10 p-6 mb-4">
+              <Plus size={32} className="text-[#000000]" />
             </div>
-            <h3 className="text-lg font-bold text-[#1A1A2E] mb-2">No posts yet</h3>
+            <h3 className="text-lg font-bold text-[#1A1A2E] mb-2">{t("noPostsYet")}</h3>
             <p className="text-sm text-[#8E8E93] text-center max-w-[280px] mb-4">
-              Be the first to share something with the campus community!
+              {t("beFirstToShare")}
             </p>
             <button
               onClick={() => setShowCreatePost(true)}
-              className="px-6 py-2.5 bg-[#4A90D9] text-white rounded-full font-medium text-sm cloud-shadow micro-press micro-hover focus-ring"
+              className="px-6 py-2.5 bg-primary text-primary-foreground rounded-full font-medium text-sm cloud-shadow micro-press micro-hover focus-ring"
             >
-              Create Post
+              {t("createPost")}
             </button>
           </div>
         ) : (
@@ -290,33 +370,33 @@ export function FeedPage() {
               >
                 <X size={20} className="text-[#8E8E93]" />
               </button>
-              <h2 className="text-base font-bold text-[#1A1A2E]">New Post</h2>
+              <h2 className="text-base font-bold text-[#1A1A2E]">{t("newPost")}</h2>
               <button
                 onClick={handleCreatePost}
                 disabled={creating || selectedImages.length === 0}
-                className="px-4 py-1.5 bg-[#4A90D9] text-white rounded-full font-semibold text-sm cloud-shadow micro-press focus-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-1.5 bg-primary text-primary-foreground rounded-full font-semibold text-sm cloud-shadow micro-press focus-ring disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {creating ? "Posting..." : "Share"}
+                {creating ? t("posting") : t("share")}
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-full bg-[#4A90D9] flex items-center justify-center flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-[#000000] flex items-center justify-center flex-shrink-0">
                   <span className="text-white font-bold text-sm">
                     {user?.name?.charAt(0).toUpperCase() || "U"}
                   </span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-[#1A1A2E]">{user?.name || "User"}</p>
-                  <p className="text-xs text-[#8E8E93]">{(user as any)?.major || "USC Student"}</p>
+                  <p className="text-sm font-semibold text-[#1A1A2E]">{user?.name || t("defaultUser")}</p>
+                  <p className="text-xs text-[#8E8E93]">{(user as any)?.major || t("defaultMajor")}</p>
                 </div>
               </div>
 
               <textarea
                 value={newPostContent}
                 onChange={(e) => setNewPostContent(e.target.value)}
-                placeholder={selectedImages.length > 0 ? "Write a caption..." : "Add an image first to write a caption..."}
+                placeholder={selectedImages.length > 0 ? t("writeCaption") : t("addImageFirst")}
                 rows={imagePreviews.length > 0 ? 3 : 5}
                 className="w-full border-none bg-transparent px-0 py-2 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none resize-none"
                 autoFocus
@@ -326,7 +406,7 @@ export function FeedPage() {
               {selectedImages.length === 0 && newPostContent.trim() && (
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2">
                   <p className="text-xs text-amber-800">
-                    📸 Please add an image to post with a caption
+                    {t("addImageNotice")}
                   </p>
                 </div>
               )}
@@ -382,7 +462,7 @@ export function FeedPage() {
                           key={index}
                           onClick={() => setCurrentPreviewIndex(index)}
                           className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all ${
-                            index === currentPreviewIndex ? "ring-2 ring-[#4A90D9] scale-105" : "opacity-60"
+                            index === currentPreviewIndex ? "ring-2 ring-[#000000] scale-105" : "opacity-60"
                           }`}
                         >
                           <Image src={preview} alt={`Thumb ${index + 1}`} fill className="object-cover" />
@@ -392,29 +472,50 @@ export function FeedPage() {
                   )}
 
                   {imagePreviews.length < 10 && (
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full py-3 bg-white border-t border-[#EBEBF0] text-sm font-medium text-[#4A90D9] hover:bg-[#4A90D9]/8 transition-colors duration-300"
-                    >
-                      + Add More Photos ({imagePreviews.length}/10)
-                    </button>
+                    <div className="flex border-t border-[#EBEBF0]">
+                      <button
+                        onClick={() => cameraInputRef.current?.click()}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-white text-sm font-medium text-[#000000] hover:bg-[#000000]/8 transition-colors duration-300 border-r border-[#EBEBF0]"
+                      >
+                        <Camera size={16} /> {t("takePhoto")}
+                      </button>
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-white text-sm font-medium text-[#000000] hover:bg-[#000000]/8 transition-colors duration-300"
+                      >
+                        <ImageIcon size={16} /> {t("gallery")} ({imagePreviews.length}/10)
+                      </button>
+                    </div>
                   )}
                 </div>
               )}
 
               {imagePreviews.length === 0 && (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full mt-4 rounded-2xl border-2 border-dashed border-[#C7C7CC] bg-[#F8F8FA] px-4 py-10 hover:border-[#4A90D9] hover:bg-[#4A90D9]/5 transition-all duration-300"
-                >
-                  <div className="flex flex-col items-center gap-2.5">
-                    <div className="p-3.5 rounded-full bg-[#4A90D9]/10">
-                      <ImageIcon size={24} className="text-[#4A90D9]" />
-                    </div>
-                    <p className="text-sm font-medium text-[#1A1A2E]">Add Photos</p>
-                    <p className="text-xs text-[#8E8E93]">JPG, PNG • Up to 10 photos • Max 5MB each</p>
+                <div className="mt-4 rounded-2xl border-2 border-dashed border-[#C7C7CC] bg-[#F8F8FA] px-4 py-8 transition-all duration-300">
+                  <div className="flex flex-col items-center gap-1 mb-5">
+                    <p className="text-sm font-medium text-[#1A1A2E]">{t("addPhotos")}</p>
                   </div>
-                </button>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => cameraInputRef.current?.click()}
+                      className="flex-1 flex flex-col items-center gap-2 rounded-xl border border-[#000000]/30 bg-white py-4 hover:border-[#000000] hover:bg-[#000000]/5 transition-all duration-300"
+                    >
+                      <div className="p-2.5 rounded-full bg-[#000000]/10">
+                        <Camera size={20} className="text-[#000000]" />
+                      </div>
+                      <span className="text-xs font-semibold text-[#1A1A2E]">{t("takePhoto")}</span>
+                    </button>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex-1 flex flex-col items-center gap-2 rounded-xl border border-[#000000]/30 bg-white py-4 hover:border-[#000000] hover:bg-[#000000]/5 transition-all duration-300"
+                    >
+                      <div className="p-2.5 rounded-full bg-[#000000]/10">
+                        <ImageIcon size={20} className="text-[#000000]" />
+                      </div>
+                      <span className="text-xs font-semibold text-[#1A1A2E]">{t("chooseFromGallery")}</span>
+                    </button>
+                  </div>
+                </div>
               )}
 
               <input
@@ -422,6 +523,14 @@ export function FeedPage() {
                 type="file"
                 accept="image/*"
                 multiple
+                onChange={handleImageSelect}
+                className="hidden"
+              />
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
                 onChange={handleImageSelect}
                 className="hidden"
               />

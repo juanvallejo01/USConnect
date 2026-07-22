@@ -5,16 +5,6 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 const STORAGE_KEY = "usc_profile_photos"
 const DEFAULT_PHOTOS = ["/images/swipe-profile.jpg"]
 
-export const AVAILABLE_PHOTOS = [
-  "/images/swipe-profile.jpg",
-  "/images/profile-1.jpg",
-  "/images/profile-4.jpg",
-  "/images/profile-5.jpg",
-  "/images/profile-6.jpg",
-  "/images/feed-post-1.jpg",
-  "/images/feed-post-2.jpg",
-]
-
 interface ProfilePhotosContextType {
   photos: string[]
   addPhoto: (url: string) => void

@@ -65,10 +65,11 @@ export interface Conversation {
 export interface Notification {
   id: string;
   userId: string;
-  type: 'MATCH';
+  type: 'MATCH' | 'LIKE_RECEIVED';
   referenceId: string;
   read: boolean;
   createdAt: string;
+  fromUser: { id: string; name: string; major: string } | null;
 }
 
 export interface LeaderboardEntry {

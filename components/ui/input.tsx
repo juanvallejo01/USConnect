@@ -32,7 +32,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "transition-all duration-200 ease-out",
             "focus-ring",
             // Default state
-            !error && !success && "border-[#EBEBF0] focus:border-[#4A90D9]",
+            !error && !success && "border-[#EBEBF0] focus:border-[#000000]",
             // Error state
             error && "border-[#FF3B30] focus:border-[#FF3B30]",
             // Success state

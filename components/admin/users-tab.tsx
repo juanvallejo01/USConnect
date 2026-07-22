@@ -2,10 +2,12 @@
 
 import { useState } from "react"
 import { ShieldCheck, CheckCircle, Ban, Trash2 } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { StatusBadge } from "./stat-card"
 import { ADMIN_USERS } from "@/utils/constants"
 
 export function UsersTab() {
+  const t = useTranslations("adminUsers")
   const [userList, setUserList] = useState(ADMIN_USERS)
 
   function handleVerify(id: number) {
@@ -25,8 +27,8 @@ export function UsersTab() {
   return (
     <div className="flex flex-col gap-3 p-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">All Users</h3>
-        <span className="text-xs text-muted-foreground">{userList.length} users</span>
+        <h3 className="text-sm font-semibold text-foreground">{t("allUsers")}</h3>
+        <span className="text-xs text-muted-foreground">{t("userCount", { count: userList.length })}</span>
       </div>
       {userList.map((user) => (
         <div key={user.id} className="rounded-xl bg-card border border-border cloud-shadow p-4">
@@ -34,7 +36,7 @@ export function UsersTab() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h4 className="text-sm font-semibold text-foreground">{user.name}</h4>
-                {user.verified && <ShieldCheck size={14} className="text-[#4A90D9] shrink-0" />}
+                {user.verified && <ShieldCheck size={14} className="text-[#000000] shrink-0" />}
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">{user.email}</p>
               <p className="text-xs text-muted-foreground">{user.major}</p>
@@ -45,9 +47,9 @@ export function UsersTab() {
             {!user.verified && (
               <button
                 onClick={() => handleVerify(user.id)}
-                className="flex items-center gap-1.5 rounded-lg bg-[#4A90D9]/10 px-3 py-1.5 text-xs font-medium text-[#4A90D9] transition-colors hover:bg-[#4A90D9]/20 active:scale-95"
+                className="flex items-center gap-1.5 rounded-lg bg-[#000000]/10 px-3 py-1.5 text-xs font-medium text-[#000000] transition-colors hover:bg-[#000000]/20 active:scale-95"
               >
-                <CheckCircle size={12} /> Verify
+                <CheckCircle size={12} /> {t("verify")}
               </button>
             )}
             {user.status !== "suspended" && user.status !== "banned" && (
@@ -55,14 +57,14 @@ export function UsersTab() {
                 onClick={() => handleSuspend(user.id)}
                 className="flex items-center gap-1.5 rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-200 active:scale-95"
               >
-                <Ban size={12} /> Suspend
+                <Ban size={12} /> {t("suspend")}
               </button>
             )}
             <button
               onClick={() => handleDelete(user.id)}
               className="flex items-center gap-1.5 rounded-lg bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-200 active:scale-95"
             >
-              <Trash2 size={12} /> Delete
+              <Trash2 size={12} /> {t("delete")}
             </button>
           </div>
         </div>

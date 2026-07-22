@@ -1,0 +1,368 @@
+{
+  "landing": {
+    "nav": {
+      "signIn": "Sign In"
+    },
+    "hero": {
+      "badge": "🎓 Exclusively for Cali university students",
+      "title": "The exclusive social network for Cali university students.",
+      "subtitle": "Connect, discover, and share with students from your university in a safe, verified environment.",
+      "signIn": "Sign In",
+      "createAccount": "Create Account"
+    },
+    "benefits": {
+      "kicker": "Benefits",
+      "title": "Made for university life",
+      "items": {
+        "onlyStudents": {
+          "title": "Students only",
+          "description": "Sign in with a university account only, to be part of an authentic community."
+        },
+        "connect": {
+          "title": "Connect easily",
+          "description": "Find people with similar interests, make friends, and grow your university circle."
+        },
+        "discover": {
+          "title": "Discover opportunities",
+          "description": "Share posts, learn about events and activities, and connect with students from other universities."
+        }
+      }
+    },
+    "howItWorks": {
+      "kicker": "Process",
+      "title": "How it works",
+      "steps": {
+        "create": "Create your account",
+        "verify": "Verify you belong to a university",
+        "start": "Start connecting with other students"
+      }
+    },
+    "faq": {
+      "kicker": "FAQ",
+      "title": "Frequently asked questions",
+      "items": {
+        "who": {
+          "question": "Who can sign up?",
+          "answer": "Only university students."
+        },
+        "privacy": {
+          "question": "Is my data private?",
+          "answer": "Yes, we protect your information and only share what's necessary for the platform to work."
+        },
+        "otherUniversities": {
+          "question": "Can I meet students from other universities?",
+          "answer": "Yes, as long as they belong to participating universities in Cali."
+        }
+      }
+    },
+    "footer": {
+      "tagline": "Cali's university community.",
+      "terms": "Terms and Conditions",
+      "privacy": "Privacy Policy",
+      "contact": "Contact",
+      "rights": "All rights reserved."
+    }
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{count}m ago",
+    "hoursAgo": "{count}h ago",
+    "yesterday": "Yesterday",
+    "daysAgo": "{count}d ago"
+  },
+  "nav": {
+    "ariaLabel": "Main navigation",
+    "home": "Home",
+    "discover": "Discover",
+    "messages": "Messages",
+    "ranking": "Ranking",
+    "profile": "Profile"
+  },
+  "auth": {
+    "joinTitle": "Join Campus Circle",
+    "welcomeBackTitle": "Welcome back",
+    "joinSubtitle": "Create your account to get started",
+    "welcomeBackSubtitle": "Sign in to your campus community",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "John Doe",
+    "useTestAccount": "Use test account (student1@usc.edu)",
+    "fill": "Fill",
+    "email": "Email",
+    "emailPlaceholder": "yourname@usc.edu",
+    "password": "Password",
+    "passwordPlaceholderRegister": "At least 6 characters",
+    "passwordPlaceholderLogin": "Enter your password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "major": "Major",
+    "majorPlaceholder": "Computer Science",
+    "loading": "Loading...",
+    "createAccount": "Create Account",
+    "signIn": "Sign In",
+    "or": "or",
+    "toggleToSignIn": "Already have an account? Sign In",
+    "termsNotice": "By continuing, you agree to our Terms of Service",
+    "errors": {
+      "nameRequired": "Name is required",
+      "validEmailRequired": "Valid email is required",
+      "passwordLength": "Password must be at least 6 characters",
+      "majorRequired": "Major is required",
+      "emailPasswordRequired": "Email and password are required",
+      "authFailed": "Authentication failed"
+    }
+  },
+  "feed": {
+    "searchPlaceholder": "Search people by name...",
+    "searching": "Searching...",
+    "noPeopleFound": "No people found",
+    "createPost": "Create post",
+    "whatsOnYourMind": "What's on your mind?",
+    "noPostsYet": "No posts yet",
+    "beFirstToShare": "Be the first to share something with the campus community!",
+    "newPost": "New Post",
+    "posting": "Posting...",
+    "share": "Share",
+    "defaultUser": "User",
+    "defaultMajor": "USC Student",
+    "writeCaption": "Write a caption...",
+    "addImageFirst": "Add an image first to write a caption...",
+    "addImageNotice": "📸 Please add an image to post with a caption",
+    "takePhoto": "Take Photo",
+    "gallery": "Gallery",
+    "addPhotos": "Add Photos",
+    "chooseFromGallery": "Choose from Gallery",
+    "alerts": {
+      "maxImages": "You can only upload up to 10 images per post",
+      "needImage": "Please add at least one image to your post",
+      "createFailed": "Failed to create post",
+      "deleteConfirm": "Are you sure you want to delete this post?",
+      "deleteFailed": "Failed to delete post"
+    }
+  },
+  "post": {
+    "deletePost": "Delete post",
+    "deleteComment": "Delete comment",
+    "share": "Share",
+    "shareText": "Check out this post on Ve!",
+    "likes": "{count, plural, one {1 like} other {# likes}}",
+    "viewAllComments": "View all {count} comments",
+    "noComments": "No comments yet. Be the first!",
+    "addComment": "Add a comment...",
+    "post": "Post"
+  },
+  "explore": {
+    "title": "Explore",
+    "allCaughtUpTitle": "You're all caught up",
+    "allCaughtUpSubtitle": "No more new people to show right now. Check back later!",
+    "refresh": "Refresh",
+    "matchBanner": "✨ It's a match! Tap 💬 to message",
+    "notifications": "Notifications",
+    "unreadCount": "{count} unread",
+    "markAllAsRead": "Mark all as read",
+    "noNotificationsYet": "No notifications yet",
+    "notificationsHint": "When you get likes or matches, they'll appear here",
+    "someone": "Someone",
+    "matchedWithYou": "matched with you!",
+    "likedYourProfile": "liked your profile",
+    "sendMessage": "Send message",
+    "reviewProfile": "Review profile",
+    "itsAMatch": "It's a Match!",
+    "likedEachOther": "You and {name} liked each other",
+    "keepSwiping": "Keep Swiping",
+    "you": "You"
+  },
+  "swipeCard": {
+    "like": "LIKE",
+    "nope": "NOPE",
+    "nearby": "Nearby"
+  },
+  "likeReview": {
+    "likedYourProfile": "liked your profile",
+    "reject": "Reject",
+    "like": "Like"
+  },
+  "matches": {
+    "title": "Matches",
+    "loading": "Loading...",
+    "matchCount": "{count, plural, one {# match} other {# matches}}",
+    "noMatchesYet": "No matches yet",
+    "startExploring": "Start exploring and liking profiles to find your matches!",
+    "startChatting": "Start chatting"
+  },
+  "notificationsPage": {
+    "title": "Notifications",
+    "markAllAsRead": "Mark all as read",
+    "noNotificationsYet": "No notifications yet",
+    "hint": "You'll be notified when someone likes you or you get a match",
+    "matchedWith": "You matched with {name} 🎉",
+    "someone": "someone",
+    "likedYourProfile": "liked your profile 💛",
+    "matchSubtitle": "Start a conversation and get to know each other!",
+    "likeSubtitle": "Check out their profile and decide if you want to like them back.",
+    "startChat": "Start Chat",
+    "reviewProfile": "Review profile",
+    "itsAMatch": "It's a Match!",
+    "likedEachOther": "You and {name} liked each other",
+    "nice": "Nice!"
+  },
+  "leaderboard": {
+    "title": "Rankings",
+    "subtitle": "This week's top performers",
+    "topUsers": "Top Users",
+    "hotPosts": "Hot Posts",
+    "leaderboardLabel": "Leaderboard",
+    "trendingPosts": "Trending Posts",
+    "likesCount": "{count} likes",
+    "bestPost": "Best Post · {count} Likes",
+    "yourRank": "Your rank",
+    "resetNotice": "⚡ Rankings reset every Monday · Based on likes received",
+    "trendingNotice": "🔥 Top posts by engagement this week"
+  },
+  "profile": {
+    "tabs": {
+      "posts": "Posts",
+      "interests": "Interests",
+      "highlights": "Highlights",
+      "photos": "Photos"
+    },
+    "defaultBio": "Backend-focused Dev 🧑‍💻 computer engineering USC",
+    "interests": {
+      "Photography": "Photography",
+      "Design": "Design",
+      "Music": "Music",
+      "Hiking": "Hiking",
+      "Coffee": "Coffee",
+      "Film": "Film",
+      "Art": "Art",
+      "Tech": "Tech"
+    },
+    "switchLanguage": "Switch language",
+    "editProfile": "Edit profile",
+    "defaultUser": "User",
+    "addBio": "Add a bio…",
+    "defaultMajorLocation": "USC · Cali",
+    "joinedIn": "Joined in 2024",
+    "interestsCount": "interests",
+    "likesCount": "likes",
+    "photosCount": "photos",
+    "sharePhotos": "Share photos",
+    "sharePhotosHint": "Photos you add will appear here.",
+    "addFirstPhoto": "Add your first photo",
+    "noHighlightsYet": "No highlights yet",
+    "noHighlightsHint": "Posts with the most likes will appear here.",
+    "managePhotos": "Manage photos",
+    "myPhotos": "My photos",
+    "main": "MAIN"
+  },
+  "chat": {
+    "goBack": "Go back",
+    "activeNow": "Active now",
+    "notMatchedYet": "Not matched yet",
+    "matchRequiredTitle": "Match Required",
+    "matchRequiredBody": "You need to match with {name} to start chatting. Both users must like each other.",
+    "youMatched": "You matched! Say hi to {name} 👋",
+    "matchRequiredBanner": "Match required to start chat",
+    "messagePlaceholder": "Message...",
+    "matchRequiredPlaceholder": "Match required...",
+    "sendMessage": "Send message"
+  },
+  "userProfile": {
+    "joined": "Joined {date}",
+    "posts": "Posts",
+    "likes": "Likes",
+    "verified": "Verified",
+    "postsTab": "Posts",
+    "activityTab": "Activity",
+    "noPostsYet": "No posts yet",
+    "recentActivity": "Recent Activity",
+    "receivedLikes": "Received {count} likes",
+    "thisWeek": "This week",
+    "postedTimes": "Posted {count} times",
+    "total": "Total",
+    "engagement": "Engagement",
+    "avgLikesPerPost": "Avg. likes per post"
+  },
+  "admin": {
+    "tabs": {
+      "overview": "Overview",
+      "users": "Users",
+      "moderation": "Reports",
+      "analytics": "Analytics"
+    },
+    "goBack": "Go back",
+    "title": "Admin Dashboard",
+    "subtitle": "Campus Circle Management",
+    "logout": "Logout"
+  },
+  "adminOverview": {
+    "loadingStats": "Loading statistics...",
+    "loadFailed": "Failed to load statistics",
+    "totalUsers": "Total Users",
+    "activeUsers": "Active Users",
+    "totalLikes": "Total Likes",
+    "totalMatches": "Total Matches",
+    "messages": "Messages",
+    "matchRate": "Match Rate",
+    "recentActivity": "Recent Activity",
+    "activity": {
+      "newUser": "New user registered: {name}",
+      "newMatch": "New match created: {names}",
+      "newLikes": "{count} new likes created today",
+      "reachedLikes": "{name} reached {count} likes"
+    }
+  },
+  "adminUsers": {
+    "allUsers": "All Users",
+    "userCount": "{count, plural, one {# user} other {# users}}",
+    "verify": "Verify",
+    "suspend": "Suspend",
+    "delete": "Delete",
+    "status": {
+      "active": "active",
+      "suspended": "suspended",
+      "banned": "banned"
+    }
+  },
+  "adminModeration": {
+    "reportedContent": "Reported Content",
+    "pendingCount": "{count} pending",
+    "allClear": "All clear! No pending reports.",
+    "reportsCount": "{count} reports",
+    "review": "Review",
+    "warnUser": "Warn User",
+    "remove": "Remove",
+    "reasons": {
+      "Inappropriate content": "Inappropriate content",
+      "Spam": "Spam",
+      "Harassment": "Harassment"
+    }
+  },
+  "adminAnalytics": {
+    "avgDailyPosts": "Avg. Daily Posts",
+    "avgDailySparks": "Avg. Daily Sparks",
+    "engagementRate": "Engagement Rate",
+    "retention": "Retention (7d)",
+    "vsLastWeek": "{sign}{percent}% vs last week",
+    "postsPerDay": "Posts Per Day",
+    "sparksGrowth": "Sparks Growth",
+    "usersByMajor": "Users by Major",
+    "days": {
+      "Mon": "Mon",
+      "Tue": "Tue",
+      "Wed": "Wed",
+      "Thu": "Thu",
+      "Fri": "Fri",
+      "Sat": "Sat",
+      "Sun": "Sun"
+    },
+    "majors": {
+      "Computer Science": "Computer Science",
+      "Business Admin": "Business Admin",
+      "Film Production": "Film Production",
+      "Engineering": "Engineering",
+      "Art & Design": "Art & Design",
+      "Psychology": "Psychology",
+      "Other": "Other"
+    }
+  }
+}

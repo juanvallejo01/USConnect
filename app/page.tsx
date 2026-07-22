@@ -1,16 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { LocaleProvider } from "@/context/locale-context"
 import { AuthProvider, useAuth } from "@/context/auth-context"
 import { MatchProvider } from "@/context/match-context"
 import { NotificationProvider } from "@/context/notification-context"
 import { ChatProvider, useChat } from "@/context/chat-context"
-import { RankProvider } from "@/context/rank-context"
 import { ProfilePhotosProvider } from "@/context/profile-photos-context"
 import { ToastProvider } from "@/context/toast-context"
 import { MobileFrame } from "@/components/layout/mobile-frame"
 import { BottomNav, type Tab } from "@/components/navigation/bottom-nav"
 import { PageTransition } from "@/components/layout/page-transition"
+import { LandingPage } from "@/screens/Landing"
 import { AuthPage } from "@/screens/Auth"
 import { ExplorePage } from "@/screens/Explore"
 import { FeedPage } from "@/screens/Feed"
@@ -23,35 +24,53 @@ import { AdminDashboardPage } from "@/screens/AdminDashboard"
 
 export default function Home() {
   return (
-    <AuthProvider>
-      <ToastProvider>
-        <ProfilePhotosProvider>
-          <MatchProvider>
-            <NotificationProvider>
-              <ChatProvider>
-                <RankProvider>
+    <LocaleProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <ProfilePhotosProvider>
+            <MatchProvider>
+              <NotificationProvider>
+                <ChatProvider>
                   <AppShell />
-                </RankProvider>
-              </ChatProvider>
-            </NotificationProvider>
-          </MatchProvider>
-        </ProfilePhotosProvider>
-      </ToastProvider>
-    </AuthProvider>
+                </ChatProvider>
+              </NotificationProvider>
+            </MatchProvider>
+          </ProfilePhotosProvider>
+        </ToastProvider>
+      </AuthProvider>
+    </LocaleProvider>
   )
 }
 
 function AppShell() {
-  const { isLoggedIn, user } = useAuth()
+  const { isLoggedIn, isLoading, user } = useAuth()
   const { activeUserId, closeChat } = useChat()
   const [activeTab, setActiveTab] = useState<Tab>("feed")
   const [showAdmin, setShowAdmin] = useState(false)
-  
+  const [authEntry, setAuthEntry] = useState<"login" | "register" | null>(null)
+
   // Check if user is admin based on role from backend
   const isAdmin = user?.role === 'ADMIN'
 
+  // Return to the landing page after logging out
+  useEffect(() => {
+    if (!isLoggedIn) setAuthEntry(null)
+  }, [isLoggedIn])
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-background" />
+  }
+
   if (!isLoggedIn) {
-    return <AuthPage />
+    if (!authEntry) {
+      return (
+        <LandingPage
+          onSignIn={() => setAuthEntry("login")}
+          onCreateAccount={() => setAuthEntry("register")}
+        />
+      )
+    }
+    return <AuthPage initialMode={authEntry} />
   }
 
   // Si es admin, mostrar SOLO el panel de administración

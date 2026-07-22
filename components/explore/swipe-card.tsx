@@ -3,15 +3,17 @@
 import { useRef, useState } from "react"
 import Image from "next/image"
 import { Info, MapPin } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 interface SwipeProfile {
-  id: number
+  id: string
   name: string
-  age: number
-  image: string
+  major: string
+  age?: number
+  image?: string
   photos?: readonly string[]
-  interests: readonly string[]
-  bio: string
+  interests?: readonly string[]
+  bio?: string
 }
 
 export function SwipeCard({
@@ -23,7 +25,14 @@ export function SwipeCard({
   onSwipe: (direction: "left" | "right") => void
   overridePhotos?: string[]
 }) {
-  const photos = overridePhotos ?? (profile.photos as string[] | undefined) ?? [profile.image]
+  const t = useTranslations("swipeCard")
+  const photos = overridePhotos?.length
+    ? overridePhotos
+    : profile.photos?.length
+      ? (profile.photos as string[])
+      : profile.image
+        ? [profile.image]
+        : []
   const [dragX, setDragX] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [photoIndex, setPhotoIndex] = useState(0)
@@ -81,15 +90,21 @@ export function SwipeCard({
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
     >
-      {/* Background photo */}
-      <Image
-        src={photos[photoIndex] ?? profile.image}
-        alt={profile.name}
-        fill
-        className="object-cover transition-opacity duration-200"
-        priority
-        draggable={false}
-      />
+      {/* Background photo (or initials fallback when no photo exists) */}
+      {photos.length > 0 ? (
+        <Image
+          src={photos[photoIndex] ?? photos[0]}
+          alt={profile.name}
+          fill
+          className="object-cover transition-opacity duration-200"
+          priority
+          draggable={false}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#000000] to-[#404040]">
+          <span className="text-8xl font-black text-white/90">{profile.name.charAt(0).toUpperCase()}</span>
+        </div>
+      )}
 
       {/* Top-to-bottom gradient (for overlay bar readability) */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-transparent" />
@@ -117,7 +132,7 @@ export function SwipeCard({
         style={{ opacity: likeOpacity }}
       >
         <span className="text-2xl font-black text-[#4CD964] tracking-[0.15em] drop-shadow-sm">
-          LIKE
+          {t("like")}
         </span>
       </div>
 
@@ -127,7 +142,7 @@ export function SwipeCard({
         style={{ opacity: nopeOpacity }}
       >
         <span className="text-2xl font-black text-[#FF4458] tracking-[0.15em] drop-shadow-sm">
-          NOPE
+          {t("nope")}
         </span>
       </div>
 
@@ -137,7 +152,7 @@ export function SwipeCard({
         <div className="mb-3">
           <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#1DA462] px-3 py-1.5 shadow-sm">
             <MapPin size={11} className="text-white" fill="white" />
-            <span className="text-xs font-bold text-white">Nearby</span>
+            <span className="text-xs font-bold text-white">{t("nearby")}</span>
           </span>
         </div>
 
@@ -148,17 +163,17 @@ export function SwipeCard({
               <h2 className="text-[28px] font-bold text-white leading-none drop-shadow">
                 {profile.name}
               </h2>
-              <span className="text-[22px] font-light text-white/90">{profile.age}</span>
+              {profile.age && <span className="text-[22px] font-light text-white/90">{profile.age}</span>}
             </div>
 
-            {/* Bio */}
+            {/* Bio (falls back to major when there's no real bio) */}
             <p className="text-sm text-white/72 mt-1.5 line-clamp-2 leading-snug">
-              {profile.bio}
+              {profile.bio || profile.major}
             </p>
 
-            {/* Interest chips */}
+            {/* Interest chips (falls back to major when there are no real interests) */}
             <div className="flex flex-wrap gap-1.5 mt-3">
-              {profile.interests.slice(0, 3).map((tag) => (
+              {(profile.interests?.length ? profile.interests.slice(0, 3) : [profile.major]).map((tag) => (
                 <span
                   key={tag}
                   className="rounded-xl bg-white/25 backdrop-blur-lg px-3 py-1 text-xs font-medium text-white"

@@ -1,4 +1,4 @@
-import type { ChatMessage } from "@/utils/constants"
+import type { ChatMessage } from "@/context/chat-context"
 
 export function ChatBubble({ message }: { message: ChatMessage }) {
   return (
@@ -7,8 +7,8 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
         <div
           className={`rounded-[22px] px-4 py-3 text-[15px] leading-snug ${
             message.sent
-              ? "bg-[#4A90D9] text-white rounded-br-lg"
-              : "bg-[#F2F2F7] text-[#1A1A2E] rounded-bl-lg"
+              ? "bg-primary text-primary-foreground rounded-br-lg"
+              : "bg-[#F2F2F7] dark:bg-[#1C1C1E] text-[#1A1A2E] dark:text-[#F5F5F0] rounded-bl-lg"
           }`}
         >
           {message.text}
