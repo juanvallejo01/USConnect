@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react"
 import Image from "next/image"
-import { Info, MapPin } from "lucide-react"
+import { Info, MapPin, Trophy } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 interface SwipeProfile {
@@ -20,10 +20,13 @@ export function SwipeCard({
   profile,
   onSwipe,
   overridePhotos,
+  rank,
 }: {
   profile: SwipeProfile
   onSwipe: (direction: "left" | "right") => void
   overridePhotos?: string[]
+  /** Weekly top-100 users ranking (same data as "Populares"); omitted entirely outside the top 100. */
+  rank?: number
 }) {
   const t = useTranslations("swipeCard")
   const photos = overridePhotos?.length
@@ -148,12 +151,21 @@ export function SwipeCard({
 
       {/* Bottom profile info */}
       <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 z-10">
-        {/* Nearby badge */}
-        <div className="mb-3">
+        {/* Nearby + weekly rank badges */}
+        <div className="mb-3 flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#1DA462] px-3 py-1.5 shadow-sm">
             <MapPin size={11} className="text-white" fill="white" />
             <span className="text-xs font-bold text-white">{t("nearby")}</span>
           </span>
+          {rank && (
+            <span
+              className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 px-3 py-1.5 shadow-sm"
+              style={{ boxShadow: "0 2px 10px rgba(255,215,0,0.35)" }}
+            >
+              <Trophy size={11} className="text-yellow-900" />
+              <span className="text-xs font-bold text-yellow-900">{t("weeklyRank", { rank })}</span>
+            </span>
+          )}
         </div>
 
         <div className="flex items-end gap-3">

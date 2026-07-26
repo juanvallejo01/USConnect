@@ -141,6 +141,9 @@
   },
   "post": {
     "deletePost": "Eliminar publicación",
+    "authorWeeklyRank": "Autor: top #{rank} de usuarios esta semana",
+    "postTopLabel": "Publicación top #{rank}",
+    "postWeeklyRankBeyond100": "Publicación fuera del top 100 semanal",
     "deleteComment": "Eliminar comentario",
     "share": "Compartir",
     "shareText": "Mira esta publicación en Ve!",
@@ -174,7 +177,8 @@
   "swipeCard": {
     "like": "SÍ",
     "nope": "NO",
-    "nearby": "Cerca de ti"
+    "nearby": "Cerca de ti",
+    "weeklyRank": "#{rank}"
   },
   "likeReview": {
     "likedYourProfile": "le dio like a tu perfil",
@@ -187,7 +191,11 @@
     "matchCount": "{count, plural, one {# match} other {# matches}}",
     "noMatchesYet": "Aún no tienes matches",
     "startExploring": "¡Empieza a explorar y dar like a perfiles para encontrar tus matches!",
-    "startChatting": "Iniciar conversación"
+    "startChatting": "Iniciar conversación",
+    "newLikes": "Nuevos likes",
+    "itsAMatch": "¡Es un Match!",
+    "likedEachOther": "Tú y {name} se dieron like",
+    "nice": "¡Genial!"
   },
   "notificationsPage": {
     "title": "Notificaciones",
@@ -237,6 +245,8 @@
       "Tech": "Tecnología"
     },
     "switchLanguage": "Cambiar idioma",
+    "editBanner": "Cambiar banner",
+    "removeBanner": "Quitar banner",
     "editProfile": "Editar perfil",
     "defaultUser": "Usuario",
     "addBio": "Añade una bio…",
@@ -245,6 +255,8 @@
     "interestsCount": "intereses",
     "likesCount": "likes",
     "photosCount": "fotos",
+    "noPostsYet": "Aún no hay publicaciones",
+    "noPostsHint": "Las publicaciones que compartas en el inicio aparecerán aquí.",
     "sharePhotos": "Comparte fotos",
     "sharePhotosHint": "Las fotos que agregues aparecerán aquí.",
     "addFirstPhoto": "Agrega tu primera foto",
@@ -252,7 +264,9 @@
     "noHighlightsHint": "Los posts con más likes aparecerán aquí.",
     "managePhotos": "Gestionar fotos",
     "myPhotos": "Mis fotos",
-    "main": "PRINCIPAL"
+    "main": "PRINCIPAL",
+    "weeklyRank": "Top #{rank} esta semana",
+    "editProfilePhoto": "Cambiar foto de perfil"
   },
   "chat": {
     "goBack": "Volver",
@@ -264,12 +278,42 @@
     "matchRequiredBanner": "Necesitas hacer match para chatear",
     "messagePlaceholder": "Mensaje...",
     "matchRequiredPlaceholder": "Necesitas hacer match...",
-    "sendMessage": "Enviar mensaje"
+    "sendMessage": "Enviar mensaje",
+    "viewProfile": "Ver perfil",
+    "ephemeralToggle": "Mensajes que desaparecen en 24h",
+    "ephemeralActiveMine": "Activaste los mensajes de 24h: se borrarán solos.",
+    "ephemeralActiveOther": "La otra persona activó los mensajes de 24h: se borrarán solos.",
+    "typing": "Escribiendo...",
+    "youScreenshotted": "Tomaste una captura de pantalla",
+    "theyScreenshotted": "{name} tomó una captura de pantalla"
   },
   "userProfile": {
     "joined": "Se unió {date}",
     "posts": "Publicaciones",
     "likes": "Me gusta",
+    "sendMatch": "Match",
+    "matchPending": "Solicitud enviada",
+    "sendMessage": "Enviar mensaje",
+    "unmatch": "Quitar match",
+    "unmatchConfirm": "¿Quitar el match con {name}? Podrán volver a enviarse una solicitud más adelante.",
+    "block": "Bloquear",
+    "unblock": "Desbloquear",
+    "blockConfirm": "¿Bloquear a {name}? Se eliminará el match si existe y no podrán contactarse.",
+    "blockedByMeNotice": "Bloqueaste a este usuario. Desbloquéalo para volver a interactuar.",
+    "blockedMeNotice": "No puedes interactuar con este perfil.",
+    "report": "Reportar",
+    "reportTitle": "Reportar a {name}",
+    "reportPrompt": "¿Por qué quieres reportar este perfil?",
+    "reportSubmit": "Enviar reporte",
+    "reportSubmitting": "Enviando...",
+    "reportSubmitted": "Reporte enviado. Nuestro equipo lo revisará.",
+    "reportReasons": {
+      "SPAM": "Spam",
+      "HARASSMENT": "Acoso",
+      "FAKE_PROFILE": "Perfil falso",
+      "INAPPROPRIATE_CONTENT": "Contenido inapropiado",
+      "OTHER": "Otro"
+    },
     "verified": "Verificado",
     "postsTab": "Posts",
     "activityTab": "Actividad",
@@ -280,7 +324,8 @@
     "postedTimes": "Publicó {count} veces",
     "total": "Total",
     "engagement": "Interacción",
-    "avgLikesPerPost": "Promedio de likes por publicación"
+    "avgLikesPerPost": "Promedio de likes por publicación",
+    "weeklyRank": "Top #{rank} esta semana"
   },
   "admin": {
     "tabs": {
@@ -335,6 +380,30 @@
       "Inappropriate content": "Contenido inapropiado",
       "Spam": "Spam",
       "Harassment": "Acoso"
+    }
+  },
+  "adminReports": {
+    "title": "Usuarios reportados",
+    "pendingCount": "{count} pendientes",
+    "allClear": "¡Todo en orden! No hay reportes de usuarios pendientes.",
+    "reportedBy": "Reportado por {name}",
+    "dismiss": "Descartar",
+    "resolve": "Marcar resuelto",
+    "totalReportsCount": "{count} reportes en total contra este usuario",
+    "alreadySuspended": "Ya suspendido",
+    "alreadyBanned": "Ya baneado",
+    "confirmAction": "¿Aplicar \"{action}\" a {name}?",
+    "actions": {
+      "suspend_1w": "Suspender 1 semana",
+      "suspend_1m": "Suspender 1 mes",
+      "ban": "Banear permanentemente"
+    },
+    "reasons": {
+      "SPAM": "Spam",
+      "HARASSMENT": "Acoso",
+      "FAKE_PROFILE": "Perfil falso",
+      "INAPPROPRIATE_CONTENT": "Contenido inapropiado",
+      "OTHER": "Otro"
     }
   },
   "adminAnalytics": {

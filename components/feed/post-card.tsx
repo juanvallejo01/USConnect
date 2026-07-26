@@ -1,11 +1,40 @@
 "use client"
 
-import { useState, useRef } from "react"
-import { Heart, MessageSquare, Share2, Trash2 } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { Heart, MessageSquare, Share2, Trash2, Trophy, Medal, Award } from "lucide-react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 import { postsApi } from "@/lib/api-client"
 import { formatRelativeTime } from "@/utils/relative-time"
+import { RankBadge } from "@/components/leaderboard/rank-badge"
+import { ProfileAvatarImage as UserAvatarImage } from "@/components/layout/profile-avatar-image"
+
+// Tiered look for the "top post" pill: gold/silver/bronze for #1-3 (matching
+// RankBadge), light blue for #4-100 — same glow/bounce treatment, different color.
+const POST_RANK_TIERS: Record<number, { gradient: string; shadow: string; textColor: string; Icon: typeof Trophy }> = {
+  1: { gradient: "from-yellow-400 via-amber-400 to-yellow-500", shadow: "0 3px 12px rgba(255,215,0,0.35)", textColor: "text-yellow-900", Icon: Trophy },
+  2: { gradient: "from-slate-300 via-gray-200 to-slate-400", shadow: "0 3px 12px rgba(148,163,184,0.3)", textColor: "text-slate-700", Icon: Medal },
+  3: { gradient: "from-amber-500 via-orange-400 to-amber-600", shadow: "0 3px 12px rgba(217,119,6,0.3)", textColor: "text-amber-900", Icon: Award },
+}
+const POST_RANK_DEFAULT_TIER = {
+  gradient: "from-sky-300 via-sky-400 to-sky-500",
+  shadow: "0 3px 12px rgba(56,189,248,0.35)",
+  textColor: "text-sky-900",
+  Icon: Trophy,
+}
+
+function PostRankPill({ rank, label }: { rank: number; label: string }) {
+  const { gradient, shadow, textColor, Icon } = POST_RANK_TIERS[rank] ?? POST_RANK_DEFAULT_TIER
+  return (
+    <div
+      className={`flex items-center gap-1.5 rounded-full bg-gradient-to-br ${gradient} px-2.5 py-1 animate-crownBounce`}
+      style={{ boxShadow: shadow }}
+    >
+      <Icon size={11} className={textColor} />
+      <span className={`text-[10px] font-bold ${textColor}`}>{label}</span>
+    </div>
+  )
+}
 
 function parseImages(imageUrl?: string): string[] {
   if (!imageUrl) return []
@@ -28,6 +57,7 @@ interface Post {
     id: string
     name: string
     major: string
+    photoUrl?: string | null
   }
 }
 
@@ -39,18 +69,22 @@ interface Comment {
     id: string
     name: string
     major: string
+    photoUrl?: string | null
   }
 }
 
-export function PostCard({ 
-  post, 
+export function PostCard({
+  post,
   currentUserId,
   onLike,
   onUnlike,
   onComment,
   onDelete,
   onUserClick,
-}: { 
+  showRanking = false,
+  authorRank,
+  postRank,
+}: {
   post: Post
   currentUserId: string
   onLike: (postId: string) => void
@@ -58,6 +92,12 @@ export function PostCard({
   onComment: (postId: string, content: string) => Promise<Comment>
   onDelete?: (postId: string) => void
   onUserClick?: (userId: string) => void
+  /** Weekly top-100 rankings (same data as "Populares"): only Feed opts into showing them. */
+  showRanking?: boolean
+  /** Author's weekly top-100 users rank — omitted entirely outside the top 100. */
+  authorRank?: number
+  /** This post's weekly top-100 posts rank — shows "+100" outside the top 100. */
+  postRank?: number
 }) {
   const t = useTranslations("post")
   const tTime = useTranslations("time")
@@ -137,9 +177,12 @@ export function PostCard({
           onClick={() => onUserClick?.(post.user.id)}
           className="cursor-pointer"
         >
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#000000] to-[#404040] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 ring-2 ring-[#000000]/20 transition-transform duration-300 hover:scale-105">
-            {post.user.name.charAt(0)}
-          </div>
+          <UserAvatarImage
+            photoUrl={post.user.photoUrl}
+            name={post.user.name}
+            size={40}
+            className="ring-2 ring-[#000000]/20 transition-transform duration-300 hover:scale-105"
+          />
         </div>
         <div className="flex-1 min-w-0">
           <h3
@@ -152,6 +195,11 @@ export function PostCard({
             {post.user.major} &middot; {getRelativeTime(post.createdAt)}
           </p>
         </div>
+        {showRanking && authorRank && (
+          <div className="flex items-center gap-1 flex-shrink-0" title={t("authorWeeklyRank", { rank: authorRank })}>
+            <RankBadge rank={authorRank} size="sm" />
+          </div>
+        )}
         {isOwnPost && onDelete && (
           <button
             onClick={() => onDelete(post.id)}
@@ -228,6 +276,20 @@ export function PostCard({
           >
             <MessageSquare size={22} className="text-[#262626] hover:text-[#8E8E93] transition-colors duration-200" strokeWidth={1.8} />
           </button>
+
+          {showRanking && (
+            postRank ? (
+              <PostRankPill rank={postRank} label={t("postTopLabel", { rank: postRank })} />
+            ) : (
+              <div
+                className="flex items-center gap-1 rounded-full bg-[#F2F2F7] px-2 py-1"
+                title={t("postWeeklyRankBeyond100")}
+              >
+                <Trophy size={10} className="text-[#C7C7CC]" />
+                <span className="text-[10px] font-bold text-[#C7C7CC]">+100</span>
+              </div>
+            )
+          )}
         </div>
 
         <div className="flex-1" />
@@ -286,9 +348,7 @@ export function PostCard({
                 const canDelete = comment.user.id === currentUserId || isOwnPost
                 return (
                   <div key={comment.id} className="flex gap-2.5 items-start group">
-                    <div className="h-7 w-7 rounded-full bg-[#000000]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-[10px] font-bold text-[#000000]">{comment.user.name.charAt(0)}</span>
-                    </div>
+                    <UserAvatarImage photoUrl={comment.user.photoUrl} name={comment.user.name} size={28} className="mt-0.5" />
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] text-[#1A1A2E] leading-[1.4]">
                         <span className="font-bold">{comment.user.name}</span>{" "}

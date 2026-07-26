@@ -17,6 +17,7 @@ export const ENDPOINTS = {
   updateProfile: '/users/me',
   deleteAccount: '/users/me',
   getUser: (id: string) => `/users/${id}`,
+  getUserProfile: (id: string) => `/users/${id}/profile`,
   getRandomUsers: '/users/random',
   searchUsers: '/users/search',
   
@@ -27,11 +28,24 @@ export const ENDPOINTS = {
   
   // Matches
   matches: '/matches',
+  unmatch: (userId: string) => `/matches/user/${userId}`,
+  ephemeral: (userId: string) => `/matches/user/${userId}/ephemeral`,
+
+  // Blocks
+  blockUser: '/blocks',
+  unblockUser: (userId: string) => `/blocks/${userId}`,
+
+  // Reports
+  createReport: '/reports',
+  adminReports: '/admin/reports',
+  resolveReport: (id: string) => `/admin/reports/${id}`,
   
   // Messages
   sendMessage: '/messages',
   conversations: '/messages/conversations',
   getConversation: (userId: string) => `/messages/conversation/${userId}`,
+  reportScreenshot: (userId: string) => `/messages/screenshot/${userId}`,
+  typing: (userId: string) => `/messages/typing/${userId}`,
   
   // Notifications
   notifications: '/notifications',
@@ -41,6 +55,8 @@ export const ENDPOINTS = {
   
   // Leaderboard
   leaderboard: '/leaderboard',
+  usersRanking: '/leaderboard/users',
+  postsRanking: '/leaderboard/posts',
   myRank: '/leaderboard/my-rank',
   
   // Admin

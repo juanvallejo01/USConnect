@@ -3,8 +3,12 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
 
 const STORAGE_KEY = "usc_profile_photos"
-const DEFAULT_PHOTOS = ["/images/swipe-profile.jpg"]
 
+/**
+ * The additional photos used for match/swipe cards — separate from the
+ * "principal" profile photo, which is backend-persisted on `User.photoUrl`
+ * and shown everywhere else (feed, search, ranking, chat, profile).
+ */
 interface ProfilePhotosContextType {
   photos: string[]
   addPhoto: (url: string) => void
@@ -12,13 +16,13 @@ interface ProfilePhotosContextType {
 }
 
 const ProfilePhotosContext = createContext<ProfilePhotosContextType>({
-  photos: DEFAULT_PHOTOS,
+  photos: [],
   addPhoto: () => {},
   removePhoto: () => {},
 })
 
 export function ProfilePhotosProvider({ children }: { children: ReactNode }) {
-  const [photos, setPhotos] = useState<string[]>(DEFAULT_PHOTOS)
+  const [photos, setPhotos] = useState<string[]>([])
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -38,7 +42,6 @@ export function ProfilePhotosProvider({ children }: { children: ReactNode }) {
   }
 
   function removePhoto(index: number) {
-    if (index === 0) return // main photo can't be removed
     setPhotos((prev) => prev.filter((_, i) => i !== index))
   }
 

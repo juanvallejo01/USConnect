@@ -7,6 +7,7 @@ import { MatchProvider } from "@/context/match-context"
 import { NotificationProvider } from "@/context/notification-context"
 import { ChatProvider, useChat } from "@/context/chat-context"
 import { ProfilePhotosProvider } from "@/context/profile-photos-context"
+import { BannerProvider } from "@/context/banner-context"
 import { ToastProvider } from "@/context/toast-context"
 import { MobileFrame } from "@/components/layout/mobile-frame"
 import { BottomNav, type Tab } from "@/components/navigation/bottom-nav"
@@ -28,13 +29,15 @@ export default function Home() {
       <AuthProvider>
         <ToastProvider>
           <ProfilePhotosProvider>
-            <MatchProvider>
-              <NotificationProvider>
-                <ChatProvider>
-                  <AppShell />
-                </ChatProvider>
-              </NotificationProvider>
-            </MatchProvider>
+            <BannerProvider>
+              <MatchProvider>
+                <NotificationProvider>
+                  <ChatProvider>
+                    <AppShell />
+                  </ChatProvider>
+                </NotificationProvider>
+              </MatchProvider>
+            </BannerProvider>
           </ProfilePhotosProvider>
         </ToastProvider>
       </AuthProvider>

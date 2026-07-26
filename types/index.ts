@@ -6,6 +6,7 @@ export interface User {
   major: string;
   role: 'USER' | 'ADMIN';
   likesCount: number;
+  photoUrl?: string | null;
   createdAt: string;
   avatar?: string; // For frontend display
 }
@@ -69,7 +70,7 @@ export interface Notification {
   referenceId: string;
   read: boolean;
   createdAt: string;
-  fromUser: { id: string; name: string; major: string } | null;
+  fromUser: { id: string; name: string; major: string; photoUrl?: string | null } | null;
 }
 
 export interface LeaderboardEntry {
@@ -78,6 +79,24 @@ export interface LeaderboardEntry {
   name: string;
   major: string;
   likesCount: number;
+}
+
+export type ReportReason = 'SPAM' | 'HARASSMENT' | 'FAKE_PROFILE' | 'INAPPROPRIATE_CONTENT' | 'OTHER';
+export type ReportStatus = 'PENDING' | 'RESOLVED' | 'DISMISSED';
+export type ReportAction = 'dismiss' | 'resolve' | 'suspend_1w' | 'suspend_1m' | 'ban';
+export type AccountStatus = 'ACTIVE' | 'SUSPENDED' | 'BANNED';
+
+export interface Report {
+  id: string;
+  reporterId: string;
+  reportedId: string;
+  reason: ReportReason;
+  details?: string;
+  status: ReportStatus;
+  createdAt: string;
+  reportedTotalCount?: number;
+  reporter?: { id: string; name: string; major: string };
+  reported?: { id: string; name: string; major: string; accountStatus?: AccountStatus; suspendedUntil?: string | null };
 }
 
 export interface AdminStats {

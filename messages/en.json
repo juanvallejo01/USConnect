@@ -141,6 +141,9 @@
   },
   "post": {
     "deletePost": "Delete post",
+    "authorWeeklyRank": "Author: top #{rank} user this week",
+    "postTopLabel": "Top post #{rank}",
+    "postWeeklyRankBeyond100": "Post outside this week's top 100",
     "deleteComment": "Delete comment",
     "share": "Share",
     "shareText": "Check out this post on Ve!",
@@ -174,7 +177,8 @@
   "swipeCard": {
     "like": "LIKE",
     "nope": "NOPE",
-    "nearby": "Nearby"
+    "nearby": "Nearby",
+    "weeklyRank": "#{rank}"
   },
   "likeReview": {
     "likedYourProfile": "liked your profile",
@@ -187,7 +191,11 @@
     "matchCount": "{count, plural, one {# match} other {# matches}}",
     "noMatchesYet": "No matches yet",
     "startExploring": "Start exploring and liking profiles to find your matches!",
-    "startChatting": "Start chatting"
+    "startChatting": "Start chatting",
+    "newLikes": "New Likes",
+    "itsAMatch": "It's a Match!",
+    "likedEachOther": "You and {name} liked each other",
+    "nice": "Nice!"
   },
   "notificationsPage": {
     "title": "Notifications",
@@ -237,6 +245,8 @@
       "Tech": "Tech"
     },
     "switchLanguage": "Switch language",
+    "editBanner": "Change banner",
+    "removeBanner": "Remove banner",
     "editProfile": "Edit profile",
     "defaultUser": "User",
     "addBio": "Add a bio…",
@@ -245,6 +255,8 @@
     "interestsCount": "interests",
     "likesCount": "likes",
     "photosCount": "photos",
+    "noPostsYet": "No posts yet",
+    "noPostsHint": "Posts you share from the feed will show up here.",
     "sharePhotos": "Share photos",
     "sharePhotosHint": "Photos you add will appear here.",
     "addFirstPhoto": "Add your first photo",
@@ -252,7 +264,9 @@
     "noHighlightsHint": "Posts with the most likes will appear here.",
     "managePhotos": "Manage photos",
     "myPhotos": "My photos",
-    "main": "MAIN"
+    "main": "MAIN",
+    "weeklyRank": "Top #{rank} this week",
+    "editProfilePhoto": "Change profile photo"
   },
   "chat": {
     "goBack": "Go back",
@@ -264,12 +278,42 @@
     "matchRequiredBanner": "Match required to start chat",
     "messagePlaceholder": "Message...",
     "matchRequiredPlaceholder": "Match required...",
-    "sendMessage": "Send message"
+    "sendMessage": "Send message",
+    "viewProfile": "View profile",
+    "ephemeralToggle": "Disappearing messages (24h)",
+    "ephemeralActiveMine": "You turned on 24h messages: they'll disappear automatically.",
+    "ephemeralActiveOther": "The other person turned on 24h messages: they'll disappear automatically.",
+    "typing": "Typing...",
+    "youScreenshotted": "You took a screenshot",
+    "theyScreenshotted": "{name} took a screenshot"
   },
   "userProfile": {
     "joined": "Joined {date}",
     "posts": "Posts",
     "likes": "Likes",
+    "sendMatch": "Match",
+    "matchPending": "Request sent",
+    "sendMessage": "Send message",
+    "unmatch": "Unmatch",
+    "unmatchConfirm": "Unmatch with {name}? You'll both be able to send a new match request later.",
+    "block": "Block",
+    "unblock": "Unblock",
+    "blockConfirm": "Block {name}? Any existing match will be removed and you won't be able to contact each other.",
+    "blockedByMeNotice": "You blocked this user. Unblock them to interact again.",
+    "blockedMeNotice": "You can't interact with this profile.",
+    "report": "Report",
+    "reportTitle": "Report {name}",
+    "reportPrompt": "Why are you reporting this profile?",
+    "reportSubmit": "Submit report",
+    "reportSubmitting": "Submitting...",
+    "reportSubmitted": "Report submitted. Our team will review it.",
+    "reportReasons": {
+      "SPAM": "Spam",
+      "HARASSMENT": "Harassment",
+      "FAKE_PROFILE": "Fake profile",
+      "INAPPROPRIATE_CONTENT": "Inappropriate content",
+      "OTHER": "Other"
+    },
     "verified": "Verified",
     "postsTab": "Posts",
     "activityTab": "Activity",
@@ -280,7 +324,8 @@
     "postedTimes": "Posted {count} times",
     "total": "Total",
     "engagement": "Engagement",
-    "avgLikesPerPost": "Avg. likes per post"
+    "avgLikesPerPost": "Avg. likes per post",
+    "weeklyRank": "Top #{rank} this week"
   },
   "admin": {
     "tabs": {
@@ -335,6 +380,30 @@
       "Inappropriate content": "Inappropriate content",
       "Spam": "Spam",
       "Harassment": "Harassment"
+    }
+  },
+  "adminReports": {
+    "title": "Reported users",
+    "pendingCount": "{count} pending",
+    "allClear": "All clear! No pending user reports.",
+    "reportedBy": "Reported by {name}",
+    "dismiss": "Dismiss",
+    "resolve": "Mark resolved",
+    "totalReportsCount": "{count} total reports against this user",
+    "alreadySuspended": "Already suspended",
+    "alreadyBanned": "Already banned",
+    "confirmAction": "Apply \"{action}\" to {name}?",
+    "actions": {
+      "suspend_1w": "Suspend 1 week",
+      "suspend_1m": "Suspend 1 month",
+      "ban": "Ban permanently"
+    },
+    "reasons": {
+      "SPAM": "Spam",
+      "HARASSMENT": "Harassment",
+      "FAKE_PROFILE": "Fake profile",
+      "INAPPROPRIATE_CONTENT": "Inappropriate content",
+      "OTHER": "Other"
     }
   },
   "adminAnalytics": {

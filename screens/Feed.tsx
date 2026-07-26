@@ -8,10 +8,14 @@ import { GradientHeader } from "@/components/layout/gradient-header"
 import { Logo } from "@/components/layout/logo"
 import { PostCard } from "@/components/feed/post-card"
 import { PostCardSkeletonList } from "@/components/feed/post-card-skeleton"
+import { ProfileAvatarImage } from "@/components/layout/profile-avatar-image"
 import { UserProfile } from "./UserProfile"
 import { useAuth } from "@/context/auth-context"
-import { postsApi, usersApi } from "@/lib/api-client"
+import { postsApi, usersApi, leaderboardApi } from "@/lib/api-client"
 import { FEED_POSTS } from "@/utils/constants"
+
+const RANKED_POSTS_LIMIT = 100
+const RANKED_USERS_LIMIT = 100
 
 interface Post {
   id: string
@@ -25,6 +29,7 @@ interface Post {
     id: string
     name: string
     major: string
+    photoUrl?: string | null
   }
 }
 
@@ -32,13 +37,21 @@ interface SearchResult {
   id: string
   name: string
   major: string
+  photoUrl?: string | null
 }
+
+const FEED_PAGE_SIZE = 20
 
 export function FeedPage() {
   const t = useTranslations("feed")
   const { user } = useAuth()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [postRanks, setPostRanks] = useState<Map<string, number>>(new Map())
+  const [userRanks, setUserRanks] = useState<Map<string, number>>(new Map())
+  const offsetRef = useRef(0)
   const [showCreatePost, setShowCreatePost] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [newPostContent, setNewPostContent] = useState("")
@@ -55,7 +68,27 @@ export function FeedPage() {
 
   useEffect(() => {
     loadFeed()
+    loadPostRanks()
+    loadUserRanks()
   }, [])
+
+  const loadPostRanks = async () => {
+    try {
+      const ranking = await leaderboardApi.getPostsRanking(RANKED_POSTS_LIMIT)
+      setPostRanks(new Map(ranking.map((p: { id: string; rank: number }) => [p.id, p.rank])))
+    } catch (error) {
+      console.error("Failed to load post rankings:", error)
+    }
+  }
+
+  const loadUserRanks = async () => {
+    try {
+      const ranking = await leaderboardApi.getUsersRanking(RANKED_USERS_LIMIT)
+      setUserRanks(new Map(ranking.map((u: { id: string; rank: number }) => [u.id, u.rank])))
+    } catch (error) {
+      console.error("Failed to load user rankings:", error)
+    }
+  }
 
   useEffect(() => {
     const query = searchQuery.trim()
@@ -89,12 +122,36 @@ export function FeedPage() {
   const loadFeed = async () => {
     try {
       setLoading(true)
-      const data = await postsApi.getFeed()
+      const data = await postsApi.getFeed(0, FEED_PAGE_SIZE)
       setPosts(data)
+      offsetRef.current = data.length
+      setHasMore(data.length === FEED_PAGE_SIZE)
     } catch (error) {
       console.error("Failed to load feed:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadMorePosts = async () => {
+    if (loading || loadingMore || !hasMore) return
+    try {
+      setLoadingMore(true)
+      const data = await postsApi.getFeed(offsetRef.current, FEED_PAGE_SIZE)
+      setPosts((prev) => [...prev, ...data])
+      offsetRef.current += data.length
+      setHasMore(data.length === FEED_PAGE_SIZE)
+    } catch (error) {
+      console.error("Failed to load more posts:", error)
+    } finally {
+      setLoadingMore(false)
+    }
+  }
+
+  const handleFeedScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
+    if (scrollHeight - scrollTop - clientHeight < 400) {
+      loadMorePosts()
     }
   }
 
@@ -170,6 +227,7 @@ export function FeedPage() {
       })
 
       setPosts([newPost, ...posts])
+      offsetRef.current += 1
       setNewPostContent("")
       setSelectedImages([])
       setImagePreviews([])
@@ -224,6 +282,7 @@ export function FeedPage() {
     try {
       await postsApi.deletePost(postId)
       setPosts(posts.filter((p) => p.id !== postId))
+      offsetRef.current = Math.max(0, offsetRef.current - 1)
     } catch (error) {
       console.error("Failed to delete post:", error)
       alert(t("alerts.deleteFailed"))
@@ -237,55 +296,53 @@ export function FeedPage() {
   return (
     <div className="flex flex-col h-full bg-[#FAFAFA]">
       <GradientHeader
-        title={<Logo size="md" className="text-black dark:text-white" />}
-        subtitle={
-          <div className="relative">
-            <div className="relative">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setShowSearchResults(true) }}
-                onFocus={() => setShowSearchResults(true)}
-                onBlur={() => setTimeout(() => setShowSearchResults(false), 150)}
-                placeholder={t("searchPlaceholder")}
-                className="w-full rounded-full border border-[#EBEBF0] bg-white pl-9 pr-3 py-2 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none focus:border-[#000000] transition-colors duration-300"
-              />
-            </div>
-
-            {showSearchResults && searchQuery.trim() && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl border border-[#EBEBF0] shadow-lg overflow-hidden z-20 max-h-72 overflow-y-auto">
-                {searching ? (
-                  <p className="px-4 py-3 text-sm text-[#8E8E93]">{t("searching")}</p>
-                ) : searchResults.length === 0 ? (
-                  <p className="px-4 py-3 text-sm text-[#8E8E93]">{t("noPeopleFound")}</p>
-                ) : (
-                  searchResults.map((result) => (
-                    <button
-                      key={result.id}
-                      onMouseDown={() => handleSelectSearchResult(result.id)}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#F8F8FA] transition-colors duration-200 text-left"
-                    >
-                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#000000] to-[#404040] flex items-center justify-center flex-shrink-0">
-                        <span className="text-white font-bold text-xs">
-                          {result.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-[#1A1A2E] truncate">{result.name}</p>
-                        <p className="text-xs text-[#8E8E93] truncate">{result.major}</p>
-                      </div>
-                    </button>
-                  ))
-                )}
+        title={
+          <div className="flex items-center gap-3">
+            <Logo size="md" className="text-black dark:text-white shrink-0" />
+            <div className="relative flex-1 min-w-0">
+              <div className="relative">
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => { setSearchQuery(e.target.value); setShowSearchResults(true) }}
+                  onFocus={() => setShowSearchResults(true)}
+                  onBlur={() => setTimeout(() => setShowSearchResults(false), 150)}
+                  placeholder={t("searchPlaceholder")}
+                  className="w-full rounded-full border border-[#EBEBF0] bg-white pl-9 pr-3 py-2 text-sm font-normal text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none focus:border-[#000000] transition-colors duration-300"
+                />
               </div>
-            )}
+
+              {showSearchResults && searchQuery.trim() && (
+                <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl border border-[#EBEBF0] shadow-lg overflow-hidden z-20 max-h-72 overflow-y-auto">
+                  {searching ? (
+                    <p className="px-4 py-3 text-sm text-[#8E8E93]">{t("searching")}</p>
+                  ) : searchResults.length === 0 ? (
+                    <p className="px-4 py-3 text-sm text-[#8E8E93]">{t("noPeopleFound")}</p>
+                  ) : (
+                    searchResults.map((result) => (
+                      <button
+                        key={result.id}
+                        onMouseDown={() => handleSelectSearchResult(result.id)}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#F8F8FA] transition-colors duration-200 text-left"
+                      >
+                        <ProfileAvatarImage photoUrl={result.photoUrl} name={result.name} size={36} />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-[#1A1A2E] truncate">{result.name}</p>
+                          <p className="text-xs text-[#8E8E93] truncate">{result.major}</p>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         }
         rightAction={
           <button
             onClick={() => setShowCreatePost(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-all active:scale-90"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-all active:scale-90 shrink-0"
             aria-label={t("createPost")}
           >
             <Plus size={20} className="text-white" strokeWidth={2.5} />
@@ -293,24 +350,24 @@ export function FeedPage() {
         }
       />
 
-      {/* Create Post Button - Sticky */}
-      <div className="sticky top-0 z-10 bg-white border-b border-[#EBEBF0] px-4 py-3">
-        <button
-          onClick={() => setShowCreatePost(true)}
-          className="w-full flex items-center gap-3 micro-press"
-        >
-          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#000000] to-[#404040] flex items-center justify-center flex-shrink-0 ring-2 ring-[#000000]/20">
-            <span className="text-white font-bold text-xs">
-              {user?.name?.charAt(0).toUpperCase() || "U"}
-            </span>
-          </div>
-          <div className="flex-1 text-left border border-[#DBDBDB] rounded-full px-4 py-2">
-            <span className="text-[#8E8E93] text-[13px]">{t("whatsOnYourMind")}</span>
-          </div>
-        </button>
-      </div>
+      <div className="flex-1 overflow-y-auto" onScroll={handleFeedScroll}>
+        {/* Create Post Button — scrolls away with the feed, like Instagram's composer bar */}
+        <div className="bg-white border-b border-[#EBEBF0] px-4 py-3">
+          <button
+            onClick={() => setShowCreatePost(true)}
+            className="w-full flex items-center gap-3 micro-press"
+          >
+            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#000000] to-[#404040] flex items-center justify-center flex-shrink-0 ring-2 ring-[#000000]/20">
+              <span className="text-white font-bold text-xs">
+                {user?.name?.charAt(0).toUpperCase() || "U"}
+              </span>
+            </div>
+            <div className="flex-1 text-left border border-[#DBDBDB] rounded-full px-4 py-2">
+              <span className="text-[#8E8E93] text-[13px]">{t("whatsOnYourMind")}</span>
+            </div>
+          </button>
+        </div>
 
-      <div className="flex-1 overflow-y-auto">
         {loading ? (
           <PostCardSkeletonList count={4} />
         ) : posts.length === 0 ? (
@@ -341,8 +398,16 @@ export function FeedPage() {
                   onComment={handleComment}
                   onDelete={handleDelete}
                   onUserClick={setSelectedUserId}
+                  showRanking
+                  authorRank={userRanks.get(post.user.id)}
+                  postRank={postRanks.get(post.id)}
                 />
             ))}
+            {loadingMore && (
+              <div className="flex justify-center py-6">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#000000] border-t-transparent" />
+              </div>
+            )}
           </div>
         )}
       </div>

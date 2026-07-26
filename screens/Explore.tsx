@@ -1,18 +1,17 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { X, Heart, RotateCcw, Sparkles, MessageCircle } from "lucide-react"
+import { X, Heart, RotateCcw, Sparkles } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { SwipeCard } from "@/components/explore/swipe-card"
-import { LikeReviewModal } from "@/components/explore/like-review-modal"
 import { UserAvatar } from "@/components/layout/user-avatar"
 import { useMatch } from "@/context/match-context"
 import { useChat } from "@/context/chat-context"
 import { useNotification } from "@/context/notification-context"
 import { useAuth } from "@/context/auth-context"
-import { usersApi } from "@/lib/api-client"
-import { formatRelativeTime } from "@/utils/relative-time"
-import type { Notification } from "@/types"
+import { usersApi, leaderboardApi } from "@/lib/api-client"
+
+const RANKED_USERS_LIMIT = 100
 
 interface ExploreUser {
   id: string
@@ -23,22 +22,18 @@ interface ExploreUser {
 
 export function ExplorePage() {
   const t = useTranslations("explore")
-  const tTime = useTranslations("time")
   const { user } = useAuth()
   const [profiles, setProfiles] = useState<ExploreUser[]>([])
   const [loadingProfiles, setLoadingProfiles] = useState(true)
+  const [userRanks, setUserRanks] = useState<Map<string, number>>(new Map())
   const [currentIndex, setCurrentIndex] = useState(0)
   const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(null)
   const [canUndo, setCanUndo] = useState(false)
   const [showMatchModal, setShowMatchModal] = useState(false)
   const [matchedProfile, setMatchedProfile] = useState<ExploreUser | null>(null)
-  const [showNotifications, setShowNotifications] = useState(false)
-  const [isClosingNotifications, setIsClosingNotifications] = useState(false)
-  const [reviewing, setReviewing] = useState<Notification | null>(null)
-  const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const { likeUser, hasLiked, isMatched } = useMatch()
   const { openChat } = useChat()
-  const { notifications, markAsRead, markAllAsRead, unreadCount, refresh: refreshNotifications } = useNotification()
+  const { refresh: refreshNotifications } = useNotification()
 
   const loadProfiles = useCallback(async () => {
     setLoadingProfiles(true)
@@ -56,7 +51,17 @@ export function ExplorePage() {
 
   useEffect(() => {
     loadProfiles()
+    loadUserRanks()
   }, [loadProfiles])
+
+  async function loadUserRanks() {
+    try {
+      const ranking = await leaderboardApi.getUsersRanking(RANKED_USERS_LIMIT)
+      setUserRanks(new Map(ranking.map((u: { id: string; rank: number }) => [u.id, u.rank])))
+    } catch (error) {
+      console.error("Failed to load user rankings:", error)
+    }
+  }
 
   const profile = profiles[currentIndex]
   const alreadyLiked = profile ? hasLiked(profile.id) : false
@@ -94,42 +99,6 @@ export function ExplorePage() {
     if (matchedProfile) {
       openChat({ id: matchedProfile.id, name: matchedProfile.name, major: matchedProfile.major })
     }
-  }
-
-  const handleCloseNotifications = () => {
-    setIsClosingNotifications(true)
-    setTimeout(() => {
-      setShowNotifications(false)
-      setIsClosingNotifications(false)
-    }, 300)
-  }
-
-  const handleStartChatFromNotification = (notification: Notification) => {
-    if (!notification.fromUser) return
-    markAsRead(notification.id)
-    handleCloseNotifications()
-    setTimeout(() => {
-      openChat({ id: notification.fromUser!.id, name: notification.fromUser!.name, major: notification.fromUser!.major })
-    }, 300)
-  }
-
-  const handleLikeBack = async () => {
-    if (!reviewing?.fromUser) return
-    setReviewSubmitting(true)
-    const result = await likeUser(reviewing.fromUser.id)
-    setReviewSubmitting(false)
-    markAsRead(reviewing.id)
-    setReviewing(null)
-    if (result.success && result.matched) {
-      setMatchedProfile({ id: reviewing.fromUser.id, name: reviewing.fromUser.name, major: reviewing.fromUser.major, likesCount: 0 })
-      setShowMatchModal(true)
-    }
-  }
-
-  const handleRejectReview = () => {
-    if (!reviewing) return
-    markAsRead(reviewing.id)
-    setReviewing(null)
   }
 
   const outOfProfiles = !loadingProfiles && (!profile || currentIndex >= profiles.length)
@@ -174,31 +143,17 @@ export function ExplorePage() {
               key={`${profile.id}-${currentIndex}`}
               profile={profile}
               onSwipe={handleSwipe}
+              rank={userRanks.get(profile.id)}
             />
           </div>
         )}
 
         {/* ── TOP BAR OVERLAY ── */}
-        <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-5 py-3.5 pointer-events-none">
+        <div className="absolute top-0 left-0 right-0 z-30 flex items-center px-5 py-3.5 pointer-events-none">
           {/* Logo */}
           <span className="text-[17px] font-bold text-white drop-shadow-sm tracking-tight pointer-events-auto">
             {t("title")}
           </span>
-
-          {/* Notification bell */}
-          <button
-            className="relative pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full bg-black/30 backdrop-blur-md transition-all active:scale-90"
-            onClick={() => showNotifications ? handleCloseNotifications() : setShowNotifications(true)}
-          >
-            <Sparkles size={18} className="text-white" />
-            {unreadCount > 0 && (
-              <div className="absolute -top-1 -right-1 h-[18px] min-w-[18px] bg-[#000000] rounded-full flex items-center justify-center px-1">
-                <span className="text-[9px] font-bold text-white leading-none">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              </div>
-            )}
-          </button>
         </div>
 
         {/* Match banner */}
@@ -244,88 +199,6 @@ export function ExplorePage() {
           <Heart size={32} className="text-[#4CD964]" fill="#4CD964" />
         </button>
       </div>
-
-      {/* ── NOTIFICATIONS PANEL ── */}
-      {showNotifications && (
-        <div className={`absolute inset-0 bg-[#F8F8FA] dark:bg-[#0A0A0C] z-40 overflow-hidden ${isClosingNotifications ? "animate-slideOut" : "animate-slideDown"}`}>
-          <div className="h-full overflow-y-auto">
-            <div className="p-5 pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-[#1A1A2E] dark:text-white">{t("notifications")}</h2>
-                <button onClick={handleCloseNotifications} className="p-1 text-[#8E8E93]">
-                  <X size={24} />
-                </button>
-              </div>
-              {unreadCount > 0 && (
-                <div className="flex items-center justify-between mb-4 pb-4 border-b border-[#EBEBF0]">
-                  <p className="text-sm text-[#8E8E93]">{t("unreadCount", { count: unreadCount })}</p>
-                  <button onClick={markAllAsRead} className="text-sm font-medium text-[#000000]">
-                    {t("markAllAsRead")}
-                  </button>
-                </div>
-              )}
-              <div className="space-y-3">
-                {notifications.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-[#EBEBF0] rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Sparkles size={32} className="text-[#C7C7CC]" />
-                    </div>
-                    <p className="text-[#8E8E93] text-sm">{t("noNotificationsYet")}</p>
-                    <p className="text-[#C7C7CC] text-xs mt-1">{t("notificationsHint")}</p>
-                  </div>
-                ) : (
-                  notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`p-4 rounded-2xl border ${notification.read ? "bg-white dark:bg-[#141416] border-[#EBEBF0] dark:border-[#262622]" : "bg-[#000000]/5 dark:bg-[#000000]/10 border-[#000000]/20"}`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <UserAvatar alt={notification.fromUser?.name ?? "?"} size="md" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-[#1A1A2E] dark:text-[#E0E0F0]">
-                            <span className="font-bold">{notification.fromUser?.name ?? t("someone")}</span>{" "}
-                            {notification.type === "MATCH" ? t("matchedWithYou") : t("likedYourProfile")}
-                          </p>
-                          <p className="text-xs text-[#8E8E93] mt-1">{formatRelativeTime(notification.createdAt, tTime)}</p>
-                          {notification.type === "MATCH" ? (
-                            <button
-                              onClick={() => handleStartChatFromNotification(notification)}
-                              className="mt-2 text-xs font-medium text-[#000000] flex items-center gap-1"
-                            >
-                              <MessageCircle size={14} /> {t("sendMessage")}
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => { markAsRead(notification.id); setReviewing(notification) }}
-                              className="mt-2 text-xs font-medium text-[#000000] flex items-center gap-1"
-                            >
-                              <Heart size={14} fill="currentColor" /> {t("reviewProfile")}
-                            </button>
-                          )}
-                        </div>
-                        {!notification.read && (
-                          <div className="w-2 h-2 rounded-full bg-[#000000] flex-shrink-0 mt-1" />
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Review a received like */}
-      {reviewing?.fromUser && (
-        <LikeReviewModal
-          user={reviewing.fromUser}
-          isSubmitting={reviewSubmitting}
-          onLikeBack={handleLikeBack}
-          onReject={handleRejectReview}
-          onClose={() => setReviewing(null)}
-        />
-      )}
 
       {/* ── MATCH MODAL ── */}
       {showMatchModal && matchedProfile && (

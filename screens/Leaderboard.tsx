@@ -5,6 +5,7 @@ import { Trophy, Medal, Award, Heart, TrendingUp, Users, Crown, Flame, Sparkles,
 import { useTranslations } from "next-intl"
 import { UserProfile } from "./UserProfile"
 import { UserAvatar } from "@/components/layout/user-avatar"
+import { ProfileAvatarImage } from "@/components/layout/profile-avatar-image"
 import { LeaderboardSkeletonList } from "@/components/leaderboard/leaderboard-skeleton"
 import { useLocale } from "@/context/locale-context"
 
@@ -13,6 +14,7 @@ interface UserRanking {
   id: string
   name: string
   major: string
+  photoUrl?: string | null
   weeklyLikes: number
   topPost: {
     id: string
@@ -34,6 +36,7 @@ interface PostRanking {
     id: string
     name: string
     major: string
+    photoUrl?: string | null
   }
 }
 
@@ -211,9 +214,7 @@ export function LeaderboardPage() {
                   >
                     <div className="relative mb-2">
                       <div className="h-[60px] w-[60px] rounded-full bg-gradient-to-br from-slate-200 to-slate-400 p-[2.5px]">
-                        <div className="h-full w-full rounded-full bg-gradient-to-br from-slate-500 to-slate-700 dark:from-slate-600 dark:to-slate-800 flex items-center justify-center text-white font-bold text-lg">
-                          {topThree[1].name.charAt(0)}
-                        </div>
+                        <ProfileAvatarImage photoUrl={topThree[1].photoUrl} name={topThree[1].name} size={55} />
                       </div>
                       <div className="absolute -top-1.5 -right-1.5 animate-crownBounce" style={{ animationDelay: '0.5s' }}>
                         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-slate-300 to-slate-500"
@@ -247,9 +248,7 @@ export function LeaderboardPage() {
                     </div>
                     <div className="relative mb-2">
                       <div className="h-[72px] w-[72px] rounded-full bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-500 p-[3px] animate-glowPulse">
-                        <div className="h-full w-full rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-white font-bold text-2xl">
-                          {topThree[0].name.charAt(0)}
-                        </div>
+                        <ProfileAvatarImage photoUrl={topThree[0].photoUrl} name={topThree[0].name} size={66} />
                       </div>
                       <div className="absolute -bottom-1 -right-1 animate-crownBounce" style={{ animationDelay: '0.6s' }}>
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-yellow-400 to-amber-500"
@@ -281,9 +280,7 @@ export function LeaderboardPage() {
                   >
                     <div className="relative mb-2">
                       <div className="h-[56px] w-[56px] rounded-full bg-gradient-to-br from-amber-400 to-orange-500 p-[2.5px]">
-                        <div className="h-full w-full rounded-full bg-gradient-to-br from-amber-600 to-orange-700 dark:from-amber-700 dark:to-orange-800 flex items-center justify-center text-white font-bold text-base">
-                          {topThree[2].name.charAt(0)}
-                        </div>
+                        <ProfileAvatarImage photoUrl={topThree[2].photoUrl} name={topThree[2].name} size={51} />
                       </div>
                       <div className="absolute -top-1.5 -right-1.5 animate-crownBounce" style={{ animationDelay: '0.55s' }}>
                         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-orange-500"
@@ -325,9 +322,7 @@ export function LeaderboardPage() {
                   style={{ animationDelay: `${200 + index * 60}ms` }}
                 >
                   {getRankDisplay(user.rank)}
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#000000] to-[#404040] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
-                    {user.name.charAt(0)}
-                  </div>
+                  <ProfileAvatarImage photoUrl={user.photoUrl} name={user.name} size={40} className="shadow-sm" />
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-semibold text-[#1A1A2E] dark:text-white truncate">{user.name}</h3>
                     <p className="text-[11px] text-[#8E8E93] dark:text-[#A8A398] truncate">{user.major}</p>
@@ -365,9 +360,7 @@ export function LeaderboardPage() {
                       className="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer"
                       onClick={() => setViewingProfile(post.user.id)}
                     >
-                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#000000] to-[#404040] flex items-center justify-center text-white font-bold text-xs flex-shrink-0 shadow-sm">
-                        {post.user.name.charAt(0)}
-                      </div>
+                      <ProfileAvatarImage photoUrl={post.user.photoUrl} name={post.user.name} size={36} className="shadow-sm" />
                       <div className="min-w-0">
                         <h3 className="text-[13px] font-semibold text-[#1A1A2E] dark:text-white truncate hover:text-[#000000] transition-colors">{post.user.name}</h3>
                         <p className="text-[10px] text-[#8E8E93] dark:text-[#A8A398]">{post.user.major}</p>

@@ -195,7 +195,7 @@ export const usersApi = {
     return response.data;
   },
 
-  updateProfile: async (data: { name?: string; major?: string }) => {
+  updateProfile: async (data: { name?: string; major?: string; photoUrl?: string }) => {
     const response = await api.put(ENDPOINTS.updateProfile, data);
     return response.data;
   },
@@ -207,6 +207,11 @@ export const usersApi = {
 
   getUser: async (id: string) => {
     const response = await api.get(ENDPOINTS.getUser(id));
+    return response.data;
+  },
+
+  getUserProfile: async (id: string) => {
+    const response = await api.get(ENDPOINTS.getUserProfile(id));
     return response.data;
   },
 
@@ -247,6 +252,40 @@ export const matchesApi = {
     const response = await api.get(ENDPOINTS.matches);
     return response.data;
   },
+
+  unmatch: async (userId: string) => {
+    const response = await api.delete(ENDPOINTS.unmatch(userId));
+    return response.data;
+  },
+
+  getEphemeral: async (userId: string) => {
+    const response = await api.get(ENDPOINTS.ephemeral(userId));
+    return response.data as { active: boolean; mine: boolean };
+  },
+
+  setEphemeral: async (userId: string, enabled: boolean) => {
+    const response = await api.patch(ENDPOINTS.ephemeral(userId), { enabled });
+    return response.data as { active: boolean; mine: boolean };
+  },
+};
+
+export const blocksApi = {
+  blockUser: async (blockedId: string) => {
+    const response = await api.post(ENDPOINTS.blockUser, { blockedId });
+    return response.data;
+  },
+
+  unblockUser: async (userId: string) => {
+    const response = await api.delete(ENDPOINTS.unblockUser(userId));
+    return response.data;
+  },
+};
+
+export const reportsApi = {
+  createReport: async (data: { reportedId: string; reason: string; details?: string }) => {
+    const response = await api.post(ENDPOINTS.createReport, data);
+    return response.data;
+  },
 };
 
 export const messagesApi = {
@@ -263,6 +302,21 @@ export const messagesApi = {
   getConversation: async (userId: string) => {
     const response = await api.get(ENDPOINTS.getConversation(userId));
     return response.data;
+  },
+
+  reportScreenshot: async (userId: string) => {
+    const response = await api.post(ENDPOINTS.reportScreenshot(userId));
+    return response.data;
+  },
+
+  setTyping: async (userId: string, isTyping: boolean) => {
+    const response = await api.post(ENDPOINTS.typing(userId), { isTyping });
+    return response.data;
+  },
+
+  getTypingStatus: async (userId: string) => {
+    const response = await api.get(ENDPOINTS.typing(userId));
+    return response.data as { typing: boolean };
   },
 };
 
@@ -300,6 +354,16 @@ export const leaderboardApi = {
     const response = await api.get(ENDPOINTS.myRank);
     return response.data;
   },
+
+  getUsersRanking: async (limit?: number) => {
+    const response = await api.get(ENDPOINTS.usersRanking, { params: { limit } });
+    return response.data;
+  },
+
+  getPostsRanking: async (limit?: number) => {
+    const response = await api.get(ENDPOINTS.postsRanking, { params: { limit } });
+    return response.data;
+  },
 };
 
 export const adminApi = {
@@ -331,11 +395,21 @@ export const adminApi = {
     const response = await api.delete(ENDPOINTS.deleteUser(id));
     return response.data;
   },
+
+  getReports: async (status?: string) => {
+    const response = await api.get(ENDPOINTS.adminReports, { params: { status } });
+    return response.data;
+  },
+
+  resolveReport: async (id: string, action: 'dismiss' | 'resolve' | 'suspend_1w' | 'suspend_1m' | 'ban') => {
+    const response = await api.patch(ENDPOINTS.resolveReport(id), { action });
+    return response.data;
+  },
 };
 
 export const postsApi = {
-  getFeed: async (page = 1, limit = 20) => {
-    const response = await api.get('/posts/feed', { params: { page, limit } });
+  getFeed: async (offset = 0, limit = 20) => {
+    const response = await api.get('/posts/feed', { params: { offset, limit } });
     return response.data;
   },
 
