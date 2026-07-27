@@ -24,8 +24,8 @@ export function LandingBenefits() {
         <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {items.map(({ key, icon: Icon }, i) => (
             <Reveal key={key} delay={i * 100}>
-              <div className="group h-full rounded-3xl border border-border bg-card p-7 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_16px_40px_rgba(0,0,0,0.4)]">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground transition-transform duration-300 group-hover:scale-110">
+              <div className="landing-glass-card group h-full rounded-3xl border border-border/40 bg-card/50 p-7 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 hover:border-blue-500/25 hover:shadow-[0_8px_32px_rgba(59,130,246,0.12)]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]">
                   <Icon size={22} strokeWidth={2} />
                 </div>
                 <h3 className="mt-5 text-base font-bold text-foreground">

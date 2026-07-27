@@ -18,9 +18,9 @@ export function LandingFaq() {
         </Reveal>
 
         <Reveal delay={100} className="mt-10">
-          <Accordion type="single" collapsible className="rounded-3xl border border-border bg-card px-6">
+          <Accordion type="single" collapsible className="rounded-3xl border border-border/40 bg-card/50 px-6 backdrop-blur-xl">
             {questions.map((key) => (
-              <AccordionItem key={key} value={key} className="border-border">
+              <AccordionItem key={key} value={key} className="border-border/40">
                 <AccordionTrigger className="text-sm font-semibold text-foreground hover:no-underline">
                   {t(`items.${key}.question`)}
                 </AccordionTrigger>

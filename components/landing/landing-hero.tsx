@@ -14,13 +14,12 @@ export function LandingHero({
 
   return (
     <section className="relative overflow-hidden px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
-      {/* Ambient decorative circles */}
-      <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-black/[0.03] dark:bg-white/[0.04] blur-3xl" />
-      <div className="pointer-events-none absolute top-1/2 -left-24 h-72 w-72 rounded-full bg-black/[0.03] dark:bg-white/[0.04] blur-3xl" />
+      {/* Subtle radial gradient overlay for depth — works in both modes */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(59,130,246,0.08)_0%,_transparent_70%)]" />
 
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 lg:grid-cols-2 lg:gap-10">
         <div className="animate-fadeIn text-center lg:text-left">
-          <span className="inline-flex items-center rounded-full border border-border bg-card px-4 py-1.5 text-xs font-semibold text-muted-foreground">
+          <span className="landing-glass-badge inline-flex items-center rounded-full border border-border/50 bg-card/40 px-4 py-1.5 text-xs font-semibold text-muted-foreground backdrop-blur-xl">
             {t("badge")}
           </span>
 
@@ -35,13 +34,13 @@ export function LandingHero({
           <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
             <button
               onClick={onCreateAccount}
-              className="w-full rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-transform duration-200 hover:scale-[1.03] active:scale-95 sm:w-auto"
+              className="landing-glow-btn w-full rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:scale-[1.03] active:scale-95 sm:w-auto"
             >
               {t("createAccount")}
             </button>
             <button
               onClick={onSignIn}
-              className="w-full rounded-full border border-border bg-transparent px-7 py-3.5 text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-card sm:w-auto"
+              className="landing-glow-btn-outline w-full rounded-full border border-border/60 bg-card/30 px-7 py-3.5 text-sm font-semibold text-foreground backdrop-blur-xl transition-all duration-300 hover:bg-card/50 hover:border-blue-500/30 sm:w-auto"
             >
               {t("signIn")}
             </button>
