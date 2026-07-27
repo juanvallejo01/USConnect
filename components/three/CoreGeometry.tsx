@@ -55,11 +55,11 @@ export function CoreGeometry({ scrollProgress, isDark }: CoreGeometryProps) {
     return geo
   }, [nodeData])
 
-  // Colors for light and dark mode, with a touch of USC Gold
-  const emissiveColor = isDark ? "#fbbf24" : "#f59e0b" // Golden/Yellow glow
-  const wireColor = isDark ? "#60a5fa" : "#3b82f6" // Keep wireframe blue for contrast
-  const nodeColor = isDark ? "#fbbf24" : "#f59e0b" // Golden nodes
-  const lineColor = isDark ? "#fcd34d" : "#fbbf24" // Lighter gold lines
+  // Colors for light and dark mode: Blue main, Yellow details
+  const emissiveColor = isDark ? "#3b82f6" : "#2563eb" // Blue glow (principal)
+  const wireColor = isDark ? "#fbbf24" : "#f59e0b" // Yellow wireframe (detail)
+  const nodeColor = isDark ? "#fbbf24" : "#f59e0b" // Yellow nodes (detail)
+  const lineColor = isDark ? "#fcd34d" : "#fbbf24" // Yellow lines (detail)
 
   useFrame((state) => {
     const time = state.clock.elapsedTime
@@ -142,7 +142,7 @@ export function CoreGeometry({ scrollProgress, isDark }: CoreGeometryProps) {
       // Connection lines opacity
       const lineMesh = nodesGroupRef.current.children[nodeData.length]
       if (lineMesh) {
-        const lineMat = lineMesh.material as THREE.LineBasicMaterial
+        const lineMat = (lineMesh as THREE.Line).material as THREE.LineBasicMaterial
         if (lineMat) {
           lineMat.opacity = THREE.MathUtils.lerp(lineMat.opacity, nodeVisibility * 0.3, 0.02)
         }
@@ -156,7 +156,7 @@ export function CoreGeometry({ scrollProgress, isDark }: CoreGeometryProps) {
       <mesh ref={mainRef}>
         <icosahedronGeometry args={[1.2, 8]} />
         <MeshDistortMaterial
-          color={isDark ? "#0f172a" : "#e0e7ff"}
+          color={isDark ? "#1e3a8a" : "#93c5fd"}
           emissive={emissiveColor}
           emissiveIntensity={0.4}
           transparent
