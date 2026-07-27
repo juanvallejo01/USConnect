@@ -6,10 +6,11 @@ import { useTranslations } from "next-intl"
 import { useAuth } from "@/context/auth-context"
 import { GradientButton } from "@/components/layout/gradient-button"
 import { Logo } from "@/components/layout/logo"
+import { FACULTIES, FACULTY_NAMES } from "@/utils/faculties"
 
 export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "register" } = {}) {
   const t = useTranslations("auth")
-  const { login, register } = useAuth()
+  const { login, verifyOtp, register } = useAuth()
   const [isRegistering, setIsRegistering] = useState(initialMode === "register")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -18,8 +19,29 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
+  const [nickname, setNickname] = useState("")
+  const [faculty, setFaculty] = useState("")
   const [major, setMajor] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+
+  // Paso 2FA: tras validar credenciales, se pide el código de 6 dígitos
+  // enviado por correo antes de abrir la sesión.
+  const [step, setStep] = useState<"credentials" | "otp">("credentials")
+  const [otpEmail, setOtpEmail] = useState("")
+  const [otpCode, setOtpCode] = useState("")
+  const [otpMessage, setOtpMessage] = useState("")
+  const [isResending, setIsResending] = useState(false)
+
+  // Tanto login como register (cuenta recién creada) pasan por el mismo
+  // reto de 2FA — si la respuesta lo pide, se muestra el paso de código.
+  const goToOtpStepIfNeeded = (response: Awaited<ReturnType<typeof login>>) => {
+    if ("requiresTwoFactor" in response) {
+      setOtpEmail(response.email)
+      setOtpMessage(response.message)
+      setOtpCode("")
+      setStep("otp")
+    }
+  }
 
   const handleSubmit = async () => {
     setError("")
@@ -32,15 +54,18 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
         if (!password || password.length < 6) { setError(t("errors.passwordLength")); setIsLoading(false); return }
         if (!major.trim()) { setError(t("errors.majorRequired")); setIsLoading(false); return }
 
-        await register({
+        const response = await register({
           name: name.trim(),
+          nickname: nickname.trim() || undefined,
           email: email.trim().toLowerCase(),
           password,
           major: major.trim(),
         })
+        goToOtpStepIfNeeded(response)
       } else {
         if (!email.trim() || !password) { setError(t("errors.emailPasswordRequired")); setIsLoading(false); return }
-        await login({ email: email.trim().toLowerCase(), password })
+        const response = await login({ email: email.trim().toLowerCase(), password })
+        goToOtpStepIfNeeded(response)
       }
     } catch (err: any) {
       console.error("Auth error:", err)
@@ -51,12 +76,57 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
     }
   }
 
+  const handleVerifyOtp = async () => {
+    setError("")
+    const code = otpCode.trim()
+    if (!/^\d{6}$/.test(code)) { setError(t("errors.otpInvalid")); return }
+
+    setIsLoading(true)
+    try {
+      await verifyOtp({ email: otpEmail, code })
+    } catch (err: any) {
+      console.error("OTP verification error:", err)
+      const message = err?.response?.data?.message || err?.message || t("errors.authFailed")
+      setError(message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleResendCode = async () => {
+    setError("")
+    setIsResending(true)
+    try {
+      // Volver a llamar a login con las mismas credenciales genera y envía
+      // un código nuevo (el backend invalida el anterior automáticamente).
+      const response = await login({ email: otpEmail, password })
+      if ("requiresTwoFactor" in response) {
+        setOtpCode("")
+        setOtpMessage(t("otp.resendSuccess"))
+      }
+    } catch (err: any) {
+      console.error("Resend OTP error:", err)
+      const message = err?.response?.data?.message || err?.message || t("errors.authFailed")
+      setError(message)
+    } finally {
+      setIsResending(false)
+    }
+  }
+
+  const handleBackToCredentials = () => {
+    setStep("credentials")
+    setOtpCode("")
+    setError("")
+  }
+
   const toggleMode = () => {
     setIsRegistering(!isRegistering)
     setError("")
     setEmail("")
     setPassword("")
     setName("")
+    setNickname("")
+    setFaculty("")
     setMajor("")
   }
 
@@ -80,10 +150,12 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
           </div>
           <div className="flex flex-col items-center gap-2">
             <h1 className="text-[26px] font-bold tracking-tight text-[#1A1A2E]">
-              {isRegistering ? t("joinTitle") : t("welcomeBackTitle")}
+              {step === "otp" ? t("otp.title") : isRegistering ? t("joinTitle") : t("welcomeBackTitle")}
             </h1>
-            <p className="text-sm text-[#8E8E93]">
-              {isRegistering ? t("joinSubtitle") : t("welcomeBackSubtitle")}
+            <p className="text-sm text-[#8E8E93] text-center">
+              {step === "otp"
+                ? (otpMessage || t("otp.subtitleFallback", { email: otpEmail }))
+                : isRegistering ? t("joinSubtitle") : t("welcomeBackSubtitle")}
             </p>
           </div>
         </div>
@@ -100,6 +172,60 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
               </div>
             )}
 
+            {step === "otp" ? (
+              <>
+                {/* Código OTP */}
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="otp" className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider pl-1">
+                    {t("otp.codeLabel")}
+                  </label>
+                  <input
+                    id="otp"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    placeholder={t("otp.codePlaceholder")}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    onKeyDown={(e) => { if (e.key === "Enter") handleVerifyOtp() }}
+                    autoFocus
+                    className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-center text-2xl font-bold tracking-[0.4em] text-[#1A1A2E] placeholder:text-[#C7C7CC] placeholder:tracking-[0.4em] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
+                  />
+                </div>
+
+                <GradientButton
+                  fullWidth
+                  size="lg"
+                  onClick={handleVerifyOtp}
+                  className="mt-1 !from-[#fbbf24] !to-[#f59e0b] !text-[#0A0A0C] hover:!from-[#f59e0b] hover:!to-[#d97706] shadow-[0_8px_20px_rgb(251,191,36,0.3)]"
+                  disabled={isLoading}
+                >
+                  {isLoading ? t("otp.verifying") : t("otp.verifyButton")}
+                </GradientButton>
+
+                <div className="flex items-center justify-center gap-4 text-sm">
+                  <button
+                    type="button"
+                    onClick={handleResendCode}
+                    disabled={isResending || isLoading}
+                    className="font-semibold text-[#d97706] transition-colors hover:text-[#b45309] disabled:opacity-50"
+                  >
+                    {isResending ? t("otp.resending") : t("otp.resendButton")}
+                  </button>
+                  <span className="text-[#EBEBF0]">•</span>
+                  <button
+                    type="button"
+                    onClick={handleBackToCredentials}
+                    disabled={isLoading}
+                    className="font-semibold text-[#8E8E93] transition-colors hover:text-[#1A1A2E]"
+                  >
+                    {t("otp.back")}
+                  </button>
+                </div>
+              </>
+            ) : (
+            <>
             {/* Name */}
             {isRegistering && (
               <div className="flex flex-col gap-2">
@@ -112,6 +238,23 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
                   placeholder={t("fullNamePlaceholder")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
+                />
+              </div>
+            )}
+
+            {/* Nickname (optional) */}
+            {isRegistering && (
+              <div className="flex flex-col gap-2">
+                <label htmlFor="nickname" className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider pl-1">
+                  {t("nickname")}
+                </label>
+                <input
+                  id="nickname"
+                  type="text"
+                  placeholder={t("nicknamePlaceholder")}
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
                   className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
                 />
               </div>
@@ -174,20 +317,43 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
               </div>
             </div>
 
-            {/* Major */}
+            {/* Facultad */}
             {isRegistering && (
+              <div className="flex flex-col gap-2">
+                <label htmlFor="faculty" className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider pl-1">
+                  {t("faculty")}
+                </label>
+                <select
+                  id="faculty"
+                  value={faculty}
+                  onChange={(e) => { setFaculty(e.target.value); setMajor("") }}
+                  className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
+                >
+                  <option value="" disabled>{t("facultyPlaceholder")}</option>
+                  {FACULTY_NAMES.map((facultyName) => (
+                    <option key={facultyName} value={facultyName}>{facultyName}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Carrera — solo aparece una vez elegida la facultad */}
+            {isRegistering && faculty && (
               <div className="flex flex-col gap-2">
                 <label htmlFor="major" className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider pl-1">
                   {t("major")}
                 </label>
-                <input
+                <select
                   id="major"
-                  type="text"
-                  placeholder={t("majorPlaceholder")}
                   value={major}
                   onChange={(e) => setMajor(e.target.value)}
-                  className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
-                />
+                  className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
+                >
+                  <option value="" disabled>{t("majorPlaceholder")}</option>
+                  {FACULTIES[faculty].map((careerName) => (
+                    <option key={careerName} value={careerName}>{careerName}</option>
+                  ))}
+                </select>
               </div>
             )}
 
@@ -219,6 +385,8 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
             >
               {isRegistering ? t("toggleToSignIn") : t("createAccount")}
             </GradientButton>
+            </>
+            )}
           </div>
         </div>
 

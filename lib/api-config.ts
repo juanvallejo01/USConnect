@@ -9,6 +9,7 @@ export const ENDPOINTS = {
   // Auth
   register: '/auth/register',
   login: '/auth/login',
+  verifyOtp: '/auth/verify-otp',
   logout: '/auth/logout',
   refresh: '/auth/refresh',
   
@@ -32,6 +33,7 @@ export const ENDPOINTS = {
   ephemeral: (userId: string) => `/matches/user/${userId}/ephemeral`,
 
   // Blocks
+  getBlockedUsers: '/blocks',
   blockUser: '/blocks',
   unblockUser: (userId: string) => `/blocks/${userId}`,
 

@@ -2,12 +2,15 @@
 export interface User {
   id: string;
   name: string;
+  nickname?: string | null;
   email: string;
   major: string;
   role: 'USER' | 'ADMIN';
   likesCount: number;
   photoUrl?: string | null;
   photos?: string[];
+  bio?: string | null;
+  bannerUrl?: string | null;
   createdAt: string;
   avatar?: string; // For frontend display
 }
@@ -18,13 +21,29 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
+// Respuesta del primer paso del login cuando el 2FA por correo está activo:
+// las credenciales son correctas pero aún no se emiten tokens de sesión.
+export interface TwoFactorChallengeResponse {
+  requiresTwoFactor: true;
+  email: string;
+  message: string;
+}
+
+export type LoginResponse = AuthResponse | TwoFactorChallengeResponse;
+
 export interface LoginRequest {
   email: string;
   password: string;
 }
 
+export interface VerifyOtpRequest {
+  email: string;
+  code: string;
+}
+
 export interface RegisterRequest {
   name: string;
+  nickname?: string;
   email: string;
   password: string;
   major: string;

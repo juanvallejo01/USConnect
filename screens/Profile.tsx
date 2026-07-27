@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import {
   Camera, LogOut, Moon, Sun, Plus, ImagePlus, X,
   MapPin, CalendarDays, MessageSquare, Trophy,
+  Settings, Ban, ChevronLeft, ChevronRight,
 } from "lucide-react"
 import Image from "next/image"
 import { useTheme } from "next-themes"
@@ -15,8 +16,10 @@ import { useLocale } from "@/context/locale-context"
 import { useProfilePhotos } from "@/context/profile-photos-context"
 import { useBanner } from "@/context/banner-context"
 import { useToast } from "@/context/toast-context"
-import { postsApi, usersApi, leaderboardApi } from "@/lib/api-client"
+import { postsApi, usersApi, blocksApi, leaderboardApi } from "@/lib/api-client"
 import { compressImageToDataUrl } from "@/lib/image-compression"
+
+const DELETE_CONFIRM_PHRASE = "borrar cuenta"
 
 const RANKED_USERS_LIMIT = 100
 
@@ -30,12 +33,16 @@ export function ProfilePage() {
   const { showToast } = useToast()
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState(0)
-  const [bio, setBio] = useState(t("defaultBio"))
+  // La bio la escribe cada usuario — no hay texto por defecto. Se guarda en
+  // el backend (User.bio) al salir del modo edición.
+  const [bioDraft, setBioDraft] = useState("")
+  const [savingBio, setSavingBio] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [showPhotoManager, setShowPhotoManager] = useState(false)
   const { photos, maxPhotos, addPhoto, removePhoto } = useProfilePhotos()
   const [uploadingMainPhoto, setUploadingMainPhoto] = useState(false)
   const [uploadingGalleryPhoto, setUploadingGalleryPhoto] = useState(false)
+  const [uploadingBanner, setUploadingBanner] = useState(false)
   const { banner, setBanner, clearBanner } = useBanner()
   const mainCameraInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
@@ -43,6 +50,18 @@ export function ProfilePage() {
   const [posts, setPosts] = useState<any[]>([])
   const [loadingPosts, setLoadingPosts] = useState(true)
   const [weeklyRank, setWeeklyRank] = useState<number | undefined>(undefined)
+
+  // ── Configuración (bloqueados, apodo, borrar cuenta) ──
+  const [showSettings, setShowSettings] = useState(false)
+  const [settingsView, setSettingsView] = useState<"main" | "blocked">("main")
+  const [blockedUsers, setBlockedUsers] = useState<any[]>([])
+  const [loadingBlocked, setLoadingBlocked] = useState(false)
+  const [unblockingId, setUnblockingId] = useState<string | null>(null)
+  const [nicknameDraft, setNicknameDraft] = useState("")
+  const [savingNickname, setSavingNickname] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteConfirmText, setDeleteConfirmText] = useState("")
+  const [deletingAccount, setDeletingAccount] = useState(false)
 
   useEffect(() => {
     if (!user?.id) return
@@ -140,13 +159,126 @@ export function ProfilePage() {
     }
   }
 
-  const handleBannerFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     e.target.value = ""
-    if (!file || !file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) return
-    const reader = new FileReader()
-    reader.onloadend = () => setBanner(reader.result as string)
-    reader.readAsDataURL(file)
+    if (!file || !file.type.startsWith("image/")) return
+    if (file.size > 15 * 1024 * 1024) {
+      showToast(t("alerts.photoTooLarge"), "error")
+      return
+    }
+    setUploadingBanner(true)
+    try {
+      const dataUrl = await compressImageToDataUrl(file, { maxDimension: 1600 })
+      await setBanner(dataUrl)
+    } catch (error) {
+      console.error("Failed to save banner:", error)
+      showToast(t("alerts.photoUploadFailed"), "error")
+    } finally {
+      setUploadingBanner(false)
+    }
+  }
+
+  const handleClearBanner = async () => {
+    try {
+      await clearBanner()
+    } catch (error) {
+      console.error("Failed to clear banner:", error)
+      showToast(t("alerts.photoRemoveFailed"), "error")
+    }
+  }
+
+  // Al entrar en modo edición se toma una copia de la bio actual para editar;
+  // al salir (botón "Listo"), se guarda si cambió.
+  const handleToggleEditing = async () => {
+    if (!isEditing) {
+      setBioDraft(user?.bio ?? "")
+      setIsEditing(true)
+      return
+    }
+
+    const nextBio = bioDraft.trim()
+    if (nextBio !== (user?.bio ?? "")) {
+      setSavingBio(true)
+      try {
+        await usersApi.updateProfile({ bio: nextBio })
+        await refreshUser()
+      } catch (error) {
+        console.error("Failed to save bio:", error)
+        showToast(t("alerts.bioSaveFailed"), "error")
+      } finally {
+        setSavingBio(false)
+      }
+    }
+    setIsEditing(false)
+  }
+
+  const handleOpenSettings = () => {
+    setNicknameDraft(user?.nickname ?? "")
+    setSettingsView("main")
+    setShowDeleteConfirm(false)
+    setDeleteConfirmText("")
+    setShowSettings(true)
+  }
+
+  const loadBlockedUsers = async () => {
+    setLoadingBlocked(true)
+    try {
+      const data = await blocksApi.getBlockedUsers()
+      setBlockedUsers(data)
+    } catch (error) {
+      console.error("Failed to load blocked users:", error)
+      showToast(t("settings.loadBlockedFailed"), "error")
+    } finally {
+      setLoadingBlocked(false)
+    }
+  }
+
+  const handleOpenBlockedList = () => {
+    setSettingsView("blocked")
+    loadBlockedUsers()
+  }
+
+  const handleUnblock = async (blockedUserId: string) => {
+    setUnblockingId(blockedUserId)
+    try {
+      await blocksApi.unblockUser(blockedUserId)
+      setBlockedUsers((prev) => prev.filter((u) => u.id !== blockedUserId))
+    } catch (error) {
+      console.error("Failed to unblock user:", error)
+      showToast(t("settings.unblockFailed"), "error")
+    } finally {
+      setUnblockingId(null)
+    }
+  }
+
+  const handleSaveNickname = async () => {
+    const nextNickname = nicknameDraft.trim()
+    if (nextNickname === (user?.nickname ?? "")) return
+    setSavingNickname(true)
+    try {
+      await usersApi.updateProfile({ nickname: nextNickname })
+      await refreshUser()
+      showToast(t("settings.nicknameSaved"), "success")
+    } catch (error) {
+      console.error("Failed to save nickname:", error)
+      showToast(t("settings.nicknameSaveFailed"), "error")
+    } finally {
+      setSavingNickname(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText.trim().toLowerCase() !== DELETE_CONFIRM_PHRASE) return
+    setDeletingAccount(true)
+    try {
+      await usersApi.deleteAccount()
+      await logout()
+    } catch (error) {
+      console.error("Failed to delete account:", error)
+      showToast(t("settings.deleteAccountFailed"), "error")
+      setDeletingAccount(false)
+    }
   }
 
   useEffect(() => { setMounted(true) }, [])
@@ -197,7 +329,7 @@ export function ProfilePage() {
           <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
             {banner && (
               <button
-                onClick={clearBanner}
+                onClick={handleClearBanner}
                 aria-label={t("removeBanner")}
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-all active:scale-90"
               >
@@ -207,9 +339,14 @@ export function ProfilePage() {
             <button
               onClick={() => bannerInputRef.current?.click()}
               aria-label={t("editBanner")}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-all active:scale-90"
+              disabled={uploadingBanner}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-all active:scale-90 disabled:opacity-60"
             >
-              <Camera size={14} className="text-white" />
+              {uploadingBanner ? (
+                <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <Camera size={14} className="text-white" />
+              )}
             </button>
           </div>
         )}
@@ -221,7 +358,7 @@ export function ProfilePage() {
         {/* Avatar overlaps banner */}
         <div className="absolute -top-[46px] left-4">
           <div className="relative h-[90px] w-[90px]">
-            <div className="h-full w-full rounded-full overflow-hidden border-4 border-[#F8F8FA]">
+            <div className="h-full w-full rounded-full overflow-hidden border-4 border-black dark:border-white">
               <ProfileAvatarImage photoUrl={user?.photoUrl} name={user?.name || "?"} size={90} />
             </div>
             {isEditing && (
@@ -247,10 +384,18 @@ export function ProfilePage() {
             </button>
           )}
           <button
-            onClick={() => setIsEditing((prev) => !prev)}
-            className="h-9 px-5 rounded-full border border-[#EBEBF0] bg-white text-[13px] font-bold text-[#1A1A2E] transition-all active:scale-95"
+            onClick={handleToggleEditing}
+            disabled={savingBio}
+            className="h-9 px-5 rounded-full border border-[#EBEBF0] bg-white text-[13px] font-bold text-[#1A1A2E] transition-all active:scale-95 disabled:opacity-60"
           >
-            {isEditing ? t("doneEditing") : t("editProfile")}
+            {savingBio ? t("savingProfile") : isEditing ? t("doneEditing") : t("editProfile")}
+          </button>
+          <button
+            onClick={handleOpenSettings}
+            aria-label={t("settings.title")}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#EBEBF0] bg-white transition-all active:scale-90"
+          >
+            <Settings size={16} className="text-[#1A1A2E]" />
           </button>
         </div>
 
@@ -262,14 +407,16 @@ export function ProfilePage() {
           {isEditing ? (
             <textarea
               autoFocus
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
+              value={bioDraft}
+              onChange={(e) => setBioDraft(e.target.value)}
+              placeholder={t("addBio")}
+              maxLength={300}
               rows={2}
-              className="mt-2 w-full rounded-xl border border-[#EBEBF0] bg-white px-3 py-2 text-[13px] text-[#1A1A2E] outline-none focus:border-[#000000] resize-none leading-relaxed"
+              className="mt-2 w-full rounded-xl border border-[#EBEBF0] bg-white px-3 py-2 text-[13px] text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none focus:border-[#000000] resize-none leading-relaxed"
             />
           ) : (
             <p className="mt-2 text-[14px] text-[#1A1A2E] leading-[1.5]">
-              {bio || <span className="text-[#C7C7CC]">{t("addBio")}</span>}
+              {user?.bio || <span className="text-[#C7C7CC]">{t("addBio")}</span>}
             </p>
           )}
 
@@ -483,6 +630,167 @@ export function ProfilePage() {
                 })}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Settings Sheet ── */}
+      {showSettings && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center"
+          onClick={() => setShowSettings(false)}
+        >
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div
+            className="relative w-full max-w-sm bg-white rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 bg-[#EBEBF0] rounded-full mx-auto mt-4 mb-1" />
+            <div className="flex items-center gap-2 px-5 py-3 border-b border-[#EBEBF0]">
+              {settingsView === "blocked" && (
+                <button
+                  onClick={() => setSettingsView("main")}
+                  className="h-8 w-8 flex items-center justify-center rounded-full bg-[#EBEBF0] transition-all active:scale-90 -ml-1"
+                >
+                  <ChevronLeft size={16} className="text-[#8E8E93]" />
+                </button>
+              )}
+              <h3 className="text-base font-bold text-[#1A1A2E] flex-1">
+                {settingsView === "blocked" ? t("settings.blockedTitle") : t("settings.title")}
+              </h3>
+              <button
+                onClick={() => setShowSettings(false)}
+                className="h-8 w-8 flex items-center justify-center rounded-full bg-[#EBEBF0] transition-all active:scale-90"
+              >
+                <X size={16} className="text-[#8E8E93]" />
+              </button>
+            </div>
+
+            {settingsView === "blocked" ? (
+              <div className="p-4 pb-8">
+                {loadingBlocked ? (
+                  <div className="flex justify-center py-10">
+                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#000000] border-t-transparent" />
+                  </div>
+                ) : blockedUsers.length === 0 ? (
+                  <p className="text-[13px] text-[#8E8E93] text-center py-10">{t("settings.noBlockedUsers")}</p>
+                ) : (
+                  <div className="flex flex-col gap-1">
+                    {blockedUsers.map((blockedUser) => (
+                      <div key={blockedUser.id} className="flex items-center gap-3 py-2">
+                        <ProfileAvatarImage photoUrl={blockedUser.photoUrl} name={blockedUser.name} size={40} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[14px] font-semibold text-[#1A1A2E] truncate">{blockedUser.name}</p>
+                          <p className="text-[12px] text-[#8E8E93] truncate">{blockedUser.major}</p>
+                        </div>
+                        <button
+                          onClick={() => handleUnblock(blockedUser.id)}
+                          disabled={unblockingId === blockedUser.id}
+                          className="h-8 px-3.5 rounded-full border border-[#EBEBF0] text-[12px] font-semibold text-[#1A1A2E] transition-all active:scale-95 disabled:opacity-50"
+                        >
+                          {unblockingId === blockedUser.id ? t("settings.unblocking") : t("settings.unblock")}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-4 pb-8 flex flex-col gap-5">
+                {/* Bloqueados */}
+                <button
+                  onClick={handleOpenBlockedList}
+                  className="flex items-center justify-between rounded-2xl border border-[#EBEBF0] px-4 py-3 transition-all active:scale-[0.98]"
+                >
+                  <span className="flex items-center gap-2 text-[13px] font-semibold text-[#1A1A2E]">
+                    <Ban size={15} />
+                    {t("settings.blocked")}
+                  </span>
+                  <ChevronRight size={16} className="text-[#C7C7CC]" />
+                </button>
+
+                {/* Información personal */}
+                <div>
+                  <p className="text-[11px] font-semibold text-[#8E8E93] uppercase tracking-wider mb-2">
+                    {t("settings.personalInfo")}
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    <div>
+                      <label className="text-[11px] text-[#8E8E93]">{t("nickname")}</label>
+                      <div className="flex gap-2 mt-1">
+                        <input
+                          value={nicknameDraft}
+                          onChange={(e) => setNicknameDraft(e.target.value)}
+                          placeholder={t("nicknamePlaceholder")}
+                          className="flex-1 min-w-0 rounded-xl border border-[#EBEBF0] bg-white px-3 py-2 text-[13px] text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none focus:border-[#000000]"
+                        />
+                        <button
+                          onClick={handleSaveNickname}
+                          disabled={savingNickname || nicknameDraft.trim() === (user?.nickname ?? "")}
+                          className="px-4 rounded-xl bg-[#000000] text-white text-[12px] font-semibold transition-all active:scale-95 disabled:opacity-40"
+                        >
+                          {savingNickname ? t("settings.saving") : t("settings.save")}
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-[#8E8E93] mt-1">{t("settings.nicknameHint")}</p>
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] text-[#8E8E93]">{t("fullName")}</label>
+                      <p className="mt-1 rounded-xl bg-[#F8F8FA] px-3 py-2 text-[13px] text-[#8E8E93]">{user?.name}</p>
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-[#8E8E93]">{t("email")}</label>
+                      <p className="mt-1 rounded-xl bg-[#F8F8FA] px-3 py-2 text-[13px] text-[#8E8E93] truncate">{user?.email}</p>
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-[#8E8E93]">{t("major")}</label>
+                      <p className="mt-1 rounded-xl bg-[#F8F8FA] px-3 py-2 text-[13px] text-[#8E8E93]">{user?.major}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Borrar cuenta */}
+                <div className="border-t border-[#EBEBF0] pt-4">
+                  {!showDeleteConfirm ? (
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="text-[13px] font-semibold text-[#FF3B30]"
+                    >
+                      {t("settings.deleteAccount")}
+                    </button>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <p className="text-[13px] font-semibold text-[#FF3B30]">{t("settings.deleteConfirmPrompt")}</p>
+                      <p className="text-[12px] text-[#8E8E93] leading-snug">
+                        {t("settings.deleteConfirmInstructions", { phrase: DELETE_CONFIRM_PHRASE })}
+                      </p>
+                      <input
+                        value={deleteConfirmText}
+                        onChange={(e) => setDeleteConfirmText(e.target.value)}
+                        placeholder={DELETE_CONFIRM_PHRASE}
+                        className="rounded-xl border border-[#FF3B30]/30 bg-white px-3 py-2 text-[13px] text-[#1A1A2E] outline-none focus:border-[#FF3B30]"
+                      />
+                      <div className="flex gap-2 mt-1">
+                        <button
+                          onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText("") }}
+                          className="flex-1 h-9 rounded-full border border-[#EBEBF0] text-[13px] font-semibold text-[#1A1A2E] transition-all active:scale-95"
+                        >
+                          {t("settings.cancel")}
+                        </button>
+                        <button
+                          onClick={handleDeleteAccount}
+                          disabled={deleteConfirmText.trim().toLowerCase() !== DELETE_CONFIRM_PHRASE || deletingAccount}
+                          className="flex-1 h-9 rounded-full bg-[#FF3B30] text-white text-[13px] font-semibold transition-all active:scale-95 disabled:opacity-40"
+                        >
+                          {deletingAccount ? t("settings.deleting") : t("settings.confirmDelete")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

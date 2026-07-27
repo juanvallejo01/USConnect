@@ -68,7 +68,10 @@ export function Particles({ scrollProgress, isDark }: ParticlesProps) {
 
   return (
     <points ref={pointsRef}>
-      <bufferGeometry>
+      {/* key={count} fuerza a recrear la geometría (en vez de mutarla) cuando
+          el conteo de partículas cambia al cruzar el umbral isMobile — THREE
+          no soporta redimensionar un bufferAttribute existente in situ. */}
+      <bufferGeometry key={count}>
         <bufferAttribute
           attach="attributes-position"
           count={count}

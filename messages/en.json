@@ -85,6 +85,10 @@
     "welcomeBackSubtitle": "Sign in to your campus community",
     "fullName": "Full Name",
     "fullNamePlaceholder": "John Doe",
+    "nickname": "Nickname",
+    "nicknamePlaceholder": "What do people call you? (optional)",
+    "faculty": "Faculty",
+    "facultyPlaceholder": "Select your faculty",
     "useTestAccount": "Use test account (student1@usc.edu)",
     "fill": "Fill",
     "email": "Email",
@@ -95,20 +99,33 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "major": "Major",
-    "majorPlaceholder": "Computer Science",
+    "majorPlaceholder": "Select your major",
     "loading": "Loading...",
     "createAccount": "Create Account",
     "signIn": "Sign In",
     "or": "or",
     "toggleToSignIn": "Already have an account? Sign In",
     "termsNotice": "By continuing, you agree to our Terms of Service",
+    "otp": {
+      "title": "Verify your email",
+      "subtitleFallback": "We sent a verification code to {email}",
+      "codeLabel": "Verification code",
+      "codePlaceholder": "123456",
+      "verifyButton": "Verify code",
+      "verifying": "Verifying...",
+      "resendButton": "Resend code",
+      "resending": "Resending...",
+      "resendSuccess": "We sent a new code to your email",
+      "back": "Back"
+    },
     "errors": {
       "nameRequired": "Name is required",
       "validEmailRequired": "Valid email is required",
       "passwordLength": "Password must be at least 6 characters",
       "majorRequired": "Major is required",
       "emailPasswordRequired": "Email and password are required",
-      "authFailed": "Authentication failed"
+      "authFailed": "Authentication failed",
+      "otpInvalid": "Enter the 6-digit code we sent to your email"
     }
   },
   "feed": {
@@ -232,7 +249,6 @@
       "highlights": "Highlights",
       "photos": "Photos"
     },
-    "defaultBio": "Backend-focused Dev 🧑‍💻 computer engineering USC",
     "interests": {
       "Photography": "Photography",
       "Design": "Design",
@@ -248,6 +264,7 @@
     "removeBanner": "Remove banner",
     "editProfile": "Edit profile",
     "doneEditing": "Done",
+    "savingProfile": "Saving...",
     "defaultUser": "User",
     "addBio": "Add a bio…",
     "defaultMajorLocation": "USC · Cali",
@@ -268,11 +285,40 @@
     "main": "MAIN",
     "weeklyRank": "Top #{rank} this week",
     "editProfilePhoto": "Change profile photo",
+    "fullName": "Full name",
+    "nickname": "Nickname",
+    "nicknamePlaceholder": "What do people call you?",
+    "email": "Email",
+    "major": "Major",
+    "settings": {
+      "title": "Settings",
+      "blocked": "Blocked users",
+      "blockedTitle": "Blocked users",
+      "noBlockedUsers": "You haven't blocked anyone.",
+      "unblock": "Unblock",
+      "unblocking": "Unblocking...",
+      "unblockFailed": "Couldn't unblock. Please try again.",
+      "loadBlockedFailed": "Couldn't load your blocked list.",
+      "personalInfo": "Personal information",
+      "nicknameHint": "Your nickname is the only thing others see until they match with you.",
+      "save": "Save",
+      "saving": "Saving...",
+      "nicknameSaved": "Nickname updated",
+      "nicknameSaveFailed": "Couldn't save your nickname. Please try again.",
+      "deleteAccount": "Delete account",
+      "deleteConfirmPrompt": "Are you sure? This action cannot be undone.",
+      "deleteConfirmInstructions": "Type \"{phrase}\" to confirm you want to delete your account.",
+      "cancel": "Cancel",
+      "confirmDelete": "Delete account",
+      "deleting": "Deleting...",
+      "deleteAccountFailed": "Couldn't delete your account. Please try again."
+    },
     "alerts": {
       "photoTooLarge": "That image is too large (max 15MB)",
       "photosLimitReached": "You already have the max of {max} photos. Remove one to add another.",
       "photoUploadFailed": "Couldn't upload the photo. Please try again.",
-      "photoRemoveFailed": "Couldn't remove the photo. Please try again."
+      "photoRemoveFailed": "Couldn't remove the photo. Please try again.",
+      "bioSaveFailed": "Couldn't save your bio. Please try again."
     }
   },
   "chat": {

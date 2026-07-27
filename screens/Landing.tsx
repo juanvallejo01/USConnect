@@ -9,6 +9,7 @@ import { LandingBenefits } from "@/components/landing/landing-benefits"
 import { LandingHowItWorks } from "@/components/landing/landing-how-it-works"
 import { LandingFaq } from "@/components/landing/landing-faq"
 import { LandingFooter } from "@/components/landing/landing-footer"
+import { SceneErrorBoundary } from "@/components/three/SceneErrorBoundary"
 
 // Dynamic import to avoid SSR for WebGL
 const Scene3D = dynamic(
@@ -30,7 +31,9 @@ export function LandingPage({
   return (
     <div className="min-h-screen bg-background">
       {/* 3D Background Layer */}
-      <Scene3D scrollProgress={progressRef} isDark={isDark} />
+      <SceneErrorBoundary>
+        <Scene3D scrollProgress={progressRef} isDark={isDark} />
+      </SceneErrorBoundary>
 
       {/* HTML Content Layer */}
       <div className="relative z-10">

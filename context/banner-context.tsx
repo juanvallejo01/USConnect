@@ -1,39 +1,53 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
+import { useAuth } from "./auth-context"
+import { usersApi } from "@/lib/api-client"
 
-const STORAGE_KEY = "usc_profile_banner"
-
+/**
+ * El banner del perfil vive en `User.bannerUrl` (backend) — antes se guardaba
+ * solo en localStorage, sin ligarlo a la cuenta, así que una cuenta nueva
+ * "heredaba" el banner que hubiera quedado de otra cuenta usada antes en el
+ * mismo navegador. Ahora empieza en blanco para cada cuenta nueva y persiste
+ * por usuario.
+ */
 interface BannerContextType {
   banner: string | null
-  setBanner: (url: string) => void
-  clearBanner: () => void
+  setBanner: (url: string) => Promise<void>
+  clearBanner: () => Promise<void>
 }
 
 const BannerContext = createContext<BannerContextType>({
   banner: null,
-  setBanner: () => {},
-  clearBanner: () => {},
+  setBanner: async () => {},
+  clearBanner: async () => {},
 })
 
 export function BannerProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth()
   const [banner, setBannerState] = useState<string | null>(null)
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) setBannerState(stored)
-    } catch {}
-  }, [])
+    setBannerState(user?.bannerUrl ?? null)
+  }, [user?.bannerUrl])
 
-  function setBanner(url: string) {
+  async function persist(url: string | null) {
+    const previous = banner
     setBannerState(url)
-    localStorage.setItem(STORAGE_KEY, url)
+    try {
+      await usersApi.updateProfile({ bannerUrl: url })
+    } catch (error) {
+      setBannerState(previous)
+      throw error
+    }
   }
 
-  function clearBanner() {
-    setBannerState(null)
-    localStorage.removeItem(STORAGE_KEY)
+  async function setBanner(url: string) {
+    await persist(url)
+  }
+
+  async function clearBanner() {
+    await persist(null)
   }
 
   return (

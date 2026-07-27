@@ -155,20 +155,45 @@ api.interceptors.response.use(
 
 // API methods
 export const authApi = {
+  // La cuenta recién creada también pasa por el 2FA (igual que login) antes
+  // de abrir sesión — la respuesta es { requiresTwoFactor: true, email }.
   register: async (data: {
     name: string;
+    nickname?: string;
     email: string;
     password: string;
     major: string;
   }) => {
     const response = await api.post(ENDPOINTS.register, data);
-    const { user, accessToken, refreshToken } = response.data;
-    setTokens(accessToken, refreshToken);
-    return { user, accessToken, refreshToken };
+    const { accessToken, refreshToken } = response.data;
+    if (accessToken && refreshToken) {
+      setTokens(accessToken, refreshToken);
+    }
+    return response.data as
+      | { user: any; accessToken: string; refreshToken: string }
+      | { requiresTwoFactor: true; email: string; message: string };
   },
 
+  // Paso 1: valida credenciales. El 2FA por correo solo se exige la primera
+  // vez que la cuenta inicia sesión (justo tras crearla) — ahí la API
+  // responde { requiresTwoFactor: true, email } y el código llega por correo.
+  // En logins posteriores, ya verificada la cuenta, la API entrega los
+  // tokens de una vez.
   login: async (data: { email: string; password: string }) => {
     const response = await api.post(ENDPOINTS.login, data);
+    const { user, accessToken, refreshToken } = response.data;
+    if (accessToken && refreshToken) {
+      setTokens(accessToken, refreshToken);
+    }
+    return response.data as
+      | { user: any; accessToken: string; refreshToken: string }
+      | { requiresTwoFactor: true; email: string; message: string };
+  },
+
+  // Paso 2: valida el código OTP de 6 dígitos. Solo aquí se emiten y
+  // guardan los tokens de sesión.
+  verifyOtp: async (data: { email: string; code: string }) => {
+    const response = await api.post(ENDPOINTS.verifyOtp, data);
     const { user, accessToken, refreshToken } = response.data;
     setTokens(accessToken, refreshToken);
     return { user, accessToken, refreshToken };
@@ -195,7 +220,7 @@ export const usersApi = {
     return response.data;
   },
 
-  updateProfile: async (data: { name?: string; major?: string; photoUrl?: string; photos?: string[] }) => {
+  updateProfile: async (data: { name?: string; nickname?: string; major?: string; photoUrl?: string; photos?: string[]; bio?: string; bannerUrl?: string | null }) => {
     const response = await api.put(ENDPOINTS.updateProfile, data);
     return response.data;
   },
@@ -270,6 +295,11 @@ export const matchesApi = {
 };
 
 export const blocksApi = {
+  getBlockedUsers: async () => {
+    const response = await api.get(ENDPOINTS.getBlockedUsers);
+    return response.data;
+  },
+
   blockUser: async (blockedId: string) => {
     const response = await api.post(ENDPOINTS.blockUser, { blockedId });
     return response.data;

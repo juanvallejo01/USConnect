@@ -85,6 +85,10 @@
     "welcomeBackSubtitle": "Inicia sesión en tu comunidad universitaria",
     "fullName": "Nombre completo",
     "fullNamePlaceholder": "Juan Pérez",
+    "nickname": "Apodo",
+    "nicknamePlaceholder": "¿Cómo te dicen? (opcional)",
+    "faculty": "Facultad",
+    "facultyPlaceholder": "Selecciona tu facultad",
     "useTestAccount": "Usar cuenta de prueba (student1@usc.edu)",
     "fill": "Rellenar",
     "email": "Correo",
@@ -95,20 +99,33 @@
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña",
     "major": "Carrera",
-    "majorPlaceholder": "Ingeniería de Sistemas",
+    "majorPlaceholder": "Selecciona tu carrera",
     "loading": "Cargando...",
     "createAccount": "Crear cuenta",
     "signIn": "Iniciar sesión",
     "or": "o",
     "toggleToSignIn": "¿Ya tienes cuenta? Inicia sesión",
     "termsNotice": "Al continuar, aceptas nuestros Términos de Servicio",
+    "otp": {
+      "title": "Verifica tu correo",
+      "subtitleFallback": "Enviamos un código de verificación a {email}",
+      "codeLabel": "Código de verificación",
+      "codePlaceholder": "123456",
+      "verifyButton": "Verificar código",
+      "verifying": "Verificando...",
+      "resendButton": "Reenviar código",
+      "resending": "Reenviando...",
+      "resendSuccess": "Enviamos un nuevo código a tu correo",
+      "back": "Volver"
+    },
     "errors": {
       "nameRequired": "El nombre es obligatorio",
       "validEmailRequired": "Se requiere un correo válido",
       "passwordLength": "La contraseña debe tener al menos 6 caracteres",
       "majorRequired": "La carrera es obligatoria",
       "emailPasswordRequired": "Correo y contraseña son obligatorios",
-      "authFailed": "Error de autenticación"
+      "authFailed": "Error de autenticación",
+      "otpInvalid": "Ingresa el código de 6 dígitos que enviamos a tu correo"
     }
   },
   "feed": {
@@ -232,7 +249,6 @@
       "highlights": "Destacados",
       "photos": "Fotos"
     },
-    "defaultBio": "Dev backend 🧑‍💻 ingeniería de sistemas USC",
     "interests": {
       "Photography": "Fotografía",
       "Design": "Diseño",
@@ -248,6 +264,7 @@
     "removeBanner": "Quitar banner",
     "editProfile": "Editar perfil",
     "doneEditing": "Listo",
+    "savingProfile": "Guardando...",
     "defaultUser": "Usuario",
     "addBio": "Añade una bio…",
     "defaultMajorLocation": "USC · Cali",
@@ -268,11 +285,40 @@
     "main": "PRINCIPAL",
     "weeklyRank": "Top #{rank} esta semana",
     "editProfilePhoto": "Cambiar foto de perfil",
+    "fullName": "Nombre completo",
+    "nickname": "Apodo",
+    "nicknamePlaceholder": "¿Cómo te dicen?",
+    "email": "Correo",
+    "major": "Carrera",
+    "settings": {
+      "title": "Configuración",
+      "blocked": "Bloqueados",
+      "blockedTitle": "Personas bloqueadas",
+      "noBlockedUsers": "No has bloqueado a nadie.",
+      "unblock": "Desbloquear",
+      "unblocking": "Desbloqueando...",
+      "unblockFailed": "No se pudo desbloquear. Intenta de nuevo.",
+      "loadBlockedFailed": "No se pudo cargar la lista de bloqueados.",
+      "personalInfo": "Información personal",
+      "nicknameHint": "El apodo es lo único que ven los demás hasta que hagan match contigo.",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "nicknameSaved": "Apodo actualizado",
+      "nicknameSaveFailed": "No se pudo guardar el apodo. Intenta de nuevo.",
+      "deleteAccount": "Borrar cuenta",
+      "deleteConfirmPrompt": "¿Estás seguro? Esta acción no se puede deshacer.",
+      "deleteConfirmInstructions": "Escribe \"{phrase}\" para confirmar que quieres borrar tu cuenta.",
+      "cancel": "Cancelar",
+      "confirmDelete": "Borrar cuenta",
+      "deleting": "Borrando...",
+      "deleteAccountFailed": "No se pudo borrar la cuenta. Intenta de nuevo."
+    },
     "alerts": {
       "photoTooLarge": "La imagen es demasiado pesada (máx. 15MB)",
       "photosLimitReached": "Ya tienes el máximo de {max} fotos. Elimina una para agregar otra.",
       "photoUploadFailed": "No se pudo subir la foto. Intenta de nuevo.",
-      "photoRemoveFailed": "No se pudo eliminar la foto. Intenta de nuevo."
+      "photoRemoveFailed": "No se pudo eliminar la foto. Intenta de nuevo.",
+      "bioSaveFailed": "No se pudo guardar tu bio. Intenta de nuevo."
     }
   },
   "chat": {
