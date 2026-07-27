@@ -73,10 +73,10 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
         {/* Logo & brand */}
         <div className="flex flex-col items-center gap-5">
           <div className="relative">
-            <div className="flex h-20 w-20 items-center justify-center rounded-[24px] bg-[#0A0A0C] cloud-shadow-lg">
-              <Logo size="sm" className="text-white" />
+            <div className="flex h-20 w-20 items-center justify-center rounded-[24px] bg-[#0A0A0C] shadow-[0_8px_30px_rgb(251,191,36,0.15)]">
+              <Logo size="sm" className="text-[#fbbf24]" />
             </div>
-            <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-[#34C759] border-[3px] border-[#F8F8FA]" />
+            <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-[#fbbf24] border-[3px] border-[#F8F8FA] shadow-[0_0_10px_rgb(251,191,36,0.4)]" />
           </div>
           <div className="flex flex-col items-center gap-2">
             <h1 className="text-[26px] font-bold tracking-tight text-[#1A1A2E]">
@@ -112,7 +112,7 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
                   placeholder={t("fullNamePlaceholder")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#000000] focus:ring-4 focus:ring-[#000000]/10 focus:bg-white"
+                  className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
                 />
               </div>
             )}
@@ -122,12 +122,12 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
               <button
                 type="button"
                 onClick={fillTestCredentials}
-                className="flex items-center justify-between rounded-2xl border border-[#000000]/20 bg-[#000000]/6 px-4 py-3 text-left transition-colors duration-300 hover:bg-[#000000]/10"
+                className="flex items-center justify-between rounded-2xl border border-[#fbbf24]/30 bg-[#fbbf24]/10 px-4 py-3 text-left transition-colors duration-300 hover:bg-[#fbbf24]/20"
               >
-                <span className="text-xs font-semibold text-[#000000]">
+                <span className="text-xs font-semibold text-[#1A1A2E]">
                   {t("useTestAccount")}
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#000000]/70">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#d97706]">
                   {t("fill")}
                 </span>
               </button>
@@ -144,7 +144,7 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
                 placeholder={t("emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#000000] focus:ring-4 focus:ring-[#000000]/10 focus:bg-white"
+                className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
               />
             </div>
 
@@ -161,7 +161,7 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSubmit() }}
-                  className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 pr-12 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#000000] focus:ring-4 focus:ring-[#000000]/10 focus:bg-white"
+                  className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 pr-12 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
                 />
                 <button
                   type="button"
@@ -186,7 +186,7 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
                   placeholder={t("majorPlaceholder")}
                   value={major}
                   onChange={(e) => setMajor(e.target.value)}
-                  className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#000000] focus:ring-4 focus:ring-[#000000]/10 focus:bg-white"
+                  className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
                 />
               </div>
             )}
@@ -196,7 +196,7 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
               fullWidth
               size="lg"
               onClick={handleSubmit}
-              className="mt-1"
+              className="mt-1 !from-[#fbbf24] !to-[#f59e0b] !text-[#0A0A0C] hover:!from-[#f59e0b] hover:!to-[#d97706] shadow-[0_8px_20px_rgb(251,191,36,0.3)]"
               disabled={isLoading}
             >
               {isLoading ? t("loading") : isRegistering ? t("createAccount") : t("signIn")}
