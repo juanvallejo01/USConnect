@@ -14,7 +14,9 @@ import { useAuth } from "@/context/auth-context"
 import { useLocale } from "@/context/locale-context"
 import { useProfilePhotos } from "@/context/profile-photos-context"
 import { useBanner } from "@/context/banner-context"
+import { useToast } from "@/context/toast-context"
 import { postsApi, usersApi, leaderboardApi } from "@/lib/api-client"
+import { compressImageToDataUrl } from "@/lib/image-compression"
 
 const RANKED_USERS_LIMIT = 100
 
@@ -25,12 +27,15 @@ export function ProfilePage() {
   const { user, logout, refreshUser } = useAuth()
   const likesReceived = user?.likesCount ?? 0
   const { setTheme, resolvedTheme } = useTheme()
+  const { showToast } = useToast()
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState(0)
   const [bio, setBio] = useState(t("defaultBio"))
-  const [editingBio, setEditingBio] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const [showPhotoManager, setShowPhotoManager] = useState(false)
-  const { photos, addPhoto, removePhoto } = useProfilePhotos()
+  const { photos, maxPhotos, addPhoto, removePhoto } = useProfilePhotos()
+  const [uploadingMainPhoto, setUploadingMainPhoto] = useState(false)
+  const [uploadingGalleryPhoto, setUploadingGalleryPhoto] = useState(false)
   const { banner, setBanner, clearBanner } = useBanner()
   const mainCameraInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
@@ -87,30 +92,52 @@ export function ProfilePage() {
     setPosts((prev) => prev.filter((p) => p.id !== postId))
   }
 
-  const handlePhotoFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     e.target.value = ""
-    if (!file || !file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) return
-    const reader = new FileReader()
-    reader.onloadend = () => addPhoto(reader.result as string)
-    reader.readAsDataURL(file)
+    if (!file || !file.type.startsWith("image/")) return
+    if (file.size > 15 * 1024 * 1024) {
+      showToast(t("alerts.photoTooLarge"), "error")
+      return
+    }
+    if (photos.length >= maxPhotos) {
+      showToast(t("alerts.photosLimitReached", { max: maxPhotos }), "error")
+      return
+    }
+    setUploadingGalleryPhoto(true)
+    try {
+      const dataUrl = await compressImageToDataUrl(file)
+      await addPhoto(dataUrl)
+    } catch (error: any) {
+      console.error("Failed to add gallery photo:", error)
+      const message = error?.message === "PHOTOS_LIMIT_REACHED"
+        ? t("alerts.photosLimitReached", { max: maxPhotos })
+        : t("alerts.photoUploadFailed")
+      showToast(message, "error")
+    } finally {
+      setUploadingGalleryPhoto(false)
+    }
   }
 
-  const handleMainPhotoFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMainPhotoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     e.target.value = ""
-    if (!file || !file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) return
-    const reader = new FileReader()
-    reader.onloadend = async () => {
-      const dataUrl = reader.result as string
-      try {
-        await usersApi.updateProfile({ photoUrl: dataUrl })
-        await refreshUser()
-      } catch (error) {
-        console.error("Failed to save profile photo:", error)
-      }
+    if (!file || !file.type.startsWith("image/")) return
+    if (file.size > 15 * 1024 * 1024) {
+      showToast(t("alerts.photoTooLarge"), "error")
+      return
     }
-    reader.readAsDataURL(file)
+    setUploadingMainPhoto(true)
+    try {
+      const dataUrl = await compressImageToDataUrl(file)
+      await usersApi.updateProfile({ photoUrl: dataUrl })
+      await refreshUser()
+    } catch (error) {
+      console.error("Failed to save profile photo:", error)
+      showToast(t("alerts.photoUploadFailed"), "error")
+    } finally {
+      setUploadingMainPhoto(false)
+    }
   }
 
   const handleBannerFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,24 +193,26 @@ export function ProfilePage() {
           </button>
         </div>
 
-        <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
-          {banner && (
+        {isEditing && (
+          <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+            {banner && (
+              <button
+                onClick={clearBanner}
+                aria-label={t("removeBanner")}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-all active:scale-90"
+              >
+                <X size={14} className="text-white" />
+              </button>
+            )}
             <button
-              onClick={clearBanner}
-              aria-label={t("removeBanner")}
+              onClick={() => bannerInputRef.current?.click()}
+              aria-label={t("editBanner")}
               className="flex h-8 w-8 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-all active:scale-90"
             >
-              <X size={14} className="text-white" />
+              <Camera size={14} className="text-white" />
             </button>
-          )}
-          <button
-            onClick={() => bannerInputRef.current?.click()}
-            aria-label={t("editBanner")}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-all active:scale-90"
-          >
-            <Camera size={14} className="text-white" />
-          </button>
-        </div>
+          </div>
+        )}
       </div>
       <input ref={bannerInputRef} type="file" accept="image/*" onChange={handleBannerFile} className="hidden" />
 
@@ -195,29 +224,33 @@ export function ProfilePage() {
             <div className="h-full w-full rounded-full overflow-hidden border-4 border-[#F8F8FA]">
               <ProfileAvatarImage photoUrl={user?.photoUrl} name={user?.name || "?"} size={90} />
             </div>
-            <button
-              onClick={() => mainCameraInputRef.current?.click()}
-              aria-label={t("editProfilePhoto")}
-              className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#000000] border-2 border-[#F8F8FA] transition-all active:scale-90"
-            >
-              <Camera size={12} className="text-white" />
-            </button>
+            {isEditing && (
+              <button
+                onClick={() => mainCameraInputRef.current?.click()}
+                aria-label={t("editProfilePhoto")}
+                className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#000000] border-2 border-[#F8F8FA] transition-all active:scale-90"
+              >
+                <Camera size={12} className="text-white" />
+              </button>
+            )}
           </div>
         </div>
 
         {/* Right-side action buttons */}
         <div className="flex justify-end gap-2 pt-3">
+          {isEditing && (
+            <button
+              onClick={() => setShowPhotoManager(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#EBEBF0] bg-white transition-all active:scale-90"
+            >
+              <Camera size={16} className="text-[#1A1A2E]" />
+            </button>
+          )}
           <button
-            onClick={() => setShowPhotoManager(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#EBEBF0] bg-white transition-all active:scale-90"
-          >
-            <Camera size={16} className="text-[#1A1A2E]" />
-          </button>
-          <button
-            onClick={() => setEditingBio(true)}
+            onClick={() => setIsEditing((prev) => !prev)}
             className="h-9 px-5 rounded-full border border-[#EBEBF0] bg-white text-[13px] font-bold text-[#1A1A2E] transition-all active:scale-95"
           >
-            {t("editProfile")}
+            {isEditing ? t("doneEditing") : t("editProfile")}
           </button>
         </div>
 
@@ -226,17 +259,16 @@ export function ProfilePage() {
           <p className="text-[19px] font-extrabold text-[#1A1A2E] leading-tight">{user?.name || t("defaultUser")}</p>
           <p className="text-[14px] text-[#8E8E93] mt-0.5">@{username}</p>
 
-          {editingBio ? (
+          {isEditing ? (
             <textarea
               autoFocus
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              onBlur={() => setEditingBio(false)}
               rows={2}
               className="mt-2 w-full rounded-xl border border-[#EBEBF0] bg-white px-3 py-2 text-[13px] text-[#1A1A2E] outline-none focus:border-[#000000] resize-none leading-relaxed"
             />
           ) : (
-            <p onClick={() => setEditingBio(true)} className="mt-2 text-[14px] text-[#1A1A2E] leading-[1.5] cursor-text">
+            <p className="mt-2 text-[14px] text-[#1A1A2E] leading-[1.5]">
               {bio || <span className="text-[#C7C7CC]">{t("addBio")}</span>}
             </p>
           )}
@@ -371,7 +403,7 @@ export function ProfilePage() {
             <div className="flex items-center justify-between px-5 py-3 border-b border-[#EBEBF0]">
               <h3 className="text-base font-bold text-[#1A1A2E]">{t("myPhotos")}</h3>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#C7C7CC]">{photos.length}/8</span>
+                <span className="text-xs text-[#C7C7CC]">{photos.length}/{maxPhotos}</span>
                 <button
                   onClick={() => setShowPhotoManager(false)}
                   className="h-8 w-8 flex items-center justify-center rounded-full bg-[#EBEBF0] transition-all active:scale-90"
@@ -381,6 +413,9 @@ export function ProfilePage() {
               </div>
             </div>
             <div className="p-4 pb-8">
+              <p className="text-xs text-[#8E8E93] leading-snug mb-3">
+                {t("photosExplainer")}
+              </p>
               <div className="grid grid-cols-3 gap-2 mb-4">
                 {/* Slot 0: the principal photo — backend-persisted, shown everywhere else */}
                 <div className="relative aspect-square rounded-2xl overflow-hidden ring-2 ring-[#000000] ring-offset-1">
@@ -388,17 +423,23 @@ export function ProfilePage() {
                   <div className="absolute top-1.5 left-1.5 bg-[#000000] rounded-full px-1.5 py-0.5">
                     <span className="text-[9px] font-bold text-white">{t("main")}</span>
                   </div>
-                  <button
-                    onClick={() => mainCameraInputRef.current?.click()}
-                    aria-label={t("editProfilePhoto")}
-                    className="absolute top-1.5 right-1.5 h-6 w-6 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all active:scale-90"
-                  >
-                    <Camera size={12} className="text-white" />
-                  </button>
+                  {uploadingMainPhoto ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => mainCameraInputRef.current?.click()}
+                      aria-label={t("editProfilePhoto")}
+                      className="absolute top-1.5 right-1.5 h-6 w-6 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all active:scale-90"
+                    >
+                      <Camera size={12} className="text-white" />
+                    </button>
+                  )}
                 </div>
 
-                {/* Slots 1-8: the additional match/swipe gallery photos */}
-                {Array.from({ length: 8 }).map((_, i) => {
+                {/* Slots 1-8: the additional match/swipe gallery photos, shown on Descubrir cards */}
+                {Array.from({ length: maxPhotos }).map((_, i) => {
                   const photo = photos[i]
                   return (
                     <div
@@ -411,16 +452,28 @@ export function ProfilePage() {
                         <>
                           <Image src={photo} alt={`Photo ${i + 2}`} fill className="object-cover" />
                           <button
-                            onClick={() => removePhoto(i)}
+                            onClick={async () => {
+                              try {
+                                await removePhoto(i)
+                              } catch (error) {
+                                console.error("Failed to remove photo:", error)
+                                showToast(t("alerts.photoRemoveFailed"), "error")
+                              }
+                            }}
                             className="absolute top-1.5 right-1.5 h-6 w-6 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all active:scale-90"
                           >
                             <X size={12} className="text-white" />
                           </button>
                         </>
+                      ) : i === photos.length && uploadingGalleryPhoto ? (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#8E8E93] border-t-transparent" />
+                        </div>
                       ) : (
                         <button
                           onClick={() => galleryInputRef.current?.click()}
-                          className="w-full h-full flex flex-col items-center justify-center gap-1 transition-all active:scale-95"
+                          disabled={uploadingGalleryPhoto}
+                          className="w-full h-full flex flex-col items-center justify-center gap-1 transition-all active:scale-95 disabled:opacity-40"
                         >
                           <ImagePlus size={20} className="text-[#C7C7CC]" />
                         </button>

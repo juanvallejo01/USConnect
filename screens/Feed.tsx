@@ -52,6 +52,8 @@ export function FeedPage() {
   const [postRanks, setPostRanks] = useState<Map<string, number>>(new Map())
   const [userRanks, setUserRanks] = useState<Map<string, number>>(new Map())
   const offsetRef = useRef(0)
+  const feedScrollRef = useRef<HTMLDivElement>(null)
+  const fetchingFeedRef = useRef(false)
   const [showCreatePost, setShowCreatePost] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [newPostContent, setNewPostContent] = useState("")
@@ -120,6 +122,8 @@ export function FeedPage() {
   }
 
   const loadFeed = async () => {
+    if (fetchingFeedRef.current) return
+    fetchingFeedRef.current = true
     try {
       setLoading(true)
       const data = await postsApi.getFeed(0, FEED_PAGE_SIZE)
@@ -130,7 +134,13 @@ export function FeedPage() {
       console.error("Failed to load feed:", error)
     } finally {
       setLoading(false)
+      fetchingFeedRef.current = false
     }
+  }
+
+  const handleLogoClick = () => {
+    feedScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })
+    loadFeed()
   }
 
   const loadMorePosts = async () => {
@@ -207,13 +217,13 @@ export function FeedPage() {
 
   const handleCreatePost = async () => {
     if (creating) return
-    
-    // Debe haber al menos una imagen
-    if (selectedImages.length === 0) {
-      alert(t("alerts.needImage"))
+
+    // Debe haber al menos una imagen o texto
+    if (selectedImages.length === 0 && !newPostContent.trim()) {
+      alert(t("alerts.needContentOrImage"))
       return
     }
-    
+
     try {
       setCreating(true)
 
@@ -298,7 +308,13 @@ export function FeedPage() {
       <GradientHeader
         title={
           <div className="flex items-center gap-3">
-            <Logo size="md" className="text-black dark:text-white shrink-0" />
+            <button
+              onClick={handleLogoClick}
+              aria-label={t("refreshFeed")}
+              className="shrink-0 transition-all active:scale-90"
+            >
+              <Logo size="md" className="text-black dark:text-white" />
+            </button>
             <div className="relative flex-1 min-w-0">
               <div className="relative">
                 <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
@@ -342,15 +358,15 @@ export function FeedPage() {
         rightAction={
           <button
             onClick={() => setShowCreatePost(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-all active:scale-90 shrink-0"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#EBEBF0] bg-black/5 dark:border-transparent dark:bg-white/15 backdrop-blur-sm transition-all active:scale-90 shrink-0"
             aria-label={t("createPost")}
           >
-            <Plus size={20} className="text-white" strokeWidth={2.5} />
+            <Plus size={20} className="text-black dark:text-white" strokeWidth={2.5} />
           </button>
         }
       />
 
-      <div className="flex-1 overflow-y-auto" onScroll={handleFeedScroll}>
+      <div ref={feedScrollRef} className="flex-1 overflow-y-auto" onScroll={handleFeedScroll}>
         {/* Create Post Button — scrolls away with the feed, like Instagram's composer bar */}
         <div className="bg-white border-b border-[#EBEBF0] px-4 py-3">
           <button
@@ -438,7 +454,7 @@ export function FeedPage() {
               <h2 className="text-base font-bold text-[#1A1A2E]">{t("newPost")}</h2>
               <button
                 onClick={handleCreatePost}
-                disabled={creating || selectedImages.length === 0}
+                disabled={creating || (selectedImages.length === 0 && !newPostContent.trim())}
                 className="px-4 py-1.5 bg-primary text-primary-foreground rounded-full font-semibold text-sm cloud-shadow micro-press focus-ring disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {creating ? t("posting") : t("share")}
@@ -461,20 +477,11 @@ export function FeedPage() {
               <textarea
                 value={newPostContent}
                 onChange={(e) => setNewPostContent(e.target.value)}
-                placeholder={selectedImages.length > 0 ? t("writeCaption") : t("addImageFirst")}
+                placeholder={t("writeCaption")}
                 rows={imagePreviews.length > 0 ? 3 : 5}
                 className="w-full border-none bg-transparent px-0 py-2 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none resize-none"
                 autoFocus
-                disabled={selectedImages.length === 0}
               />
-
-              {selectedImages.length === 0 && newPostContent.trim() && (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2">
-                  <p className="text-xs text-amber-800">
-                    {t("addImageNotice")}
-                  </p>
-                </div>
-              )}
 
               {imagePreviews.length > 0 && (
                 <div className="relative w-full rounded-2xl overflow-hidden mt-4 bg-[#EBEBF0]">

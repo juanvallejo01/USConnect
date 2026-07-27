@@ -133,6 +133,7 @@ export function UserProfile({ userId, onClose }: UserProfileProps) {
 
   const handleSubmitReport = async () => {
     if (!reportReason) return
+    if (reportReason === "OTHER" && !reportDetails.trim()) return
     setReportSubmitting(true)
     try {
       await reportsApi.createReport({
@@ -489,9 +490,20 @@ export function UserProfile({ userId, onClose }: UserProfileProps) {
                       </button>
                     ))}
                   </div>
+                  {reportReason === "OTHER" && (
+                    <textarea
+                      autoFocus
+                      value={reportDetails}
+                      onChange={(e) => setReportDetails(e.target.value)}
+                      placeholder={t("reportDetailsPlaceholder")}
+                      rows={3}
+                      maxLength={500}
+                      className="w-full rounded-2xl border border-[#EBEBF0] bg-white px-4 py-2.5 text-[13px] text-[#1A1A2E] outline-none focus:border-[#000000] resize-none leading-relaxed mb-4"
+                    />
+                  )}
                   <button
                     onClick={handleSubmitReport}
-                    disabled={!reportReason || reportSubmitting}
+                    disabled={!reportReason || reportSubmitting || (reportReason === "OTHER" && !reportDetails.trim())}
                     className="w-full py-3 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm transition-all active:scale-95 disabled:opacity-40"
                   >
                     {reportSubmitting ? t("reportSubmitting") : t("reportSubmit")}

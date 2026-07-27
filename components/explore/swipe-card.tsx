@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react"
 import Image from "next/image"
-import { Info, MapPin, Trophy } from "lucide-react"
+import { MapPin, Trophy } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 interface SwipeProfile {
@@ -168,41 +168,31 @@ export function SwipeCard({
           )}
         </div>
 
-        <div className="flex items-end gap-3">
-          <div className="flex-1 min-w-0">
-            {/* Name + Age */}
-            <div className="flex items-baseline gap-2.5 flex-wrap">
-              <h2 className="text-[28px] font-bold text-white leading-none drop-shadow">
-                {profile.name}
-              </h2>
-              {profile.age && <span className="text-[22px] font-light text-white/90">{profile.age}</span>}
-            </div>
-
-            {/* Bio (falls back to major when there's no real bio) */}
-            <p className="text-sm text-white/72 mt-1.5 line-clamp-2 leading-snug">
-              {profile.bio || profile.major}
-            </p>
-
-            {/* Interest chips (falls back to major when there are no real interests) */}
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {(profile.interests?.length ? profile.interests.slice(0, 3) : [profile.major]).map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-xl bg-white/25 backdrop-blur-lg px-3 py-1 text-xs font-medium text-white"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+        <div className="flex-1 min-w-0">
+          {/* Name + Age */}
+          <div className="flex items-baseline gap-2.5 flex-wrap">
+            <h2 className="text-[28px] font-bold text-white leading-none drop-shadow">
+              {profile.name}
+            </h2>
+            {profile.age && <span className="text-[22px] font-light text-white/90">{profile.age}</span>}
           </div>
 
-          {/* Info / expand button */}
-          <button
-            className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-2xl border-2 border-white/50 bg-white/20 backdrop-blur-lg transition-all active:scale-90"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Info size={17} className="text-white" />
-          </button>
+          {/* Bio (falls back to major when there's no real bio) */}
+          <p className="text-sm text-white/72 mt-1.5 line-clamp-2 leading-snug">
+            {profile.bio || profile.major}
+          </p>
+
+          {/* Interest chips (falls back to major when there are no real interests) */}
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {(profile.interests?.length ? profile.interests.slice(0, 3) : [profile.major]).map((tag) => (
+              <span
+                key={tag}
+                className="rounded-xl bg-white/25 backdrop-blur-lg px-3 py-1 text-xs font-medium text-white"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </div>

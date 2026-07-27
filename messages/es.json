@@ -112,6 +112,7 @@
     }
   },
   "feed": {
+    "refreshFeed": "Actualizar inicio",
     "searchPlaceholder": "Buscar personas por nombre...",
     "searching": "Buscando...",
     "noPeopleFound": "No se encontraron personas",
@@ -125,15 +126,13 @@
     "defaultUser": "Usuario",
     "defaultMajor": "Estudiante universitario",
     "writeCaption": "Escribe una descripción...",
-    "addImageFirst": "Agrega una imagen primero para escribir una descripción...",
-    "addImageNotice": "📸 Agrega una imagen para publicar con descripción",
     "takePhoto": "Tomar foto",
     "gallery": "Galería",
     "addPhotos": "Agregar fotos",
     "chooseFromGallery": "Elegir de la galería",
     "alerts": {
       "maxImages": "Solo puedes subir hasta 10 imágenes por publicación",
-      "needImage": "Agrega al menos una imagen a tu publicación",
+      "needContentOrImage": "Agrega una imagen o escribe algo para publicar",
       "createFailed": "No se pudo crear la publicación",
       "deleteConfirm": "¿Seguro que quieres eliminar esta publicación?",
       "deleteFailed": "No se pudo eliminar la publicación"
@@ -248,6 +247,7 @@
     "editBanner": "Cambiar banner",
     "removeBanner": "Quitar banner",
     "editProfile": "Editar perfil",
+    "doneEditing": "Listo",
     "defaultUser": "Usuario",
     "addBio": "Añade una bio…",
     "defaultMajorLocation": "USC · Cali",
@@ -257,16 +257,23 @@
     "photosCount": "fotos",
     "noPostsYet": "Aún no hay publicaciones",
     "noPostsHint": "Las publicaciones que compartas en el inicio aparecerán aquí.",
-    "sharePhotos": "Comparte fotos",
-    "sharePhotosHint": "Las fotos que agregues aparecerán aquí.",
+    "sharePhotos": "Comparte tus fotos de Descubrir",
+    "sharePhotosHint": "Estas son las fotos que otras personas ven al hacer swipe en Descubrir.",
     "addFirstPhoto": "Agrega tu primera foto",
     "noHighlightsYet": "Sin destacados aún",
     "noHighlightsHint": "Los posts con más likes aparecerán aquí.",
-    "managePhotos": "Gestionar fotos",
-    "myPhotos": "Mis fotos",
+    "managePhotos": "Gestionar fotos de Descubrir",
+    "myPhotos": "Fotos de Descubrir",
+    "photosExplainer": "📸 Estas fotos son las que ven otras personas cuando aparezcas en Descubrir. La foto PRINCIPAL siempre se muestra primero.",
     "main": "PRINCIPAL",
     "weeklyRank": "Top #{rank} esta semana",
-    "editProfilePhoto": "Cambiar foto de perfil"
+    "editProfilePhoto": "Cambiar foto de perfil",
+    "alerts": {
+      "photoTooLarge": "La imagen es demasiado pesada (máx. 15MB)",
+      "photosLimitReached": "Ya tienes el máximo de {max} fotos. Elimina una para agregar otra.",
+      "photoUploadFailed": "No se pudo subir la foto. Intenta de nuevo.",
+      "photoRemoveFailed": "No se pudo eliminar la foto. Intenta de nuevo."
+    }
   },
   "chat": {
     "goBack": "Volver",
@@ -304,6 +311,7 @@
     "report": "Reportar",
     "reportTitle": "Reportar a {name}",
     "reportPrompt": "¿Por qué quieres reportar este perfil?",
+    "reportDetailsPlaceholder": "Cuéntanos qué pasó...",
     "reportSubmit": "Enviar reporte",
     "reportSubmitting": "Enviando...",
     "reportSubmitted": "Reporte enviado. Nuestro equipo lo revisará.",

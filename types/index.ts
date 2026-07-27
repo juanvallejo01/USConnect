@@ -7,6 +7,7 @@ export interface User {
   role: 'USER' | 'ADMIN';
   likesCount: number;
   photoUrl?: string | null;
+  photos?: string[];
   createdAt: string;
   avatar?: string; // For frontend display
 }

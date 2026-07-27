@@ -195,7 +195,7 @@ export const usersApi = {
     return response.data;
   },
 
-  updateProfile: async (data: { name?: string; major?: string; photoUrl?: string }) => {
+  updateProfile: async (data: { name?: string; major?: string; photoUrl?: string; photos?: string[] }) => {
     const response = await api.put(ENDPOINTS.updateProfile, data);
     return response.data;
   },

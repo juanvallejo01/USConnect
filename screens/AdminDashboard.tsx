@@ -33,7 +33,7 @@ export function AdminDashboardPage({ onClose }: AdminDashboardPageProps) {
   }
 
   return (
-    <MobileFrame showStatusBar={false}>
+    <MobileFrame>
       <div className="bg-[#000000] px-5 pt-12 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

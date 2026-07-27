@@ -18,6 +18,8 @@ interface ExploreUser {
   name: string
   major: string
   likesCount: number
+  photoUrl?: string | null
+  photos?: string[]
 }
 
 export function ExplorePage() {
@@ -143,6 +145,7 @@ export function ExplorePage() {
               key={`${profile.id}-${currentIndex}`}
               profile={profile}
               onSwipe={handleSwipe}
+              overridePhotos={profile.photos?.length ? profile.photos : profile.photoUrl ? [profile.photoUrl] : []}
               rank={userRanks.get(profile.id)}
             />
           </div>
@@ -169,16 +172,6 @@ export function ExplorePage() {
       {/* ── ACTION BUTTONS ROW ── */}
       <div className="bg-[#F8F8FA] dark:bg-[#141416] flex items-center justify-center gap-8 px-8 py-5 border-t border-[#EBEBF0] dark:border-[#262622] cloud-shadow">
 
-        {/* Undo — small, tertiary */}
-        <button
-          onClick={handleUndo}
-          disabled={currentIndex === 0 || !canUndo}
-          className="flex h-[52px] w-[52px] items-center justify-center rounded-[28px] bg-white dark:bg-[#1C1C1E] transition-all active:scale-90 disabled:opacity-30"
-          style={{ boxShadow: "0 2px 16px rgba(245,167,66,0.2)" }}
-        >
-          <RotateCcw size={22} className="text-[#F5A742]" strokeWidth={2.2} />
-        </button>
-
         {/* Nope — primary action */}
         <button
           onClick={() => handleSwipe("left")}
@@ -187,6 +180,16 @@ export function ExplorePage() {
           style={{ boxShadow: "0 2px 16px rgba(255,68,88,0.2)" }}
         >
           <X size={28} className="text-[#FF4458]" strokeWidth={2.8} />
+        </button>
+
+        {/* Undo — small, tertiary */}
+        <button
+          onClick={handleUndo}
+          disabled={currentIndex === 0 || !canUndo}
+          className="flex h-[52px] w-[52px] items-center justify-center rounded-[28px] bg-white dark:bg-[#1C1C1E] transition-all active:scale-90 disabled:opacity-30"
+          style={{ boxShadow: "0 2px 16px rgba(245,167,66,0.2)" }}
+        >
+          <RotateCcw size={22} className="text-[#F5A742]" strokeWidth={2.2} />
         </button>
 
         {/* Like — hero action, biggest */}
