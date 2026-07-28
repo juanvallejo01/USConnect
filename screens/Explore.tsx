@@ -4,12 +4,12 @@ import { useState, useEffect, useCallback } from "react"
 import { X, Heart, RotateCcw, Sparkles } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { SwipeCard } from "@/components/explore/swipe-card"
-import { UserAvatar } from "@/components/layout/user-avatar"
+import { PhotoGallery } from "@/components/explore/photo-gallery"
 import { useMatch } from "@/context/match-context"
 import { useChat } from "@/context/chat-context"
 import { useNotification } from "@/context/notification-context"
-import { useAuth } from "@/context/auth-context"
 import { usersApi, leaderboardApi } from "@/lib/api-client"
+import { getDisplayPhotos } from "@/lib/photos"
 
 const RANKED_USERS_LIMIT = 100
 
@@ -24,7 +24,6 @@ interface ExploreUser {
 
 export function ExplorePage() {
   const t = useTranslations("explore")
-  const { user } = useAuth()
   const [profiles, setProfiles] = useState<ExploreUser[]>([])
   const [loadingProfiles, setLoadingProfiles] = useState(true)
   const [userRanks, setUserRanks] = useState<Map<string, number>>(new Map())
@@ -145,19 +144,11 @@ export function ExplorePage() {
               key={`${profile.id}-${currentIndex}`}
               profile={profile}
               onSwipe={handleSwipe}
-              overridePhotos={profile.photos?.length ? profile.photos : profile.photoUrl ? [profile.photoUrl] : []}
+              overridePhotos={getDisplayPhotos(profile.photoUrl, profile.photos)}
               rank={userRanks.get(profile.id)}
             />
           </div>
         )}
-
-        {/* ── TOP BAR OVERLAY ── */}
-        <div className="absolute top-0 left-0 right-0 z-30 flex items-center px-5 py-3.5 pointer-events-none">
-          {/* Logo */}
-          <span className="text-[17px] font-bold text-white drop-shadow-sm tracking-tight pointer-events-auto">
-            {t("title")}
-          </span>
-        </div>
 
         {/* Match banner */}
         {matched && !swipeDirection && (
@@ -228,9 +219,12 @@ export function ExplorePage() {
                 {t("itsAMatch")}
               </h2>
               <p className="text-[#8E8E93] mb-6">{t("likedEachOther", { name: matchedProfile.name })}</p>
-              <div className="flex gap-3 mb-6 justify-center">
-                <UserAvatar alt={matchedProfile.name} size="xl" gradientRing />
-                <UserAvatar alt={user?.name ?? t("you")} size="xl" gradientRing />
+              <div className="mb-6 flex justify-center">
+                <PhotoGallery
+                  photos={getDisplayPhotos(matchedProfile.photoUrl, matchedProfile.photos)}
+                  alt={matchedProfile.name}
+                  className="w-full max-w-[220px] aspect-[3/4] rounded-3xl"
+                />
               </div>
               <div className="flex gap-3">
                 <button

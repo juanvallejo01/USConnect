@@ -10,8 +10,10 @@ import { GradientHeader } from "@/components/layout/gradient-header"
 import { UserAvatar } from "@/components/layout/user-avatar"
 import { ProfileAvatarImage, useThemedAvatarSrc } from "@/components/layout/profile-avatar-image"
 import { LikeReviewModal } from "@/components/explore/like-review-modal"
+import { PhotoGallery } from "@/components/explore/photo-gallery"
 import { messagesApi } from "@/lib/api-client"
 import { formatRelativeTime } from "@/utils/relative-time"
+import { getDisplayPhotos } from "@/lib/photos"
 import type { Notification } from "@/types"
 
 interface ConversationEntry {
@@ -89,7 +91,7 @@ export function MatchesPage() {
   const [loading, setLoading] = useState(true)
   const [reviewing, setReviewing] = useState<Notification | null>(null)
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
-  const [justMatchedWith, setJustMatchedWith] = useState<string | null>(null)
+  const [justMatchedWith, setJustMatchedWith] = useState<NonNullable<Notification["fromUser"]> | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -126,10 +128,10 @@ export function MatchesPage() {
     const result = await likeUser(reviewing.fromUser.id)
     setReviewSubmitting(false)
     markAsRead(reviewing.id)
-    const name = reviewing.fromUser.name
+    const matchedFromUser = reviewing.fromUser
     setReviewing(null)
     if (result.success && result.matched) {
-      setJustMatchedWith(name)
+      setJustMatchedWith(matchedFromUser)
       const data = await messagesApi.getConversations()
       setConversations(data)
     }
@@ -205,7 +207,14 @@ export function MatchesPage() {
           <div className="text-center">
             <div className="text-6xl mb-4 animate-bounce">🎉</div>
             <h2 className="text-2xl font-bold text-white mb-2">{t("itsAMatch")}</h2>
-            <p className="text-white/90 mb-6">{t("likedEachOther", { name: justMatchedWith })}</p>
+            <div className="mb-6 flex justify-center" onClick={(e) => e.stopPropagation()}>
+              <PhotoGallery
+                photos={getDisplayPhotos(justMatchedWith.photoUrl, justMatchedWith.photos)}
+                alt={justMatchedWith.name}
+                className="w-full max-w-[220px] aspect-[3/4] rounded-3xl"
+              />
+            </div>
+            <p className="text-white/90 mb-6">{t("likedEachOther", { name: justMatchedWith.name })}</p>
             <button
               onClick={() => setJustMatchedWith(null)}
               className="py-3 px-6 rounded-2xl bg-white text-black font-semibold cloud-shadow-blue transition-all active:scale-95"

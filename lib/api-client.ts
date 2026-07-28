@@ -90,8 +90,18 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
+    // Un 401 en estos endpoints es credenciales/código inválido — parte
+    // normal del flujo de auth, no una sesión expirada. Antes esto disparaba
+    // el intento de refresh-token, que al no haber sesión previa fallaba y
+    // forzaba un window.location.href = '/' (recarga completa que borraba
+    // el mensaje de error y devolvía al usuario al landing en vez de
+    // mostrarle "credenciales inválidas").
+    const isAuthFlowRequest = [ENDPOINTS.login, ENDPOINTS.register, ENDPOINTS.verifyOtp].some(
+      (endpoint) => originalRequest.url?.includes(endpoint)
+    );
+
     // If error is 401 and we haven't retried yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthFlowRequest) {
       if (isRefreshing) {
         // Wait for the refresh to complete
         return new Promise((resolve) => {
@@ -220,7 +230,7 @@ export const usersApi = {
     return response.data;
   },
 
-  updateProfile: async (data: { name?: string; nickname?: string; major?: string; photoUrl?: string; photos?: string[]; bio?: string; bannerUrl?: string | null }) => {
+  updateProfile: async (data: { name?: string; nickname?: string; major?: string; photoUrl?: string | null; photos?: string[]; bio?: string; bannerUrl?: string | null }) => {
     const response = await api.put(ENDPOINTS.updateProfile, data);
     return response.data;
   },
@@ -327,6 +337,11 @@ export const messagesApi = {
   getConversations: async () => {
     const response = await api.get(ENDPOINTS.conversations);
     return response.data;
+  },
+
+  getUnreadCount: async () => {
+    const response = await api.get(ENDPOINTS.messagesUnreadCount);
+    return response.data as { count: number };
   },
 
   getConversation: async (userId: string) => {

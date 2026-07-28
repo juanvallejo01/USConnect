@@ -3,7 +3,10 @@
 import { useState, useEffect, useRef } from "react"
 import { Plus, X, Image as ImageIcon, Trash2, Camera, Search } from "lucide-react"
 import Image from "next/image"
+import { Caveat } from "next/font/google"
 import { useTranslations } from "next-intl"
+
+const caveat = Caveat({ subsets: ["latin"], weight: ["700"] })
 import { GradientHeader } from "@/components/layout/gradient-header"
 import { Logo } from "@/components/layout/logo"
 import { PostCard } from "@/components/feed/post-card"
@@ -358,10 +361,10 @@ export function FeedPage() {
         rightAction={
           <button
             onClick={() => setShowCreatePost(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#EBEBF0] bg-black/5 dark:border-transparent dark:bg-white/15 backdrop-blur-sm transition-all active:scale-90 shrink-0"
+            className="flex h-9 w-9 items-center justify-center transition-all active:scale-90 shrink-0"
             aria-label={t("createPost")}
           >
-            <Plus size={20} className="text-black dark:text-white" strokeWidth={2.5} />
+            <span className={`${caveat.className} text-[30px] leading-none text-black dark:text-white select-none -translate-y-1`}>+</span>
           </button>
         }
       />

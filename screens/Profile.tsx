@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from "react"
 import {
-  Camera, LogOut, Moon, Sun, Plus, ImagePlus, X,
+  Camera, LogOut, Moon, Sun, Plus, X,
   MapPin, CalendarDays, MessageSquare, Trophy,
-  Settings, Ban, ChevronLeft, ChevronRight,
+  Settings, Ban, ChevronLeft, ChevronRight, Globe,
 } from "lucide-react"
 import Image from "next/image"
 import { useTheme } from "next-themes"
@@ -22,6 +22,7 @@ import { compressImageToDataUrl } from "@/lib/image-compression"
 const DELETE_CONFIRM_PHRASE = "borrar cuenta"
 
 const RANKED_USERS_LIMIT = 100
+const RANKED_POSTS_LIMIT = 100
 
 export function ProfilePage() {
   const t = useTranslations("profile")
@@ -38,7 +39,6 @@ export function ProfilePage() {
   const [bioDraft, setBioDraft] = useState("")
   const [savingBio, setSavingBio] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [showPhotoManager, setShowPhotoManager] = useState(false)
   const { photos, maxPhotos, addPhoto, removePhoto } = useProfilePhotos()
   const [uploadingMainPhoto, setUploadingMainPhoto] = useState(false)
   const [uploadingGalleryPhoto, setUploadingGalleryPhoto] = useState(false)
@@ -50,6 +50,7 @@ export function ProfilePage() {
   const [posts, setPosts] = useState<any[]>([])
   const [loadingPosts, setLoadingPosts] = useState(true)
   const [weeklyRank, setWeeklyRank] = useState<number | undefined>(undefined)
+  const [postRanks, setPostRanks] = useState<Map<string, number>>(new Map())
 
   // ── Configuración (bloqueados, apodo, borrar cuenta) ──
   const [showSettings, setShowSettings] = useState(false)
@@ -78,6 +79,18 @@ export function ProfilePage() {
         setWeeklyRank(ranking.find((u) => u.id === user.id)?.rank)
       })
       .catch((error) => console.error("Failed to load weekly rank:", error))
+  }, [user?.id])
+
+  // Ranking de cada publicación (top #N), igual que en Inicio — el ranking
+  // del usuario ya se muestra arriba en el perfil, así que aquí solo se
+  // pasa el ranking por publicación (postRank), no el del autor.
+  useEffect(() => {
+    if (!user?.id) return
+    leaderboardApi.getPostsRanking(RANKED_POSTS_LIMIT)
+      .then((ranking: { id: string; rank: number }[]) => {
+        setPostRanks(new Map(ranking.map((p) => [p.id, p.rank])))
+      })
+      .catch((error) => console.error("Failed to load post rankings:", error))
   }, [user?.id])
 
   const handleLikePost = async (postId: string) => {
@@ -154,6 +167,19 @@ export function ProfilePage() {
     } catch (error) {
       console.error("Failed to save profile photo:", error)
       showToast(t("alerts.photoUploadFailed"), "error")
+    } finally {
+      setUploadingMainPhoto(false)
+    }
+  }
+
+  const handleRemoveMainPhoto = async () => {
+    setUploadingMainPhoto(true)
+    try {
+      await usersApi.updateProfile({ photoUrl: null })
+      await refreshUser()
+    } catch (error) {
+      console.error("Failed to remove profile photo:", error)
+      showToast(t("alerts.photoRemoveFailed"), "error")
     } finally {
       setUploadingMainPhoto(false)
     }
@@ -302,13 +328,6 @@ export function ProfilePage() {
         )}
 
         <div className="absolute top-3 right-3 flex items-center gap-1.5">
-          <button
-            onClick={() => setLocale(locale === "es" ? "en" : "es")}
-            className="flex h-8 px-2.5 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-all active:scale-90"
-            aria-label={t("switchLanguage")}
-          >
-            <span className="text-[11px] font-bold text-white uppercase tracking-wide">{locale}</span>
-          </button>
           {mounted && (
             <button
               onClick={() => setTheme(isDark ? "light" : "dark")}
@@ -375,14 +394,6 @@ export function ProfilePage() {
 
         {/* Right-side action buttons */}
         <div className="flex justify-end gap-2 pt-3">
-          {isEditing && (
-            <button
-              onClick={() => setShowPhotoManager(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#EBEBF0] bg-white transition-all active:scale-90"
-            >
-              <Camera size={16} className="text-[#1A1A2E]" />
-            </button>
-          )}
           <button
             onClick={handleToggleEditing}
             disabled={savingBio}
@@ -445,7 +456,7 @@ export function ProfilePage() {
               <span className="text-[14px] font-bold text-[#1A1A2E]">{likesReceived}</span>
               <span className="text-[14px] text-[#8E8E93]">{t("likesCount")}</span>
             </div>
-            <button onClick={() => setShowPhotoManager(true)} className="flex items-center gap-1 active:opacity-70">
+            <button onClick={() => setActiveTab(1)} className="flex items-center gap-1 active:opacity-70">
               <span className="text-[14px] font-bold text-[#1A1A2E]">{photos.length}</span>
               <span className="text-[14px] text-[#8E8E93]">{t("photosCount")}</span>
             </button>
@@ -489,6 +500,8 @@ export function ProfilePage() {
                   onUnlike={handleUnlikePost}
                   onComment={handleCommentPost}
                   onDelete={handleDeletePost}
+                  showRanking
+                  postRank={postRanks.get(post.id)}
                 />
               ))}
             </div>
@@ -504,69 +517,20 @@ export function ProfilePage() {
         </div>
       )}
 
-      {/* ── Fotos tab: photos used for matching/swiping ── */}
+      {/* ── Fotos tab: profile photo + match/swipe gallery, managed inline ── */}
       {activeTab === 1 && (
-        <div className="grid grid-cols-3 gap-[1.5px]">
-          {photos.map((photo, i) => (
-            <div key={i} className="relative aspect-square">
-              <Image src={photo} alt={`Photo ${i + 1}`} fill className="object-cover" />
-            </div>
-          ))}
-          {photos.length === 0 && (
-            <div className="col-span-3 flex flex-col items-center justify-center py-16 gap-4 px-8">
-              <div className="h-16 w-16 rounded-full border-2 border-[#C7C7CC] flex items-center justify-center">
-                <Camera size={28} className="text-[#C7C7CC]" />
-              </div>
-              <div className="text-center">
-                <p className="text-[16px] font-bold text-[#1A1A2E]">{t("sharePhotos")}</p>
-                <p className="text-[13px] text-[#8E8E93] mt-1 leading-snug">{t("sharePhotosHint")}</p>
-              </div>
-              <button onClick={() => setShowPhotoManager(true)} className="text-[13px] font-semibold text-[#000000]">
-                {t("addFirstPhoto")}
-              </button>
-            </div>
-          )}
-          {photos.length > 0 && (
-            <button
-              onClick={() => setShowPhotoManager(true)}
-              className="col-span-3 flex items-center justify-center gap-2 py-4 text-[13px] font-semibold text-[#000000]"
-            >
-              <Plus size={16} />
-              {t("managePhotos")}
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* ── Photo Manager Sheet ── */}
-      {showPhotoManager && (
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center"
-          onClick={() => setShowPhotoManager(false)}
-        >
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-          <div className="relative w-full max-w-sm bg-white rounded-t-3xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="w-10 h-1 bg-[#EBEBF0] rounded-full mx-auto mt-4 mb-1" />
-            <div className="flex items-center justify-between px-5 py-3 border-b border-[#EBEBF0]">
-              <h3 className="text-base font-bold text-[#1A1A2E]">{t("myPhotos")}</h3>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#C7C7CC]">{photos.length}/{maxPhotos}</span>
-                <button
-                  onClick={() => setShowPhotoManager(false)}
-                  className="h-8 w-8 flex items-center justify-center rounded-full bg-[#EBEBF0] transition-all active:scale-90"
-                >
-                  <X size={16} className="text-[#8E8E93]" />
-                </button>
-              </div>
-            </div>
-            <div className="p-4 pb-8">
-              <p className="text-xs text-[#8E8E93] leading-snug mb-3">
-                {t("photosExplainer")}
-              </p>
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                {/* Slot 0: the principal photo — backend-persisted, shown everywhere else */}
-                <div className="relative aspect-square rounded-2xl overflow-hidden ring-2 ring-[#000000] ring-offset-1">
-                  <ProfileAvatarImage photoUrl={user?.photoUrl} name={user?.name || "?"} fill rounded="rounded-2xl" />
+        <div className="p-4">
+          <p className="text-xs text-[#8E8E93] leading-snug mb-3">
+            {t("photosExplainer")}
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {/* Slot 0: the principal photo — backend-persisted, shown everywhere else.
+                Empty ("primera publicación") shows a + tile just like the gallery slots. */}
+            <div className="relative aspect-square rounded-2xl overflow-hidden">
+              {user?.photoUrl ? (
+                <>
+                  <ProfileAvatarImage photoUrl={user.photoUrl} name={user?.name || "?"} fill rounded="rounded-2xl" />
+                  <div className="absolute inset-0 ring-2 ring-[#000000] ring-inset rounded-2xl pointer-events-none" />
                   <div className="absolute top-1.5 left-1.5 bg-[#000000] rounded-full px-1.5 py-0.5">
                     <span className="text-[9px] font-bold text-white">{t("main")}</span>
                   </div>
@@ -575,61 +539,76 @@ export function ProfilePage() {
                       <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     </div>
                   ) : (
-                    <button
-                      onClick={() => mainCameraInputRef.current?.click()}
-                      aria-label={t("editProfilePhoto")}
-                      className="absolute top-1.5 right-1.5 h-6 w-6 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all active:scale-90"
-                    >
-                      <Camera size={12} className="text-white" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Slots 1-8: the additional match/swipe gallery photos, shown on Descubrir cards */}
-                {Array.from({ length: maxPhotos }).map((_, i) => {
-                  const photo = photos[i]
-                  return (
-                    <div
-                      key={i}
-                      className={`relative aspect-square rounded-2xl overflow-hidden ${
-                        photo ? "" : "border-2 border-dashed border-[#EBEBF0] bg-[#F8F8FA]"
-                      }`}
-                    >
-                      {photo ? (
-                        <>
-                          <Image src={photo} alt={`Photo ${i + 2}`} fill className="object-cover" />
-                          <button
-                            onClick={async () => {
-                              try {
-                                await removePhoto(i)
-                              } catch (error) {
-                                console.error("Failed to remove photo:", error)
-                                showToast(t("alerts.photoRemoveFailed"), "error")
-                              }
-                            }}
-                            className="absolute top-1.5 right-1.5 h-6 w-6 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all active:scale-90"
-                          >
-                            <X size={12} className="text-white" />
-                          </button>
-                        </>
-                      ) : i === photos.length && uploadingGalleryPhoto ? (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#8E8E93] border-t-transparent" />
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => galleryInputRef.current?.click()}
-                          disabled={uploadingGalleryPhoto}
-                          className="w-full h-full flex flex-col items-center justify-center gap-1 transition-all active:scale-95 disabled:opacity-40"
-                        >
-                          <ImagePlus size={20} className="text-[#C7C7CC]" />
-                        </button>
-                      )}
+                    <div className="absolute top-1.5 right-1.5 flex items-center gap-1">
+                      <button
+                        onClick={handleRemoveMainPhoto}
+                        aria-label={t("removeProfilePhoto")}
+                        className="h-6 w-6 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all active:scale-90"
+                      >
+                        <X size={12} className="text-white" />
+                      </button>
+                      <button
+                        onClick={() => mainCameraInputRef.current?.click()}
+                        aria-label={t("editProfilePhoto")}
+                        className="h-6 w-6 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all active:scale-90"
+                      >
+                        <Camera size={12} className="text-white" />
+                      </button>
                     </div>
-                  )
-                })}
-              </div>
+                  )}
+                </>
+              ) : uploadingMainPhoto ? (
+                <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-[#EBEBF0] bg-[#F8F8FA]">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#8E8E93] border-t-transparent" />
+                </div>
+              ) : (
+                <button
+                  onClick={() => mainCameraInputRef.current?.click()}
+                  aria-label={t("addFirstPhoto")}
+                  className="w-full h-full flex items-center justify-center border-2 border-dashed border-[#EBEBF0] bg-[#F8F8FA] transition-all active:scale-95"
+                >
+                  <Plus size={22} className="text-[#C7C7CC]" />
+                </button>
+              )}
             </div>
+
+            {/* Slots 1-8: the additional match/swipe gallery photos, shown on Descubrir cards */}
+            {photos.map((photo, i) => (
+              <div key={i} className="relative aspect-square rounded-2xl overflow-hidden">
+                <Image src={photo} alt={`Photo ${i + 2}`} fill className="object-cover" />
+                <button
+                  onClick={async () => {
+                    try {
+                      await removePhoto(i)
+                    } catch (error) {
+                      console.error("Failed to remove photo:", error)
+                      showToast(t("alerts.photoRemoveFailed"), "error")
+                    }
+                  }}
+                  className="absolute top-1.5 right-1.5 h-6 w-6 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all active:scale-90"
+                >
+                  <X size={12} className="text-white" />
+                </button>
+              </div>
+            ))}
+
+            {/* Next empty gallery slot — always visible up to maxPhotos */}
+            {photos.length < maxPhotos && (
+              <div className="relative aspect-square rounded-2xl overflow-hidden border-2 border-dashed border-[#EBEBF0] bg-[#F8F8FA]">
+                {uploadingGalleryPhoto ? (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#8E8E93] border-t-transparent" />
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => galleryInputRef.current?.click()}
+                    className="w-full h-full flex items-center justify-center transition-all active:scale-95"
+                  >
+                    <Plus size={22} className="text-[#C7C7CC]" />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -697,6 +676,18 @@ export function ProfilePage() {
               </div>
             ) : (
               <div className="p-4 pb-8 flex flex-col gap-5">
+                {/* Idioma */}
+                <button
+                  onClick={() => setLocale(locale === "es" ? "en" : "es")}
+                  className="flex items-center justify-between rounded-2xl border border-[#EBEBF0] px-4 py-3 transition-all active:scale-[0.98]"
+                >
+                  <span className="flex items-center gap-2 text-[13px] font-semibold text-[#1A1A2E]">
+                    <Globe size={15} />
+                    {t("settings.language")}
+                  </span>
+                  <span className="text-[13px] font-semibold text-[#8E8E93] uppercase">{locale}</span>
+                </button>
+
                 {/* Bloqueados */}
                 <button
                   onClick={handleOpenBlockedList}

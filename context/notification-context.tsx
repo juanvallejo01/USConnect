@@ -1,12 +1,16 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
-import { notificationsApi } from "@/lib/api-client"
+import { notificationsApi, messagesApi } from "@/lib/api-client"
 import { useAuth } from "./auth-context"
 import type { Notification } from "@/types"
 
 interface NotificationState {
   notifications: Notification[]
+  // Total combinado para el badge: notificaciones sin leer (likes pendientes +
+  // matches que aún no se vieron/respondieron) + mensajes pendientes por leer.
+  // Un match deja de contar en cuanto el usuario abre esa conversación (ya sea
+  // que lea o responda) — eso pasa en el backend, en ChatService.getConversation.
   unreadCount: number
   loading: boolean
   refresh: () => Promise<void>
@@ -19,19 +23,24 @@ const NotificationContext = createContext<NotificationState | null>(null)
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const { isLoggedIn } = useAuth()
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [unreadCount, setUnreadCount] = useState(0)
+  // Se mantienen separados para que markAsRead/markAllAsRead (que solo tocan
+  // notificaciones) nunca pisen el conteo de mensajes pendientes.
+  const [notificationsUnread, setNotificationsUnread] = useState(0)
+  const [messagesUnread, setMessagesUnread] = useState(0)
   const [loading, setLoading] = useState(false)
 
   const refresh = useCallback(async () => {
     if (!isLoggedIn) return
     setLoading(true)
     try {
-      const [list, unread] = await Promise.all([
+      const [list, unread, unreadMessages] = await Promise.all([
         notificationsApi.getNotifications(),
         notificationsApi.getUnreadCount(),
+        messagesApi.getUnreadCount(),
       ])
       setNotifications(list)
-      setUnreadCount(unread.count)
+      setNotificationsUnread(unread.count)
+      setMessagesUnread(unreadMessages.count)
     } catch (error) {
       console.error("Failed to load notifications:", error)
     } finally {
@@ -42,12 +51,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isLoggedIn) {
       refresh()
-      // Light polling so likes/matches from other users show up without a manual refresh
+      // Light polling so likes/matches/messages from other users show up without a manual refresh
       const interval = setInterval(refresh, 15000)
       return () => clearInterval(interval)
     } else {
       setNotifications([])
-      setUnreadCount(0)
+      setNotificationsUnread(0)
+      setMessagesUnread(0)
     }
   }, [isLoggedIn, refresh])
 
@@ -55,7 +65,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     setNotifications((prev) =>
       prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
     )
-    setUnreadCount((prev) => Math.max(0, prev - 1))
+    setNotificationsUnread((prev) => Math.max(0, prev - 1))
     try {
       await notificationsApi.markAsRead(notificationId)
     } catch (error) {
@@ -65,7 +75,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   const markAllAsRead = useCallback(async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
-    setUnreadCount(0)
+    setNotificationsUnread(0)
     try {
       await notificationsApi.markAllRead()
     } catch (error) {
@@ -77,7 +87,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     <NotificationContext.Provider
       value={{
         notifications,
-        unreadCount,
+        unreadCount: notificationsUnread + messagesUnread,
         loading,
         refresh,
         markAsRead,

@@ -1,5 +1,8 @@
 import Image from "next/image"
-import { Home, Compass, MessageCircle, Trophy, User, Heart, MessageSquare, Share2 } from "lucide-react"
+import { Caveat } from "next/font/google"
+import { Home, Compass, MessageCircle, Trophy, User, Heart, MessageSquare, Share2, Search, Plus } from "lucide-react"
+
+const caveat = Caveat({ subsets: ["latin"], weight: ["700"] })
 
 export function PhoneMockup() {
   return (
@@ -8,21 +11,14 @@ export function PhoneMockup() {
       <div className="absolute inset-0 -z-10 scale-90 rounded-full bg-black/10 dark:bg-white/10 blur-3xl" />
 
       <div className="relative aspect-[390/844] w-full overflow-hidden rounded-[42px] bg-background ring-1 ring-black/10 dark:ring-white/10 shadow-2xl">
-        {/* Status bar */}
-        <div className="flex items-center justify-between px-6 pt-3 text-[11px] font-semibold text-foreground">
-          <span>9:41</span>
-          <div className="h-4 w-16 rounded-full bg-foreground/10" />
-        </div>
-
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-2">
-          <span
-            className="text-xl leading-none text-foreground"
-            style={{ fontFamily: "var(--font-jakarta)", fontStyle: "italic" }}
-          >
-            Ve!
-          </span>
-          <div className="h-6 w-6 rounded-full bg-foreground/10" />
+        {/* Header — mirrors the real Inicio header: logo, search bar, + */}
+        <div className="flex items-center gap-2 px-3 pt-5">
+          <span className={`${caveat.className} text-2xl leading-none text-foreground shrink-0`}>Ve!</span>
+          <div className="flex-1 h-6 flex items-center gap-1.5 rounded-full bg-foreground/10 px-2.5">
+            <Search size={10} className="text-foreground/40 shrink-0" />
+            <div className="h-1.5 w-12 rounded-full bg-foreground/15" />
+          </div>
+          <Plus size={16} className="text-foreground shrink-0" strokeWidth={2.5} />
         </div>
 
         {/* Mini post card */}

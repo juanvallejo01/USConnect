@@ -48,6 +48,7 @@ export const ENDPOINTS = {
   getConversation: (userId: string) => `/messages/conversation/${userId}`,
   reportScreenshot: (userId: string) => `/messages/screenshot/${userId}`,
   typing: (userId: string) => `/messages/typing/${userId}`,
+  messagesUnreadCount: '/messages/unread-count',
   
   // Notifications
   notifications: '/notifications',

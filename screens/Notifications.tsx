@@ -15,7 +15,8 @@ import type { Notification } from "@/types"
 export function NotificationsPage() {
   const t = useTranslations("notificationsPage")
   const tTime = useTranslations("time")
-  const { notifications, markAsRead, markAllAsRead, unreadCount } = useNotification()
+  const { notifications, markAsRead, markAllAsRead } = useNotification()
+  const hasUnreadNotifications = notifications.some((n) => !n.read)
   const { openChat } = useChat()
   const { likeUser } = useMatch()
   const [reviewing, setReviewing] = useState<Notification | null>(null)
@@ -58,7 +59,7 @@ export function NotificationsPage() {
 
       <div className="flex-1 overflow-y-auto">
         {/* Header actions */}
-        {unreadCount > 0 && (
+        {hasUnreadNotifications && (
           <div className="p-4 flex justify-end">
             <button
               onClick={markAllAsRead}

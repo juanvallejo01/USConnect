@@ -90,7 +90,7 @@ export interface Notification {
   referenceId: string;
   read: boolean;
   createdAt: string;
-  fromUser: { id: string; name: string; major: string; photoUrl?: string | null } | null;
+  fromUser: { id: string; name: string; major: string; photoUrl?: string | null; photos?: string[] | null } | null;
 }
 
 export interface LeaderboardEntry {

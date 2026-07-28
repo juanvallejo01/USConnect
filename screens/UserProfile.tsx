@@ -490,16 +490,21 @@ export function UserProfile({ userId, onClose }: UserProfileProps) {
                       </button>
                     ))}
                   </div>
-                  {reportReason === "OTHER" && (
-                    <textarea
-                      autoFocus
-                      value={reportDetails}
-                      onChange={(e) => setReportDetails(e.target.value)}
-                      placeholder={t("reportDetailsPlaceholder")}
-                      rows={3}
-                      maxLength={500}
-                      className="w-full rounded-2xl border border-[#EBEBF0] bg-white px-4 py-2.5 text-[13px] text-[#1A1A2E] outline-none focus:border-[#000000] resize-none leading-relaxed mb-4"
-                    />
+                  {reportReason && (
+                    <div className="mb-4">
+                      <label className="block text-[11px] font-semibold text-[#8E8E93] uppercase tracking-wider mb-1.5">
+                        {reportReason === "OTHER" ? t("reportDetailsLabelRequired") : t("reportDetailsLabelOptional")}
+                      </label>
+                      <textarea
+                        autoFocus
+                        value={reportDetails}
+                        onChange={(e) => setReportDetails(e.target.value)}
+                        placeholder={t("reportDetailsPlaceholder")}
+                        rows={3}
+                        maxLength={500}
+                        className="w-full rounded-2xl border border-[#EBEBF0] bg-white px-4 py-2.5 text-[13px] text-[#1A1A2E] outline-none focus:border-[#000000] resize-none leading-relaxed"
+                      />
+                    </div>
                   )}
                   <button
                     onClick={handleSubmitReport}

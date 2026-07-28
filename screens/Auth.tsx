@@ -130,12 +130,6 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
     setMajor("")
   }
 
-  const fillTestCredentials = () => {
-    setError("")
-    setEmail("student1@usc.edu")
-    setPassword("UserUSC2026!")
-  }
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#F8F8FA] px-6">
       <div className="w-full max-w-[390px] flex flex-col items-center gap-10 animate-fadeIn">
@@ -258,22 +252,6 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
                   className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
                 />
               </div>
-            )}
-
-            {/* Quick test login */}
-            {!isRegistering && (
-              <button
-                type="button"
-                onClick={fillTestCredentials}
-                className="flex items-center justify-between rounded-2xl border border-[#fbbf24]/30 bg-[#fbbf24]/10 px-4 py-3 text-left transition-colors duration-300 hover:bg-[#fbbf24]/20"
-              >
-                <span className="text-xs font-semibold text-[#1A1A2E]">
-                  {t("useTestAccount")}
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#d97706]">
-                  {t("fill")}
-                </span>
-              </button>
             )}
 
             {/* Email */}

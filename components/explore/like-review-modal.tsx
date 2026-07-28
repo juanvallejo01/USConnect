@@ -1,15 +1,16 @@
 "use client"
 
-import Image from "next/image"
 import { Heart, X, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useThemedAvatarSrc } from "@/components/layout/profile-avatar-image"
+import { PhotoGallery } from "@/components/explore/photo-gallery"
+import { getDisplayPhotos } from "@/lib/photos"
 
 interface LikeReviewUser {
   id: string
   name: string
   major: string
   photoUrl?: string | null
+  photos?: string[] | null
 }
 
 /**
@@ -31,14 +32,17 @@ export function LikeReviewModal({
   isSubmitting: boolean
 }) {
   const t = useTranslations("likeReview")
-  const avatarSrc = useThemedAvatarSrc(user.photoUrl)
 
   return (
     <div className="fixed inset-0 z-50 bg-black animate-fadeIn" onClick={onClose}>
       <div className="relative h-full w-full" onClick={(e) => e.stopPropagation()}>
-        <Image src={avatarSrc} alt={user.name} fill className="object-cover" priority />
+        <PhotoGallery
+          photos={getDisplayPhotos(user.photoUrl, user.photos)}
+          alt={user.name}
+          className="h-full w-full"
+        />
 
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/90 pointer-events-none" />
 
         <button
           onClick={onClose}
