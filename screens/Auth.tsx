@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Eye, EyeOff, AlertCircle } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/context/auth-context"
+import { authApi } from "@/lib/api-client"
 import { GradientButton } from "@/components/layout/gradient-button"
 import { Logo } from "@/components/layout/logo"
 import { FACULTIES, FACULTY_NAMES } from "@/utils/faculties"
@@ -24,9 +25,8 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
   const [major, setMajor] = useState("")
   const [showPassword, setShowPassword] = useState(false)
 
-  // Paso 2FA: tras validar credenciales, se pide el código de 6 dígitos
-  // enviado por correo antes de abrir la sesión.
-  const [step, setStep] = useState<"credentials" | "otp">("credentials")
+  // Paso 2FA y recuperación de contraseña
+  const [step, setStep] = useState<"credentials" | "otp" | "forgot" | "reset">("credentials")
   const [otpEmail, setOtpEmail] = useState("")
   const [otpCode, setOtpCode] = useState("")
   const [otpMessage, setOtpMessage] = useState("")
@@ -117,6 +117,48 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
     setStep("credentials")
     setOtpCode("")
     setError("")
+    setOtpMessage("")
+  }
+
+  const handleForgotPassword = async () => {
+    setError("")
+    if (!email.trim() || !email.includes("@")) { setError(t("errors.validEmailRequired") || "Correo inválido"); return }
+    setIsLoading(true)
+    try {
+      const res = await authApi.forgotPassword({ email: email.trim().toLowerCase() })
+      setOtpEmail(email.trim().toLowerCase())
+      setOtpMessage(res.message || "Revisa tu correo para obtener el código.")
+      setStep("reset")
+    } catch (err: any) {
+      console.error("Forgot password error:", err)
+      const message = err?.response?.data?.message || err?.message || "Ocurrió un error al solicitar el restablecimiento."
+      setError(message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleResetPassword = async () => {
+    setError("")
+    const code = otpCode.trim()
+    if (!/^\d{6}$/.test(code)) { setError(t("errors.otpInvalid") || "Código inválido"); return }
+    if (!password || password.length < 6) { setError(t("errors.passwordLength") || "La contraseña debe tener al menos 6 caracteres"); return }
+
+    setIsLoading(true)
+    try {
+      const res = await authApi.resetPassword({ email: otpEmail, code, newPassword: password })
+      setError("")
+      setOtpMessage(res.message || "Contraseña restablecida exitosamente. Ahora puedes iniciar sesión.")
+      setTimeout(() => {
+        handleBackToCredentials()
+      }, 3000)
+    } catch (err: any) {
+      console.error("Reset password error:", err)
+      const message = err?.response?.data?.message || err?.message || "Ocurrió un error al restablecer la contraseña."
+      setError(message)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const toggleMode = () => {
@@ -144,11 +186,15 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
           </div>
           <div className="flex flex-col items-center gap-2">
             <h1 className="text-[26px] font-bold tracking-tight text-[#1A1A2E]">
-              {step === "otp" ? t("otp.title") : isRegistering ? t("joinTitle") : t("welcomeBackTitle")}
+              {step === "otp" ? t("otp.title") 
+               : step === "forgot" ? "Recuperar contraseña"
+               : step === "reset" ? "Restablecer contraseña"
+               : isRegistering ? t("joinTitle") : t("welcomeBackTitle")}
             </h1>
             <p className="text-sm text-[#8E8E93] text-center">
-              {step === "otp"
+              {step === "otp" || step === "reset"
                 ? (otpMessage || t("otp.subtitleFallback", { email: otpEmail }))
+                : step === "forgot" ? "Ingresa tu correo para recibir un código de recuperación."
                 : isRegistering ? t("joinSubtitle") : t("welcomeBackSubtitle")}
             </p>
           </div>
@@ -215,6 +261,104 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
                     className="font-semibold text-[#8E8E93] transition-colors hover:text-[#1A1A2E]"
                   >
                     {t("otp.back")}
+                  </button>
+                </div>
+              </>
+            ) : step === "reset" ? (
+              <>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="resetCode" className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider pl-1">
+                    Código de recuperación
+                  </label>
+                  <input
+                    id="resetCode"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    placeholder="000000"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    autoFocus
+                    className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-center text-2xl font-bold tracking-[0.4em] text-[#1A1A2E] placeholder:text-[#C7C7CC] placeholder:tracking-[0.4em] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="newPassword" className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider pl-1">
+                    Nueva contraseña
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="newPassword"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Nueva contraseña"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") handleResetPassword() }}
+                      className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 pr-12 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#C7C7CC] hover:text-[#8E8E93] transition-colors duration-300"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+                <GradientButton
+                  fullWidth
+                  size="lg"
+                  onClick={handleResetPassword}
+                  className="mt-1 !from-[#fbbf24] !to-[#f59e0b] !text-[#0A0A0C]"
+                  disabled={isLoading}
+                >
+                  {isLoading ? t("loading") : "Restablecer contraseña"}
+                </GradientButton>
+                <div className="flex items-center justify-center gap-4 text-sm mt-2">
+                  <button
+                    type="button"
+                    onClick={handleBackToCredentials}
+                    disabled={isLoading}
+                    className="font-semibold text-[#8E8E93] transition-colors hover:text-[#1A1A2E]"
+                  >
+                    Volver a iniciar sesión
+                  </button>
+                </div>
+              </>
+            ) : step === "forgot" ? (
+              <>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="forgotEmail" className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider pl-1">
+                    {t("email")}
+                  </label>
+                  <input
+                    id="forgotEmail"
+                    type="email"
+                    placeholder={t("emailPlaceholder")}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") handleForgotPassword() }}
+                    className="w-full rounded-2xl border border-[#EBEBF0] bg-[#F8F8FA] px-5 py-3.5 text-sm text-[#1A1A2E] placeholder:text-[#C7C7CC] outline-none transition-all duration-300 focus:border-[#fbbf24] focus:ring-4 focus:ring-[#fbbf24]/15 focus:bg-white"
+                  />
+                </div>
+                <GradientButton
+                  fullWidth
+                  size="lg"
+                  onClick={handleForgotPassword}
+                  className="mt-1 !from-[#fbbf24] !to-[#f59e0b] !text-[#0A0A0C]"
+                  disabled={isLoading}
+                >
+                  {isLoading ? t("loading") : "Enviar código de recuperación"}
+                </GradientButton>
+                <div className="flex items-center justify-center gap-4 text-sm mt-2">
+                  <button
+                    type="button"
+                    onClick={handleBackToCredentials}
+                    disabled={isLoading}
+                    className="font-semibold text-[#8E8E93] transition-colors hover:text-[#1A1A2E]"
+                  >
+                    Volver a iniciar sesión
                   </button>
                 </div>
               </>
@@ -293,6 +437,21 @@ export function AuthPage({ initialMode = "login" }: { initialMode?: "login" | "r
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              
+              {!isRegistering && (
+                <div className="flex justify-end mt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep("forgot");
+                      setError("");
+                    }}
+                    className="text-xs font-medium text-[#8E8E93] hover:text-[#fbbf24] transition-colors duration-300"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Facultad */}

@@ -200,13 +200,21 @@ export const authApi = {
       | { requiresTwoFactor: true; email: string; message: string };
   },
 
-  // Paso 2: valida el código OTP de 6 dígitos. Solo aquí se emiten y
-  // guardan los tokens de sesión.
   verifyOtp: async (data: { email: string; code: string }) => {
     const response = await api.post(ENDPOINTS.verifyOtp, data);
     const { user, accessToken, refreshToken } = response.data;
     setTokens(accessToken, refreshToken);
     return { user, accessToken, refreshToken };
+  },
+
+  forgotPassword: async (data: { email: string }) => {
+    const response = await api.post(ENDPOINTS.forgotPassword, data);
+    return response.data;
+  },
+
+  resetPassword: async (data: { email: string; code: string; newPassword: string }) => {
+    const response = await api.post(ENDPOINTS.resetPassword, data);
+    return response.data;
   },
 
   logout: async () => {
